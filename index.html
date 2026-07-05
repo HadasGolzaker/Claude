@@ -240,6 +240,7 @@ const I18N = {
     writing:['קוראת את מה שסיפרת...','טובלת את זה בקול שלך...','מחדדת את הפתיחה...','עוד שנייה...'],
     result_h:'הפוסט שלך',
     copy:'העתקת הפוסט', copied:'✓ הועתק',
+    li_open:'📤 העתק ופתח לינקדאין', li_toast:'✓ הועתק - הדביקי בלינקדאין',
     alt_hooks:'פתיחות חלופיות (אם ההוק לא יושב)',
     refine_post_label:'רוצה לשנות משהו?',
     refine_post_ph:'למשל: קצרי בחצי, תורידי את האימוג׳ים, תסיימי בשאלה',
@@ -299,6 +300,7 @@ const I18N = {
     writing:['Reading what you told me...','Dipping it in your voice...','Sharpening the hook...','One more second...'],
     result_h:'Your post',
     copy:'Copy post', copied:'✓ Copied',
+    li_open:'📤 Copy & open LinkedIn', li_toast:'✓ Copied - paste it in LinkedIn',
     alt_hooks:'Alternative hooks (if the opener doesn\'t sit right)',
     refine_post_label:'Want to change something?',
     refine_post_ph:'e.g. cut it in half, drop the emojis, end with a question',
@@ -1025,7 +1027,10 @@ function resultHTML(){
   return `<div class="step active">
     <div class="eyebrow">${t.result_h}</div>
     <div style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:22px;white-space:pre-wrap;font-size:1.02rem">${escapeHtml(p.post)}</div>
-    <div style="margin-top:12px"><button class="btn btn-accent" id="copy-btn" onclick="copyPost()">${t.copy}</button></div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-accent" id="copy-btn" onclick="copyPost()">${t.copy}</button>
+      <button class="btn btn-primary" id="li-open-btn" onclick="openLinkedIn()">${t.li_open}</button>
+    </div>
     ${hooks?`<div class="section-h">${t.alt_hooks}</div>${hooks}`:''}
     <div class="section-h">${t.refine_post_label}</div>
     <textarea id="post-refine" style="min-height:80px" placeholder="${t.refine_post_ph}"></textarea>
@@ -1042,6 +1047,17 @@ function copyPost(){
     const b=document.getElementById('copy-btn');
     if(b){b.textContent=T().copied; setTimeout(()=>{if(b)b.textContent=T().copy;},2000);}
   });
+}
+
+/* copy the post, then open LinkedIn's composer in a new tab to paste */
+function openLinkedIn(){
+  if(!currentPost) return;
+  const finish=()=>{
+    const b=document.getElementById('li-open-btn');
+    if(b){b.textContent=T().li_toast; setTimeout(()=>{if(b)b.textContent=T().li_open;},2500);}
+    window.open('https://www.linkedin.com/feed/?shareActive=true','_blank','noopener');
+  };
+  navigator.clipboard.writeText(currentPost.post).then(finish, finish);
 }
 
 async function savePostHistory(){

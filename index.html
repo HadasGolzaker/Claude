@@ -177,13 +177,15 @@ const LAYERS = [
   {id:'ennea',   he:'אניגרמה',        en:'Enneagram',        slots:1},
   {id:'cog',     he:'קוגניציה',       en:'Cognition',        slots:2},
   {id:'dna',     he:'DNA כתיבה',      en:'Writing DNA',      slots:4},
+  {id:'local',   he:'לוקאליזציה',     en:'Localization',     slots:2},
+  {id:'story',   he:'סיפוריות',       en:'Storytelling',     slots:2},
 ];
 
 /* which layers each question feeds (for the live sidebar) */
 const FEEDS = {
-  q1:['big5','motives','dna'], q2:['ennea'], q3:['motives','motives'],
-  q4:['big5'], q5:['big5'], q6:['dna','dna','cog'], q7:['big5'],
-  q8:['big5'], q9:['cog','motives'], q10:['dna','big5']
+  q1:['big5','motives','dna','story'], q2:['ennea'], q3:['motives','motives'],
+  q4:['big5'], q5:['big5'], q6:['dna','dna','cog','local','story'], q7:['big5'],
+  q8:['big5'], q9:['cog','motives'], q10:['dna','big5','local']
 };
 
 const I18N = {
@@ -212,6 +214,9 @@ const I18N = {
     retry:'נסי שוב',
     big5_h:'חמשת הממדים', motives_h:'מה מניע אותך', ennea_h:'טיפוס אניגרמה',
     cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלך', gaps_h:'⚡ פערים ששווה לבדוק',
+    local_h:'לוקאליזציה - שפה ותרבות', story_h:'סיפוריות',
+    dos_h:'✓ כן - כללי הכתיבה שלך', donts_h:'✗ לא - מה להימנע ממנו',
+    story_struct:'מבנה', story_moves:'מהלכים אופייניים', story_templates:'תבניות סיפור',
     ev:'על סמך',
     posts_label:'3-5 פוסטים שכתבת בעצמך', posts_small:'הדביקי אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
     posts_ph:'הדביקי כאן פוסטים אמיתיים שלך מלינקדאין...',
@@ -227,6 +232,11 @@ const I18N = {
     link_label:'לינק רלוונטי', link_small:'אופציונלי. אקרא אותו ואשלב מהתוכן.',
     img_label:'תמונות לפוסט', img_small:'אופציונלי.',
     gen_post:'כתבי לי את הפוסט',
+    ideas_btn:'💡 אין לי על מה לכתוב - תני לי רעיונות',
+    ideas_h:'רעיונות לפוסט - בחרי אחד וזה יכנס למעלה',
+    ideas_loading:['סורקת מה קורה היום...','מצליבה מול הפרופיל שלך...','מרכיבה רעיונות בקול שלך...'],
+    ideas_cats:{news:'📰 מהחדשות',professional:'💼 מקצועי',personal:'🌱 אישי',hobby:'🎨 תחביבים'},
+    ideas_use:'כתבי על זה ←', ideas_err:'לא הצלחתי להביא רעיונות. נסי שוב.',
     writing:['קוראת את מה שסיפרת...','טובלת את זה בקול שלך...','מחדדת את הפתיחה...','עוד שנייה...'],
     result_h:'הפוסט שלך',
     copy:'העתקת הפוסט', copied:'✓ הועתק',
@@ -263,6 +273,9 @@ const I18N = {
     retry:'Try again',
     big5_h:'The five dimensions', motives_h:'What drives you', ennea_h:'Enneagram type',
     cog_h:'Thinking style', dna_h:'Your writing DNA', gaps_h:'⚡ Gaps worth checking',
+    local_h:'Localization - language & culture', story_h:'Storytelling',
+    dos_h:'✓ Do - your writing rules', donts_h:'✗ Don\'t - what to avoid',
+    story_struct:'Structure', story_moves:'Signature moves', story_templates:'Story templates',
     ev:'based on',
     posts_label:'3-5 posts you wrote yourself', posts_small:'Paste them here, separated by an empty line. This is the strongest style calibration.',
     posts_ph:'Paste real LinkedIn posts of yours here...',
@@ -278,6 +291,11 @@ const I18N = {
     link_label:'Relevant link', link_small:'Optional. I\'ll read it and weave it in.',
     img_label:'Images for the post', img_small:'Optional.',
     gen_post:'Write my post',
+    ideas_btn:'💡 Nothing to write about - give me ideas',
+    ideas_h:'Post ideas - pick one and it drops into the box above',
+    ideas_loading:['Scanning what\'s happening today...','Cross-checking with your profile...','Shaping ideas in your voice...'],
+    ideas_cats:{news:'📰 In the news',professional:'💼 Professional',personal:'🌱 Personal',hobby:'🎨 Hobbies'},
+    ideas_use:'Write about this →', ideas_err:'Couldn\'t fetch ideas. Try again.',
     writing:['Reading what you told me...','Dipping it in your voice...','Sharpening the hook...','One more second...'],
     result_h:'Your post',
     copy:'Copy post', copied:'✓ Copied',
@@ -574,7 +592,20 @@ COGNITIVE ORIENTATION (mainly from Q6+Q9+posts):
 
 WRITING DNA (from Q1, Q6, and pasted posts — the pasted posts are the STRONGEST signal, weight them most):
 - primary language (he/en/mixed), average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature phrases (quote 2-3 verbatim from their text), first/second person habits, how they end posts (question? statement? CTA?).
-- Also produce 3 DO rules and 3 DON'T rules for ghostwriting this person.
+- Also produce 5 DO rules and 5 DON'T rules for ghostwriting this person. Make them specific and actionable (not generic advice) — grounded in the actual evidence from their answers and posts.
+
+LOCALIZATION — language & culture fit (from writing language, phrasing, cultural references in Q1/Q6/posts/About):
+- audience: who they write for and the market/culture they operate in.
+- language_mix: primary language and how they blend he/en (loanwords, code-switching, English terms inside Hebrew, etc.).
+- cultural_markers: local references, idioms, humor style, sensibilities that fit their audience.
+- formality: how formal/informal and how they address the reader (ata/at, plural, first-name energy).
+- note: one short line on how to keep a post culturally native to them.
+
+STORYTELLING — how they narrate (from Q1, Q6, Q9 and posts):
+- structure: how they build a post (e.g. hook → tension → turn → lesson → close), described from their real patterns.
+- signature_moves: 2-3 narrative devices they actually use (personal anecdote, dialogue, a confession, a number that lands, a reversal).
+- templates: 2-3 concrete, reusable story templates that fit this person, phrased as a short skeleton they could reuse.
+- note: one short line on what makes their storytelling land.
 
 If profile pictures are provided, use profile-image research: positive emotion + single frontal face → conscientiousness/agreeableness/extraversion signals; aesthetic/unconventional composition → openness; no face/low emotion → openness or neuroticism direction. Treat as weak supporting evidence only.
 
@@ -587,7 +618,9 @@ Respond with ONLY valid JSON, no markdown fences, no preamble. Be concise — sh
  "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short"} x3],
  "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
  "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
- "writing_dna": {"language":"he|en|mixed","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
+ "writing_dna": {"language":"he|en|mixed","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","...","...","..."],"dont":["...","...","...","...","..."]},
+ "localization": {"audience":"short","language_mix":"short","cultural_markers":"short","formality":"short","note":"short"},
+ "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
  "gaps": ["...( empty array if none )"]
 }
 All free-text values in {LANG}.`;
@@ -707,6 +740,16 @@ function profileHTML(){
   const sigs=(dna.signature_phrases||[]).map(s=>`<span class="chip">"${s}"</span>`).join('');
   const dos=(dna.do||[]).map(x=>`<li><b>✓</b> ${x}</li>`).join('');
   const donts=(dna.dont||[]).map(x=>`<li><b>✗</b> ${x}</li>`).join('');
+
+  const loc=p.localization||{};
+  const locRows=[
+    ['🌍',loc.audience],['🗣',loc.language_mix],['🎭',loc.cultural_markers],['🎩',loc.formality]
+  ].filter(r=>r[1]).map(r=>`<li>${r[0]} ${r[1]}</li>`).join('');
+
+  const st=p.storytelling||{};
+  const stMoves=(st.signature_moves||[]).map(s=>`<span class="chip">${s}</span>`).join('');
+  const stTemplates=(st.templates||[]).map(s=>`<li>${s}</li>`).join('');
+
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
   return `<div class="step active">
@@ -726,7 +769,21 @@ function profileHTML(){
     <div class="section-h">${t.dna_h}</div>
     <ul class="dna-list">${dnaRows}</ul>
     <div style="margin-top:10px">${sigs}</div>
-    <ul class="dna-list" style="margin-top:12px">${dos}${donts}</ul>
+
+    <div class="section-h">${t.dos_h}</div>
+    <ul class="dna-list">${dos}</ul>
+    <div class="section-h">${t.donts_h}</div>
+    <ul class="dna-list">${donts}</ul>
+
+    <div class="section-h">${t.local_h}</div>
+    <ul class="dna-list">${locRows}</ul>
+    ${loc.note?`<div class="char-note">${loc.note}</div>`:''}
+
+    <div class="section-h">${t.story_h}</div>
+    ${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}
+    ${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}
+    ${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}
+    ${st.note?`<div class="char-note">${st.note}</div>`:''}
     ${gaps}
 
     ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:var(--accent);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
@@ -783,7 +840,11 @@ function composerHTML(){
     <h2 class="q-title">${t.composer_h}</h2>
     <p class="q-sub">${t.composer_sub}</p>
     <textarea id="post-input" style="min-height:180px" placeholder="${t.input_ph}">${escapeHtml(postInput)}</textarea>
-    <div style="margin-top:10px"><button class="btn btn-ghost" id="rec-btn">${recog?t.rec_stop:t.rec_start}</button></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost" id="rec-btn">${recog?t.rec_stop:t.rec_start}</button>
+      <button class="btn btn-ghost" id="ideas-btn">${t.ideas_btn}</button>
+    </div>
+    <div id="ideas-box"></div>
 
     <label class="field-label">${t.link_label} <small>· ${t.link_small}</small></label>
     <input type="text" id="post-link" style="min-height:auto" placeholder="https://..." value="${escapeHtml(postLink)}">
@@ -804,6 +865,8 @@ function wireComposer(){
   const ta=document.getElementById('post-input');
   ta.addEventListener('input',()=>{postInput=ta.value;
     const b=document.getElementById('gen-btn'); if(b) b.disabled=postInput.trim().length<20;});
+  const ib=document.getElementById('ideas-btn');
+  if(ib) ib.addEventListener('click',brainstormTopics);
   const lk=document.getElementById('post-link');
   lk.addEventListener('input',()=>postLink=lk.value);
   document.getElementById('post-img').addEventListener('change',async e=>{
@@ -844,6 +907,65 @@ function wireComposer(){
   });
 }
 
+/* ---------- topic brainstormer ---------- */
+async function brainstormTopics(){
+  const t=T();
+  const box=document.getElementById('ideas-box');
+  if(!box) return;
+  let i=0;
+  box.innerHTML=`<div class="loading" style="padding:24px 0"><div class="pulse" style="width:40px;height:40px;border-width:3px"></div><p id="ideas-msg">${t.ideas_loading[0]}</p></div>`;
+  const timer=setInterval(()=>{i=(i+1)%t.ideas_loading.length;const el=document.getElementById('ideas-msg');if(el)el.textContent=t.ideas_loading[i];},2000);
+  const today=new Date().toISOString().slice(0,10);
+  const text=`You help this person decide WHAT to post on LinkedIn when they have nothing specific in mind. Their full profile (personality, motives, writing DNA, localization, storytelling):
+${JSON.stringify(profile)}
+
+Today is ${today}. Suggest 8 concrete post ideas tailored to THIS person, spread across these categories:
+- "news": something genuinely happening now that fits their field/interests — use web search to ground it in a real, recent item.
+- "professional": an insight, lesson, or take from their professional world.
+- "personal": something from personal life / values / a small human moment they could share.
+- "hobby": tied to interests or hobbies visible in their profile.
+Write each idea in ${lang==='he'?'Hebrew':'English'}, matching their voice and audience (localization). "title" = a short scroll-stopping idea; "angle" = one line on what the post would actually say. Make them specific to this person, not generic.
+
+Respond with ONLY valid JSON, no fences: {"ideas":[{"category":"news|professional|personal|hobby","title":"...","angle":"..."}]}`;
+  try{
+    const res=await callClaude([{type:'text',text}], true);
+    clearInterval(timer);
+    renderIdeas(res.ideas||[]);
+  }catch(err){
+    clearInterval(timer);
+    box.innerHTML=`<div class="gap-note">${t.ideas_err}<br><small style="opacity:.6">${escapeHtml((err&&err.message)||'')}</small></div>`;
+  }
+}
+
+function renderIdeas(ideas){
+  const t=T();
+  const box=document.getElementById('ideas-box');
+  if(!box) return;
+  if(!ideas.length){ box.innerHTML=`<div class="gap-note">${t.ideas_err}</div>`; return; }
+  const cats=t.ideas_cats;
+  const cards=ideas.map((idea,idx)=>{
+    const cat=cats[idea.category]||'';
+    return `<div class="opt" style="cursor:default">
+      <div style="font-size:.78rem;font-weight:700;color:var(--accent);margin-bottom:4px">${cat}</div>
+      <div style="font-weight:700;margin-bottom:4px">${escapeHtml(idea.title||'')}</div>
+      <div class="char-note" style="margin-bottom:10px">${escapeHtml(idea.angle||'')}</div>
+      <button class="btn btn-accent" style="padding:7px 16px;font-size:.85rem" data-idea="${idx}">${t.ideas_use}</button>
+    </div>`;
+  }).join('');
+  box.innerHTML=`<div class="section-h">${t.ideas_h}</div>${cards}`;
+  box.querySelectorAll('button[data-idea]').forEach(b=>b.addEventListener('click',()=>useIdea(ideas[+b.dataset.idea])));
+}
+
+function useIdea(idea){
+  const seed=(idea.title||'')+(idea.angle?' — '+idea.angle:'');
+  postInput=seed;
+  const ta=document.getElementById('post-input');
+  if(ta){ ta.value=seed; ta.focus(); }
+  const g=document.getElementById('gen-btn'); if(g) g.disabled=postInput.trim().length<20;
+  const box=document.getElementById('ideas-box'); if(box) box.innerHTML='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function buildPostContent(refineNote){
   const dnaLang=(profile&&profile.writing_dna&&profile.writing_dna.language)||'mixed';
   let text=`You are ghostwriting ONE LinkedIn post AS this person. Their full profile (personality + writing DNA):
@@ -855,6 +977,8 @@ RULES:
 - First line = a scroll-stopping hook drawn from the most specific, human detail in the material. No clickbait clichés.
 - Short paragraphs with breathing room. One idea per post. Specificity beats generality.
 - Match content angle to their profile: systemizer → process/insight framing; empathizer → people/story framing; their top motives shape what the post celebrates.
+- LOCALIZATION: honor the "localization" fields — keep their language_mix, cultural_markers, formality and audience fit so the post reads natively to them and their market. Never translate their voice into neutral corporate English.
+- STORYTELLING: build the post using their "storytelling.structure" and lean on ONE of their "storytelling.templates" where it fits; use their signature_moves naturally (don't force all of them).
 - Sound human. Forbidden: corporate buzzwords, "thrilled/excited to share", "game-changer", generic AI cadence. No em dashes unless their DNA shows them.
 - End the way THEY end posts (per writing_dna.endings).
 

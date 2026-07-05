@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voiceprint · טביעת קול</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FBF9F4;
+  --ink:#191A1E;
+  --ink-soft:#4A4B52;
+  --accent:#0E5B47;      /* deep ink-green */
+  --accent-soft:#E4F0EA;
+  --amber:#E8A83C;
+  --line:#E3E0D6;
+  --card:#FFFFFF;
+  --danger:#B23A3A;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Assistant',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.55;
+  font-size:17px;
+}
+.serif{font-family:'Frank Ruhl Libre',serif}
+
+/* ---------- layout ---------- */
+.app{max-width:1060px;margin:0 auto;padding:28px 20px 80px;display:grid;grid-template-columns:1fr 230px;gap:36px}
+[dir="ltr"] .app{grid-template-columns:1fr 230px}
+main{min-width:0}
+@media(max-width:820px){
+  .app{grid-template-columns:1fr;gap:18px}
+  aside{order:-1}
+}
+
+/* ---------- header ---------- */
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.logo{display:flex;align-items:baseline;gap:10px}
+.logo h1{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.6rem;letter-spacing:-.01em}
+.logo span{color:var(--accent);font-weight:700;font-size:.85rem}
+.lang-toggle{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.lang-toggle button{border:0;background:transparent;padding:6px 16px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+.lang-toggle button.active{background:var(--ink);color:var(--paper)}
+
+/* ---------- layers sidebar (signature) ---------- */
+aside{position:sticky;top:24px;align-self:start}
+.layers{border:1.5px solid var(--line);border-radius:var(--radius);background:var(--card);padding:18px}
+.layers h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:14px}
+.layer{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.layer:last-child{border-bottom:0}
+.layer .dots{display:flex;gap:4px;margin-inline-start:auto}
+.layer .dot{width:8px;height:8px;border-radius:50%;background:var(--line);transition:background .4s,transform .4s}
+.layer .dot.on{background:var(--accent);transform:scale(1.15)}
+.layer .name{font-weight:600;font-size:.9rem}
+@media(max-width:820px){
+  aside{position:static}
+  .layers{display:flex;gap:12px;overflow-x:auto;padding:12px}
+  .layers h3{display:none}
+  .layer{flex-direction:column;border-bottom:0;min-width:86px;gap:5px;text-align:center}
+  .layer .dots{margin:0}
+  .layer .name{font-size:.75rem}
+}
+
+/* ---------- cards / steps ---------- */
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:34px 36px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+@media(max-width:600px){.card{padding:24px 20px}}
+.step{display:none;animation:rise .45s ease}
+.step.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.step{animation:none}}
+
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.q-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.55rem;line-height:1.25;margin-bottom:8px}
+.q-sub{color:var(--ink-soft);margin-bottom:22px;font-size:.98rem}
+.lang-hint{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;margin-bottom:18px}
+
+/* options */
+.opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+.opt:hover{border-color:var(--accent)}
+.opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+.opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+
+textarea,input[type=text]{
+  width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;
+  padding:14px 16px;background:var(--paper);resize:vertical;min-height:150px;color:var(--ink)
+}
+textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.char-note{font-size:.82rem;color:var(--ink-soft);margin-top:6px}
+
+/* uploads */
+.upload-box{border:2px dashed var(--line);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:8px}
+.upload-box:hover{border-color:var(--accent)}
+.upload-box input{display:none}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1.5px solid var(--line)}
+.field-label{font-weight:700;margin:22px 0 8px;display:block}
+.field-label small{font-weight:400;color:var(--ink-soft)}
+
+/* nav */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px}
+.btn{border:0;font:inherit;font-weight:700;border-radius:999px;padding:12px 28px;cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink);color:var(--paper)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line)}
+.btn-accent{background:var(--accent);color:#fff}
+.progress-label{font-size:.85rem;color:var(--ink-soft)}
+
+/* intro */
+.intro h2{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:2.3rem;line-height:1.15;margin-bottom:14px}
+.intro p{color:var(--ink-soft);max-width:56ch;margin-bottom:12px}
+.intro .start-row{margin-top:26px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+
+/* loading */
+.loading{text-align:center;padding:60px 20px}
+.pulse{width:64px;height:64px;margin:0 auto 22px;border-radius:50%;border:3px solid var(--accent-soft);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{color:var(--ink-soft)}
+
+/* profile view */
+.profile-summary{background:var(--accent-soft);border-radius:10px;padding:20px 22px;margin-bottom:24px;font-size:1.05rem}
+.trait-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.trait-name{width:170px;font-weight:600;font-size:.92rem;flex-shrink:0}
+.trait-bar{flex:1;height:10px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.trait-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .8s ease}
+.trait-score{width:34px;text-align:center;font-weight:700;font-size:.9rem}
+.section-h{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:1.15rem;margin:26px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
+.chip{display:inline-block;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:5px 14px;margin:0 0 8px;margin-inline-end:8px;font-size:.88rem;font-weight:600}
+.chip.hot{border-color:var(--amber);background:#FBF3E2}
+.dna-list{list-style:none}
+.dna-list li{padding:8px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
+.dna-list li:last-child{border:0}
+.dna-list b{color:var(--accent)}
+.gap-note{background:#FBF3E2;border:1.5px solid var(--amber);border-radius:10px;padding:14px 16px;margin-top:18px;font-size:.92rem}
+.error-box{background:#FBE9E9;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.92rem}
+.approved-banner{background:var(--accent);color:#fff;border-radius:10px;padding:18px 20px;margin-top:20px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"><h1>Voiceprint</h1><span id="tagline">טביעת קול</span></div>
+    <div class="lang-toggle">
+      <button id="btn-he" class="active" onclick="setLang('he')">עברית</button>
+      <button id="btn-en" onclick="setLang('en')">English</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="card" id="main-card"></div>
+  </main>
+
+  <aside>
+    <div class="layers" id="layers-panel"></div>
+  </aside>
+</div>
+
+<script>
+/* ---- auth bootstrap: the app waits on this until the user is signed in ---- */
+window.__authReady = new Promise(function(r){ window.__resolveAuth = r; });
+</script>
+
+<script>
+/* =========================================================
+   VOICEPRINT — phase 1+2: questionnaire + profile engine
+   ========================================================= */
+
+const LAYERS = [
+  {id:'big5',    he:'Big 5',          en:'Big 5',            slots:5},
+  {id:'motives', he:'מניעים וערכים',  en:'Motives & values', slots:3},
+  {id:'ennea',   he:'אניגרמה',        en:'Enneagram',        slots:1},
+  {id:'cog',     he:'קוגניציה',       en:'Cognition',        slots:2},
+  {id:'dna',     he:'DNA כתיבה',      en:'Writing DNA',      slots:4},
+];
+
+/* which layers each question feeds (for the live sidebar) */
+const FEEDS = {
+  q1:['big5','motives','dna'], q2:['ennea'], q3:['motives','motives'],
+  q4:['big5'], q5:['big5'], q6:['dna','dna','cog'], q7:['big5'],
+  q8:['big5'], q9:['cog','motives'], q10:['dna','big5']
+};
+
+const I18N = {
+  he:{
+    tagline:'טביעת קול', back:'חזרה', next:'המשך', of:'מתוך',
+    intro_h:'לפני שנכתוב פוסט אחד - בואי נלמד איך את נשמעת.',
+    intro_p1:'עשר שאלות. חלקן קצרות, חלקן פתוחות. מהתשובות ייבנה פרופיל בחמש שכבות: אישיות (Big 5), מניעים וערכים, טיפוס אניגרמה, סגנון חשיבה, וה-DNA של הכתיבה שלך.',
+    intro_p2:'טיפ חשוב: על שאלות הכתיבה החופשית, כתבי בשפה שבה את מפרסמת בלינקדאין. שאר השאלות - באיזו שפה שנוח לך.',
+    intro_p3:'אין תשובות נכונות. ככל שתהיי יותר את - הפרופיל יהיה יותר מדויק.',
+    start:'מתחילים',
+    open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
+    write_lang_hint:'✍️ כתבי בשפה שבה את מפרסמת בלינקדאין',
+    rank_note:'בחרי 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
+    generate:'בנה את הפרופיל שלי',
+    analyzing:['קוראת את התשובות שלך...','מזהה דפוסי שפה...','מצליבה מניעים מול תכונות...','מרכיבה את טביעת הקול...'],
+    profile_h:'טביעת הקול שלך',
+    profile_sub:'ככה אני קוראת אותך. עברי על זה - ואם משהו לא מדויק, תקני אותי למטה.',
+    refine_label:'משהו לא מדויק? כתבי מה לתקן:',
+    refine_ph:'למשל: אני הרבה פחות זהירה ממה שכתבת, ואני אף פעם לא משתמשת באימוג׳ים',
+    refine_btn:'עדכני את הפרופיל',
+    approve_btn:'הפרופיל מדויק - אשרי ושמרי',
+    approved:'✓ הפרופיל נשמר. השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרי יהפוך לפוסט בקול שלך.',
+    saved_local:'הפרופיל נשמר בהצלחה.',
+    save_warn:'לא הצלחתי לשמור לאחסון קבוע - הפרופיל זמין בסשן הנוכחי בלבד.',
+    err_api:'משהו השתבש בניתוח. נסי שוב.',
+    retry:'נסי שוב',
+    big5_h:'חמשת הממדים', motives_h:'מה מניע אותך', ennea_h:'טיפוס אניגרמה',
+    cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלך', gaps_h:'⚡ פערים ששווה לבדוק',
+    ev:'על סמך',
+    posts_label:'3-5 פוסטים שכתבת בעצמך', posts_small:'הדביקי אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
+    posts_ph:'הדביקי כאן פוסטים אמיתיים שלך מלינקדאין...',
+    pic_label:'תמונת הפרופיל שלך', pic_small:'אופציונלי. מחקרים מראים שבחירת תמונת פרופיל מנבאת תכונות אישיות.',
+    pic_btn:'העלאת תמונה (אפשר גם צילומי מסך של פוסטים)',
+    about_label:'ה-About שלך מלינקדאין', about_small:'אופציונלי.',
+    about_ph:'הדביקי כאן...',
+    to_composer:'למסך כתיבת הפוסטים ←',
+    composer_h:'מה קרה היום?',
+    composer_sub:'ספרי חופשי - אירוע, שיחה, מחשבה, תסכול, ניצחון קטן. הקלדה או הקלטה. אני אדאג שזה יישמע כמוך.',
+    input_ph:'היום קרה משהו ש...',
+    rec_start:'🎙 הקלטה', rec_stop:'⏹ עצירה', rec_unsupported:'הקלטה עובדת רק בכרום',
+    link_label:'לינק רלוונטי', link_small:'אופציונלי. אקרא אותו ואשלב מהתוכן.',
+    img_label:'תמונות לפוסט', img_small:'אופציונלי.',
+    gen_post:'כתבי לי את הפוסט',
+    writing:['קוראת את מה שסיפרת...','טובלת את זה בקול שלך...','מחדדת את הפתיחה...','עוד שנייה...'],
+    result_h:'הפוסט שלך',
+    copy:'העתקת הפוסט', copied:'✓ הועתק',
+    alt_hooks:'פתיחות חלופיות (אם ההוק לא יושב)',
+    refine_post_label:'רוצה לשנות משהו?',
+    refine_post_ph:'למשל: קצרי בחצי, תורידי את האימוג׳ים, תסיימי בשאלה',
+    regen:'עדכני את הפוסט',
+    new_post:'+ פוסט חדש',
+    back_profile:'לפרופיל',
+    traits:{openness:'פתיחות לחוויה',conscientiousness:'מצפוניות',extraversion:'מוחצנות',agreeableness:'נעימות',neuroticism:'נוירוטיות'},
+  },
+  en:{
+    tagline:'your voice, profiled', back:'Back', next:'Next', of:'of',
+    intro_h:'Before we write a single post - let\'s learn how you sound.',
+    intro_p1:'Ten questions. Some quick, some open. From your answers we\'ll build a five-layer profile: personality (Big 5), motives & values, Enneagram type, thinking style, and your writing DNA.',
+    intro_p2:'Important tip: on the free-writing questions, write in the language you post in on LinkedIn. Everything else - whatever feels natural.',
+    intro_p3:'There are no right answers. The more you sound like yourself, the sharper the profile.',
+    start:'Let\'s begin',
+    open_note:'Free writing, unedited. At least a few sentences.',
+    write_lang_hint:'✍️ Write in the language you post in on LinkedIn',
+    rank_note:'Pick 3 in order of importance - click to select, click again to remove.',
+    generate:'Build my profile',
+    analyzing:['Reading your answers...','Detecting language patterns...','Cross-checking motives vs. traits...','Assembling your voiceprint...'],
+    profile_h:'Your Voiceprint',
+    profile_sub:'This is how I read you. Review it - if anything is off, correct me below.',
+    refine_label:'Something off? Tell me what to fix:',
+    refine_ph:'e.g. I\'m far less cautious than you wrote, and I never use emojis',
+    refine_btn:'Update the profile',
+    approve_btn:'It\'s accurate - approve & save',
+    approved:'✓ Profile saved. Next up: the post-writing screen - where anything you tell me becomes a post in your voice.',
+    saved_local:'Profile saved successfully.',
+    save_warn:'Couldn\'t reach persistent storage - profile is available for this session only.',
+    err_api:'Something went wrong during analysis. Try again.',
+    retry:'Try again',
+    big5_h:'The five dimensions', motives_h:'What drives you', ennea_h:'Enneagram type',
+    cog_h:'Thinking style', dna_h:'Your writing DNA', gaps_h:'⚡ Gaps worth checking',
+    ev:'based on',
+    posts_label:'3-5 posts you wrote yourself', posts_small:'Paste them here, separated by an empty line. This is the strongest style calibration.',
+    posts_ph:'Paste real LinkedIn posts of yours here...',
+    pic_label:'Your profile picture', pic_small:'Optional. Research shows profile-picture choice predicts personality traits.',
+    pic_btn:'Upload image (screenshots of posts work too)',
+    about_label:'Your LinkedIn About', about_small:'Optional.',
+    about_ph:'Paste here...',
+    to_composer:'To the post-writing screen →',
+    composer_h:'What happened today?',
+    composer_sub:'Tell it freely - an event, a conversation, a thought, a frustration, a small win. Type or record. I\'ll make it sound like you.',
+    input_ph:'Today something happened that...',
+    rec_start:'🎙 Record', rec_stop:'⏹ Stop', rec_unsupported:'Recording works in Chrome only',
+    link_label:'Relevant link', link_small:'Optional. I\'ll read it and weave it in.',
+    img_label:'Images for the post', img_small:'Optional.',
+    gen_post:'Write my post',
+    writing:['Reading what you told me...','Dipping it in your voice...','Sharpening the hook...','One more second...'],
+    result_h:'Your post',
+    copy:'Copy post', copied:'✓ Copied',
+    alt_hooks:'Alternative hooks (if the opener doesn\'t sit right)',
+    refine_post_label:'Want to change something?',
+    refine_post_ph:'e.g. cut it in half, drop the emojis, end with a question',
+    regen:'Update the post',
+    new_post:'+ New post',
+    back_profile:'Back to profile',
+    traits:{openness:'Openness',conscientiousness:'Conscientiousness',extraversion:'Extraversion',agreeableness:'Agreeableness',neuroticism:'Neuroticism'},
+  }
+};
+
+/* ---------- questions ---------- */
+const QUESTIONS = [
+ {id:'q1', type:'open', writeLang:true,
+  he:{ey:'שאלה 1 · חימום', t:'ספרי על רגע מהחודשים האחרונים שבו הרגשת בשיא שלך מקצועית.',
+      s:'מה קרה? מי היה שם? מה זה עשה לך? כתבי כמו שהיית מספרת לחבר.'},
+  en:{ey:'Question 1 · Warm-up', t:'Tell me about a recent moment when you felt at your professional best.',
+      s:'What happened? Who was there? What did it do to you? Write like you\'d tell a friend.'}},
+
+ {id:'q2', type:'single',
+  he:{ey:'שאלה 2 · תפיסת עולם', t:'איזה משפט הכי קרוב לאיך שאת רואה את העולם?', s:'בחרי אחד, גם אם כמה מדברים אליך.'},
+  en:{ey:'Question 2 · Worldview', t:'Which sentence is closest to how you see the world?', s:'Pick one, even if several resonate.'},
+  opts:[
+   {v:'e1', he:'טוב זה לא מספיק כשאפשר להגיע למצוין', en:'Good isn\'t enough when excellent is possible'},
+   {v:'e2', he:'אני מה שאני נותנת לאחרים', en:'I am what I give to others'},
+   {v:'e3', he:'אני התוצאות וההישגים שלי', en:'I am my results and achievements'},
+   {v:'e4', he:'עדיף אותנטית ושונה מאשר רגילה', en:'Better authentic and different than ordinary'},
+   {v:'e5', he:'ידע והבנה הם השריון שלי', en:'Knowledge and understanding are my armor'},
+   {v:'e6', he:'צפי לטוב, אבל תמיד תהיי מוכנה לגרוע', en:'Hope for the best, always prepare for the worst'},
+   {v:'e7', he:'החיים מלאים אפשרויות - חייבים לחוות הכל', en:'Life is full of possibilities - I must experience it all'},
+   {v:'e8', he:'או שאת מובילה, או שמובילים אותך', en:'Either you lead, or you are led'},
+   {v:'e9', he:'שלווה והרמוניה שוות יותר מכל ניצחון', en:'Peace and harmony are worth more than any victory'}]},
+
+ {id:'q3', type:'rank', max:3,
+  he:{ey:'שאלה 3 · מניעים', t:'מה הכי מניע אותך?', s:''},
+  en:{ey:'Question 3 · Motives', t:'What drives you most?', s:''},
+  opts:[
+   {v:'achievement', he:'להצליח ולהוכיח יכולת', en:'Achieving and proving ability'},
+   {v:'power',       he:'להוביל ולהשפיע על אחרים', en:'Leading and influencing others'},
+   {v:'recognition', he:'שיראו אותי ויעריכו את מה שאני עושה', en:'Being seen and appreciated'},
+   {v:'security',    he:'ודאות, סדר ויציבות', en:'Certainty, order and stability'},
+   {v:'belonging',   he:'חיבור, שייכות וקשרים חמים', en:'Connection, belonging, warm relationships'},
+   {v:'meaning',     he:'משמעות וערכים גדולים ממני', en:'Meaning and values bigger than me'},
+   {v:'thrill',      he:'ריגוש, אתגר וחוויות חדשות', en:'Thrill, challenge and new experiences'},
+   {v:'pleasure',    he:'ליהנות מהדרך - החיים הטובים', en:'Enjoying the ride - the good life'},
+   {v:'altruism',    he:'לעזור לאחרים להצליח', en:'Helping others succeed'},
+   {v:'material',    he:'ביטחון כלכלי ורמת חיים', en:'Financial security and lifestyle'}]},
+
+ {id:'q4', type:'single',
+  he:{ey:'שאלה 4 · תרחיש', t:'נחת עלייך פרויקט ענק עם דדליין לא הגיוני. מה קורה אצלך בראש קודם כל?', s:''},
+  en:{ey:'Question 4 · Scenario', t:'A huge project lands on you with an impossible deadline. What happens in your head first?', s:''},
+  opts:[
+   {v:'plan',     he:'פותחת מסמך ומפרקת הכל לשלבים ולוחות זמנים', en:'I open a doc and break everything into steps and timelines'},
+   {v:'flow',     he:'צוללת פנימה ומתחילה - הסדר יסתדר תוך כדי', en:'I dive in and start - order will emerge on the way'},
+   {v:'stress',   he:'הלב מתחיל לדפוק - צריכה רגע לעכל לפני שזזה', en:'My heart races - I need a moment to process before moving'},
+   {v:'recruit',  he:'ישר חושבת את מי לגייס ואיך לחלק את זה', en:'I immediately think who to recruit and how to split it'}]},
+
+ {id:'q5', type:'single',
+  he:{ey:'שאלה 5 · אנרגיה', t:'אחרי שבוע אינטנסיבי - מה באמת ממלא אותך מחדש?', s:''},
+  en:{ey:'Question 5 · Energy', t:'After an intense week - what actually recharges you?', s:''},
+  opts:[
+   {v:'people', he:'ערב טוב עם אנשים שאני אוהבת', en:'A good evening with people I love'},
+   {v:'alone',  he:'זמן לבד, בשקט, בלי אף אחד', en:'Time alone, quiet, nobody around'},
+   {v:'novel',  he:'משהו חדש שלא ניסיתי - מקום, חוויה, טעם', en:'Something new I haven\'t tried - a place, an experience, a taste'},
+   {v:'close',  he:'לסגור את כל הפינות הפתוחות ולהתחיל שבוע נקי', en:'Closing every open loop and starting the week clean'}]},
+
+ {id:'q6', type:'open', writeLang:true,
+  he:{ey:'שאלה 6 · דגימת כתיבה', t:'מישהו שאל אותך בלינקדאין: "מה הדבר הכי חשוב שלמדת בקריירה שלך?"',
+      s:'כתבי את התשובה בדיוק כמו שהיית מפרסמת אותה. זו השאלה הכי חשובה בשאלון.'},
+  en:{ey:'Question 6 · Writing sample', t:'Someone asked you on LinkedIn: "What\'s the most important thing you\'ve learned in your career?"',
+      s:'Write the answer exactly as you would publish it. This is the most important question here.'}},
+
+ {id:'q7', type:'single',
+  he:{ey:'שאלה 7 · חדש מול מוכר', t:'יצא כלי חדש שכולם מדברים עליו. את...', s:''},
+  en:{ey:'Question 7 · New vs. familiar', t:'A new tool comes out and everyone\'s talking about it. You...', s:''},
+  opts:[
+   {v:'first',  he:'קופצת ראשונה לנסות, עוד לפני שקראתי ביקורות', en:'Jump in first, before even reading reviews'},
+   {v:'curious',he:'סקרנית - קוראת, שואלת, ואז מנסה', en:'Curious - I read, ask around, then try'},
+   {v:'wait',   he:'מחכה שיוכיח את עצמו אצל אחרים', en:'Wait until it proves itself with others'},
+   {v:'stay',   he:'נשארת עם מה שעובד לי. אם זה לא שבור...', en:'Stick with what works for me. If it ain\'t broke...'}]},
+
+ {id:'q8', type:'single',
+  he:{ey:'שאלה 8 · ביקורת', t:'פרסמת פוסט, ומישהו כתב תגובה ביקורתית ומזלזלת. מה הכי קרוב למה שתעשי?', s:''},
+  en:{ey:'Question 8 · Criticism', t:'You published a post and someone left a dismissive, critical comment. What\'s closest to what you\'d do?', s:''},
+  opts:[
+   {v:'humor', he:'עונה בהומור ומפרקת את המתח', en:'Reply with humor and defuse it'},
+   {v:'facts', he:'עונה עניינית, עם נתונים ונימוקים', en:'Reply factually, with data and reasoning'},
+   {v:'ignore',he:'מוחקת/מתעלמת וממשיכה הלאה', en:'Delete/ignore and move on'},
+   {v:'sits',  he:'עונה בנימוס, אבל זה יושב לי בראש כל היום', en:'Reply politely, but it sits in my head all day'}]},
+
+ {id:'q9', type:'open',
+  he:{ey:'שאלה 9 · הקורא האידיאלי', t:'דמייני את האדם האחד שהכי היית רוצה שיקרא את הפוסטים שלך.',
+      s:'מי הוא? ומה היית רוצה שיקרה אצלו - שירגיש, יחשוב או יעשה - אחרי הקריאה?'},
+  en:{ey:'Question 9 · The ideal reader', t:'Picture the one person you\'d most want reading your posts.',
+      s:'Who are they? And what do you want to happen for them - feel, think or do - after reading?'}},
+
+ {id:'q10', type:'uploads',
+  he:{ey:'שאלה 10 · הראיות', t:'עכשיו החלק שמכייל הכל: החומרים האמיתיים שלך.', s:''},
+  en:{ey:'Question 10 · The evidence', t:'Now the part that calibrates everything: your real materials.', s:''}}
+];
+
+/* ---------- state ---------- */
+let lang = 'he';
+let step = -1; /* -1 = intro */
+const answers = {};   /* qid -> value */
+let uploads = {posts:'', about:'', images:[]}; /* images: [{media_type,data}] */
+let profile = null;
+let approved = false;
+let apiKey = '';
+let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
+const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3;
+
+const T = () => I18N[lang];
+
+/* ---------- language ---------- */
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  document.documentElement.dir = l==='he' ? 'rtl' : 'ltr';
+  document.getElementById('btn-he').classList.toggle('active', l==='he');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  document.getElementById('tagline').textContent = T().tagline;
+  renderLayers(); render();
+}
+
+/* ---------- sidebar ---------- */
+function renderLayers(){
+  const filled = {};
+  LAYERS.forEach(L=>filled[L.id]=0);
+  Object.keys(answers).forEach(qid=>{
+    if(!answered(qid)) return;
+    (FEEDS[qid]||[]).forEach(id=>filled[id]=(filled[id]||0)+1);
+  });
+  const el = document.getElementById('layers-panel');
+  el.innerHTML = `<h3>${lang==='he'?'שכבות הפרופיל':'Profile layers'}</h3>` +
+    LAYERS.map(L=>{
+      const n = Math.min(filled[L.id]||0, L.slots);
+      let dots='';
+      for(let i=0;i<L.slots;i++) dots+=`<span class="dot ${i<n?'on':''}"></span>`;
+      return `<div class="layer"><span class="name">${L[lang]}</span><span class="dots">${dots}</span></div>`;
+    }).join('');
+}
+
+function answered(qid){
+  const q = QUESTIONS.find(x=>x.id===qid);
+  const v = answers[qid];
+  if(!q) return false;
+  if(q.type==='open') return v && v.trim().length>=30;
+  if(q.type==='single') return !!v;
+  if(q.type==='rank') return Array.isArray(v) && v.length===q.max;
+  if(q.type==='uploads') return (uploads.posts.trim().length>50)||uploads.images.length>0;
+  return false;
+}
+
+/* ---------- render ---------- */
+function render(){
+  const card = document.getElementById('main-card');
+  if(step===-1){ card.innerHTML = introHTML(); return; }
+  if(step===QUESTIONS.length){ card.innerHTML = generateHTML(); return; }
+  if(step===QUESTIONS.length+1){ card.innerHTML = profileHTML(); wireRefine(); return; }
+  if(step===STEP_COMPOSER){ card.innerHTML = composerHTML(); wireComposer(); return; }
+  if(step===STEP_RESULT){ card.innerHTML = resultHTML(); return; }
+  card.innerHTML = questionHTML(QUESTIONS[step]);
+  wireQuestion(QUESTIONS[step]);
+  renderLayers();
+}
+
+function introHTML(){
+  const t=T();
+  return `<div class="intro step active">
+    <h2 class="serif">${t.intro_h}</h2>
+    <p>${t.intro_p1}</p>
+    <p><b>${t.intro_p2}</b></p>
+    <p>${t.intro_p3}</p>
+    <div class="start-row">
+      <button class="btn btn-primary" onclick="step=0;render()">${t.start} ←</button>
+    </div>
+  </div>`;
+}
+
+function questionHTML(q){
+  const t=T(), L=q[lang];
+  let body='';
+  if(q.type==='open'){
+    body = (q.writeLang?`<div class="lang-hint">${t.write_lang_hint}</div>`:'') +
+      `<textarea id="ta" placeholder="">${answers[q.id]||''}</textarea>
+       <div class="char-note">${t.open_note}</div>`;
+  }
+  if(q.type==='single'){
+    body = q.opts.map(o=>`<button class="opt ${answers[q.id]===o.v?'selected':''}" data-v="${o.v}">${o[lang]}</button>`).join('');
+  }
+  if(q.type==='rank'){
+    const sel = answers[q.id]||[];
+    body = `<div class="char-note" style="margin-bottom:12px">${t.rank_note}</div>`+
+      q.opts.map(o=>{
+        const idx = sel.indexOf(o.v);
+        return `<button class="opt ${idx>-1?'selected':''}" data-v="${o.v}">${o[lang]}${idx>-1?`<span class="rank-badge">${idx+1}</span>`:''}</button>`;
+      }).join('');
+  }
+  if(q.type==='uploads'){
+    body = `
+      <label class="field-label">${t.posts_label} <small>· ${t.posts_small}</small></label>
+      <textarea id="posts-ta" placeholder="${t.posts_ph}">${uploads.posts}</textarea>
+
+      <label class="field-label">${t.pic_label} <small>· ${t.pic_small}</small></label>
+      <label class="upload-box"><input type="file" id="img-input" accept="image/png,image/jpeg,image/webp" multiple>
+        📷 ${t.pic_btn}</label>
+      <div class="thumbs" id="thumbs">${uploads.images.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
+
+      <label class="field-label">${t.about_label} <small>· ${t.about_small}</small></label>
+      <textarea id="about-ta" style="min-height:90px" placeholder="${t.about_ph}">${uploads.about}</textarea>`;
+  }
+
+  const isLast = step===QUESTIONS.length-1;
+  return `<div class="step active">
+    <div class="eyebrow">${L.ey}</div>
+    <h2 class="q-title">${L.t}</h2>
+    ${L.s?`<p class="q-sub">${L.s}</p>`:''}
+    ${body}
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="step--;render()">${t.back}</button>
+      <span class="progress-label">${step+1} ${t.of} ${QUESTIONS.length}</span>
+      <button class="btn btn-primary" id="next-btn" ${answered(q.id)?'':'disabled'}
+        onclick="step++;render()">${isLast?t.generate:t.next}</button>
+    </div>
+  </div>`;
+}
+
+function wireQuestion(q){
+  if(q.type==='open'){
+    const ta=document.getElementById('ta');
+    ta.addEventListener('input',()=>{answers[q.id]=ta.value;refreshNext(q);renderLayers();});
+  }
+  if(q.type==='single'){
+    document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+      answers[q.id]=b.dataset.v; render();
+    }));
+  }
+  if(q.type==='rank'){
+    document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
+      let sel=answers[q.id]||[];
+      const v=b.dataset.v, i=sel.indexOf(v);
+      if(i>-1) sel.splice(i,1);
+      else if(sel.length<q.max) sel.push(v);
+      answers[q.id]=sel; render();
+    }));
+  }
+  if(q.type==='uploads'){
+    const pt=document.getElementById('posts-ta'), ab=document.getElementById('about-ta');
+    pt.addEventListener('input',()=>{uploads.posts=pt.value;refreshNext(q);renderLayers();});
+    ab.addEventListener('input',()=>{uploads.about=ab.value;});
+    document.getElementById('img-input').addEventListener('change',async e=>{
+      for(const f of Array.from(e.target.files).slice(0,4-uploads.images.length)){
+        const data = await new Promise((res,rej)=>{
+          const r=new FileReader();
+          r.onload=()=>res(r.result.split(',')[1]);
+          r.onerror=()=>rej(new Error('read failed'));
+          r.readAsDataURL(f);
+        });
+        uploads.images.push({media_type:f.type,data});
+      }
+      render();
+    });
+  }
+}
+function refreshNext(q){
+  const b=document.getElementById('next-btn');
+  if(b) b.disabled = !answered(q.id);
+}
+
+/* =========================================================
+   PROFILE ENGINE — Claude API
+   ========================================================= */
+
+const CODEX = `
+You are a personality-profiling engine for a LinkedIn ghostwriting platform. Build a profile from questionnaire answers using these frameworks:
+
+BIG 5 — score each 1-5 using both closed answers AND language markers in free text (open-vocabulary method, Park et al. 2014):
+- Extraversion: social words, exclamation marks, emojis, short energetic sentences, calls to action vs. reflective first-person, longer sentences, ellipses.
+- Openness: metaphors, abstract/idea words, original syntax, varied topics vs. concrete, practical, routine language.
+- Conscientiousness: planning words, structured syntax, standard punctuation vs. "we'll see", topic-jumping, casual flow.
+- Agreeableness: warm words (thanks, together, appreciate), soft phrasing, hearts vs. sharp, competitive, blunt language.
+- Neuroticism: stress words, multiple !!/..., dramatic phrasing vs. calm, solution-focused, proportionate language.
+
+MOTIVES (score the user's top 3 from their ranking Q3 + free text evidence): achievement, power/influence, recognition, security, belonging/acceptance, meaning/spiritual, thrill/risk, pleasure/hedonism, altruism, material. Motives answer WHY the person acts; traits answer HOW. Flag any contradiction between declared ranking and language evidence.
+
+ENNEAGRAM (from Q2 worldview + corroborating evidence): e1=Perfectionist, e2=Helper, e3=Performer, e4=Individualist, e5=Investigator, e6=Loyalist, e7=Enthusiast, e8=Challenger, e9=Peacemaker. Give type number, name, and the core inner motivation.
+
+COGNITIVE ORIENTATION (mainly from Q6+Q9+posts):
+- convergent (one precise solution, data, process) vs divergent (many possibilities, connections, "what if").
+- systemizer (how systems work: data, frameworks, SOPs) vs empathizer (how people feel: stories, motives, relationships).
+
+WRITING DNA (from Q1, Q6, and pasted posts — the pasted posts are the STRONGEST signal, weight them most):
+- primary language (he/en/mixed), average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature phrases (quote 2-3 verbatim from their text), first/second person habits, how they end posts (question? statement? CTA?).
+- Also produce 3 DO rules and 3 DON'T rules for ghostwriting this person.
+
+If profile pictures are provided, use profile-image research: positive emotion + single frontal face → conscientiousness/agreeableness/extraversion signals; aesthetic/unconventional composition → openness; no face/low emotion → openness or neuroticism direction. Treat as weak supporting evidence only.
+
+CROSS-CHECKING: actively look for contradictions between closed answers and free-text style (e.g., claims introvert but writes with high-energy social markers). List them in "gaps".
+
+Respond with ONLY valid JSON, no markdown fences, no preamble. Be concise — short phrases, not paragraphs. JSON schema:
+{
+ "summary": "3-4 sentence portrait in {LANG}, warm, second person",
+ "big5": {"openness":{"score":1-5,"evidence":"short"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
+ "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short"} x3],
+ "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
+ "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
+ "writing_dna": {"language":"he|en|mixed","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
+ "gaps": ["...( empty array if none )"]
+}
+All free-text values in {LANG}.`;
+
+function buildUserContent(){
+  const qa = QUESTIONS.filter(q=>q.type!=='uploads').map(q=>{
+    let a = answers[q.id];
+    if(q.type==='single'){const o=q.opts.find(x=>x.v===a);a = a+' — '+(o?o.en:'');}
+    if(q.type==='rank'){a = (a||[]).map((v,i)=>`${i+1}. ${v}`).join(' | ');}
+    return `Q ${q.id} (${q.en.t}):\n${a}`;
+  }).join('\n\n');
+
+  let text = CODEX.replaceAll('{LANG}', lang==='he'?'Hebrew':'English')
+    + '\n\n=== QUESTIONNAIRE ANSWERS ===\n' + qa;
+  if(uploads.posts.trim()) text += '\n\n=== USER\'S REAL LINKEDIN POSTS (strongest style signal) ===\n'+uploads.posts.trim();
+  if(uploads.about.trim()) text += '\n\n=== LINKEDIN ABOUT ===\n'+uploads.about.trim();
+
+  const content=[{type:'text',text}];
+  uploads.images.forEach(im=>content.push({type:'image',source:{type:'base64',media_type:im.media_type,data:im.data}}));
+  return content;
+}
+
+async function callClaude(content, useSearch){
+  const headers={'Content-Type':'application/json'};
+  const token = window.__getToken ? await window.__getToken() : '';
+  if(token) headers['Authorization']='Bearer '+token;
+  const response = await fetch('/api/claude',{
+    method:'POST',
+    headers,
+    body:JSON.stringify({
+      model:'claude-sonnet-4-6',
+      max_tokens:4000,
+      messages:[{role:'user',content}],
+      ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
+    })
+  });
+  const data = await response.json();
+  if(data.error) throw new Error(data.error.message||'API error');
+  const txt = (data.content||[]).filter(i=>i.type==='text').map(i=>i.text).join('\n');
+  const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
+  if(start===-1||end===-1) throw new Error('No JSON in response');
+  return JSON.parse(txt.slice(start,end+1));
+}
+
+function generateHTML(){
+  const t=T();
+  runGeneration();
+  return `<div class="step active loading">
+    <div class="pulse"></div>
+    <p id="loading-msg">${t.analyzing[0]}</p>
+  </div>`;
+}
+
+let loadTimer=null;
+async function runGeneration(refineNote){
+  const t=T();
+  let i=0;
+  clearInterval(loadTimer);
+  loadTimer=setInterval(()=>{
+    i=(i+1)%t.analyzing.length;
+    const el=document.getElementById('loading-msg');
+    if(el) el.textContent=t.analyzing[i];
+  },2200);
+
+  try{
+    let content;
+    if(refineNote && profile){
+      content=[{type:'text',text:
+        `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nThe user corrected it: "${refineNote}"\n\nApply the correction thoughtfully (adjust related fields too, e.g. if they say "I never use emojis" fix writing_dna.emoji and the do/dont rules). Respond with ONLY the full updated JSON, same schema, no fences. Free-text values in ${lang==='he'?'Hebrew':'English'}.`}];
+    } else {
+      content=buildUserContent();
+    }
+    profile = await callClaude(content);
+    clearInterval(loadTimer);
+    step=QUESTIONS.length+1; approved=false; render();
+  }catch(err){
+    clearInterval(loadTimer);
+    console.error('Claude API error:',err);
+    const card=document.getElementById('main-card');
+    card.innerHTML=`<div class="step active">
+      <div class="error-box">${t.err_api}<br><small style="opacity:.7">${(err&&err.message)||''}</small></div>
+      ${String(err&&err.message).includes('fetch')?`
+      <div class="gap-note" style="margin-top:14px">
+        <b>${lang==='he'?'פתרון: מפתח API אישי':'Fix: personal API key'}</b><br>
+        ${lang==='he'?'הקובץ רץ מחוץ ל-Claude, אז צריך מפתח משלך (אותו אחד מהגנרטור). הוא לא נשמר בשום מקום - רק בזיכרון של העמוד.':'The file runs outside Claude, so it needs your own key. It is not stored anywhere - memory only.'}<br>
+        <input type="text" id="api-key-input" style="min-height:auto;margin-top:8px" placeholder="sk-ant-..." value="${apiKey}">
+      </div>`:''}
+      <div class="nav"><button class="btn btn-ghost" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
+      <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
+  }
+}
+
+/* ---------- profile view ---------- */
+function profileHTML(){
+  const t=T(), p=profile;
+  const traits=['openness','conscientiousness','extraversion','agreeableness','neuroticism'];
+  const bars = traits.map(tr=>{
+    const d=p.big5[tr]||{score:3,evidence:''};
+    return `<div class="trait-row">
+      <span class="trait-name">${t.traits[tr]}</span>
+      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%"></div></div>
+      <span class="trait-score">${d.score}</span>
+    </div>
+    <div class="char-note" style="margin:-6px 0 12px">${t.ev}: ${d.evidence||''}</div>`;
+  }).join('');
+
+  const motives=(p.motives||[]).map((m,i)=>
+    `<span class="chip ${i===0?'hot':''}">${i+1}. ${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
+
+  const en=p.enneagram||{};
+  const cg=p.cognitive||{};
+  const dna=p.writing_dna||{};
+  const dnaRows=[
+    ['🗣',dna.language],['📏',dna.sentence_length],['❗',dna.punctuation],['😀',dna.emoji],
+    ['🪝',dna.hook_style],['😏',dna.humor],['🔚',dna.endings]
+  ].filter(r=>r[1]).map(r=>`<li>${r[0]} ${r[1]}</li>`).join('');
+  const sigs=(dna.signature_phrases||[]).map(s=>`<span class="chip">"${s}"</span>`).join('');
+  const dos=(dna.do||[]).map(x=>`<li><b>✓</b> ${x}</li>`).join('');
+  const donts=(dna.dont||[]).map(x=>`<li><b>✗</b> ${x}</li>`).join('');
+  const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
+
+  return `<div class="step active">
+    <div class="eyebrow">${t.profile_h}</div>
+    <div class="profile-summary serif">${p.summary||''}</div>
+    <p class="q-sub">${t.profile_sub}</p>
+
+    <div class="section-h">${t.big5_h}</div>${bars}
+    <div class="section-h">${t.motives_h}</div>${motives}
+    <div class="section-h">${t.ennea_h}</div>
+    <span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span>
+    <div class="char-note">${en.core||''}</div>
+    <div class="section-h">${t.cog_h}</div>
+    <span class="chip">${cg.convergent_divergent||''}</span>
+    <span class="chip">${cg.systemizer_empathizer||''}</span>
+    <div class="char-note">${cg.note||''}</div>
+    <div class="section-h">${t.dna_h}</div>
+    <ul class="dna-list">${dnaRows}</ul>
+    <div style="margin-top:10px">${sigs}</div>
+    <ul class="dna-list" style="margin-top:12px">${dos}${donts}</ul>
+    ${gaps}
+
+    ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:var(--accent);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
+    <div class="section-h">${t.refine_label}</div>
+    <textarea id="refine-ta" style="min-height:90px" placeholder="${t.refine_ph}"></textarea>
+    <div class="nav">
+      <button class="btn btn-ghost" id="refine-btn">${t.refine_btn}</button>
+      <button class="btn btn-accent" id="approve-btn">${t.approve_btn}</button>
+    </div>`}
+  </div>`;
+}
+
+function wireRefine(){
+  const rb=document.getElementById('refine-btn');
+  const ab=document.getElementById('approve-btn');
+  if(rb) rb.addEventListener('click',()=>{
+    const note=document.getElementById('refine-ta').value.trim();
+    if(!note) return;
+    const card=document.getElementById('main-card');
+    const t=T();
+    card.innerHTML=`<div class="step active loading"><div class="pulse"></div><p id="loading-msg">${t.analyzing[0]}</p></div>`;
+    runGeneration(note);
+  });
+  if(ab) ab.addEventListener('click',saveProfile);
+}
+
+async function saveProfile(){
+  const t=T();
+  approved=true;
+  try{
+    if(window.storage){
+      await window.storage.set('voiceprint_profile', JSON.stringify({profile,lang,savedAt:new Date().toISOString()}));
+    }
+  }catch(err){
+    console.warn('storage failed',err);
+    render();
+    const card=document.getElementById('main-card');
+    card.insertAdjacentHTML('beforeend',`<div class="gap-note">${t.save_warn}</div>`);
+    return;
+  }
+  render();
+}
+
+/* =========================================================
+   POST COMPOSER — phase 3
+   ========================================================= */
+
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function composerHTML(){
+  const t=T();
+  return `<div class="step active">
+    <div class="eyebrow">Voiceprint</div>
+    <h2 class="q-title">${t.composer_h}</h2>
+    <p class="q-sub">${t.composer_sub}</p>
+    <textarea id="post-input" style="min-height:180px" placeholder="${t.input_ph}">${escapeHtml(postInput)}</textarea>
+    <div style="margin-top:10px"><button class="btn btn-ghost" id="rec-btn">${recog?t.rec_stop:t.rec_start}</button></div>
+
+    <label class="field-label">${t.link_label} <small>· ${t.link_small}</small></label>
+    <input type="text" id="post-link" style="min-height:auto" placeholder="https://..." value="${escapeHtml(postLink)}">
+
+    <label class="field-label">${t.img_label} <small>· ${t.img_small}</small></label>
+    <label class="upload-box"><input type="file" id="post-img" accept="image/png,image/jpeg,image/webp" multiple>📷</label>
+    <div class="thumbs">${postImages.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="if(recog)recog.stop();step=QUESTIONS.length+1;render()">${t.back_profile}</button>
+      <button class="btn btn-primary" id="gen-btn" ${postInput.trim().length>=20?'':'disabled'} onclick="startPostGen()">${t.gen_post}</button>
+    </div>
+  </div>`;
+}
+
+function wireComposer(){
+  const t=T();
+  const ta=document.getElementById('post-input');
+  ta.addEventListener('input',()=>{postInput=ta.value;
+    const b=document.getElementById('gen-btn'); if(b) b.disabled=postInput.trim().length<20;});
+  const lk=document.getElementById('post-link');
+  lk.addEventListener('input',()=>postLink=lk.value);
+  document.getElementById('post-img').addEventListener('change',async e=>{
+    for(const f of Array.from(e.target.files).slice(0,3-postImages.length)){
+      const data=await new Promise((res,rej)=>{const r=new FileReader();
+        r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('read failed'));r.readAsDataURL(f);});
+      postImages.push({media_type:f.type,data});
+    }
+    render();
+  });
+  const rb=document.getElementById('rec-btn');
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){rb.disabled=true;rb.textContent=t.rec_unsupported;return;}
+  rb.addEventListener('click',()=>{
+    if(recog){recog.stop();return;}
+    recog=new SR();
+    recog.lang = lang==='he'?'he-IL':'en-US';
+    recog.continuous=true; recog.interimResults=false;
+    recog.onresult=e=>{
+      for(const r of e.results){ if(r.isFinal){ postInput+=(postInput?' ':'')+r[0].transcript; } }
+      ta.value=postInput;
+      const b=document.getElementById('gen-btn'); if(b) b.disabled=postInput.trim().length<20;
+    };
+    recog.onerror=e=>{
+      recog=null;
+      const msg = lang==='he'
+        ? (e.error==='not-allowed' ? 'הדפדפן חסם גישה למיקרופון. בדקי את אייקון המנעול ליד הכתובת ואשרי מיקרופון.'
+           : 'ההקלטה נכשלה ('+e.error+'). כשהקובץ רץ מקומית או בתוך תצוגה מוטמעת, כרום חוסם את שירות הזיהוי - ראי הסבר בצ׳אט.')
+        : (e.error==='not-allowed' ? 'The browser blocked microphone access. Check the lock icon near the address bar.'
+           : 'Recording failed ('+e.error+').');
+      const box=document.querySelector('.step');
+      if(box && !document.getElementById('rec-err')) box.insertAdjacentHTML('beforeend','<div class="gap-note" id="rec-err">'+msg+'</div>');
+      const b3=document.getElementById('rec-btn'); if(b3)b3.textContent=T().rec_start;
+    };
+    recog.onend=()=>{recog=null;const b2=document.getElementById('rec-btn');if(b2)b2.textContent=T().rec_start;};
+    try{ recog.start(); rb.textContent=t.rec_stop; }
+    catch(ex){ recog=null; rb.textContent=t.rec_start; }
+  });
+}
+
+function buildPostContent(refineNote){
+  const dnaLang=(profile&&profile.writing_dna&&profile.writing_dna.language)||'mixed';
+  let text=`You are ghostwriting ONE LinkedIn post AS this person. Their full profile (personality + writing DNA):
+${JSON.stringify(profile)}
+
+RULES:
+- Language: match the writing_dna language (${dnaLang}); but if the raw material below is clearly written in a different language, match the raw material.
+- Follow every DO and DON'T in writing_dna literally. Mimic their sentence length, punctuation habits, emoji habits, humor and endings. Reuse their signature phrasing style without quoting old posts.
+- First line = a scroll-stopping hook drawn from the most specific, human detail in the material. No clickbait clichés.
+- Short paragraphs with breathing room. One idea per post. Specificity beats generality.
+- Match content angle to their profile: systemizer → process/insight framing; empathizer → people/story framing; their top motives shape what the post celebrates.
+- Sound human. Forbidden: corporate buzzwords, "thrilled/excited to share", "game-changer", generic AI cadence. No em dashes unless their DNA shows them.
+- End the way THEY end posts (per writing_dna.endings).
+
+RAW MATERIAL (what happened, in their own words):
+${postInput}`;
+  if(postLink.trim()) text+=`\n\nRELEVANT LINK — read it and weave 1-2 concrete points naturally, no summary dump: ${postLink.trim()}`;
+  if(postImages.length) text+=`\n\nThe attached image(s) will be posted with this text. Reference what's in them naturally if it strengthens the post.`;
+  if(refineNote&&currentPost) text+=`\n\nPREVIOUS DRAFT:\n${currentPost.post}\n\nUSER FEEDBACK — apply it exactly: ${refineNote}`;
+  text+=`\n\nRespond with ONLY valid JSON, no fences: {"post":"the full post with \\n\\n between paragraphs","hooks":["alternative opening line 1","alternative opening line 2"]}`;
+  const content=[{type:'text',text}];
+  postImages.forEach(im=>content.push({type:'image',source:{type:'base64',media_type:im.media_type,data:im.data}}));
+  return content;
+}
+
+async function startPostGen(refineNote){
+  lastRefineNote=refineNote||null;
+  const t=T();
+  const card=document.getElementById('main-card');
+  let i=0;
+  card.innerHTML=`<div class="step active loading"><div class="pulse"></div><p id="loading-msg">${t.writing[0]}</p></div>`;
+  clearInterval(loadTimer);
+  loadTimer=setInterval(()=>{i=(i+1)%t.writing.length;const el=document.getElementById('loading-msg');if(el)el.textContent=t.writing[i];},2200);
+  try{
+    currentPost=await callClaude(buildPostContent(refineNote), !!postLink.trim());
+    clearInterval(loadTimer);
+    savePostHistory();
+    step=STEP_RESULT; render();
+  }catch(err){
+    clearInterval(loadTimer);
+    console.error('post gen error:',err);
+    card.innerHTML=`<div class="step active">
+      <div class="error-box">${t.err_api}<br><small style="opacity:.7">${escapeHtml((err&&err.message)||'')}</small></div>
+      ${String(err&&err.message).includes('fetch')?`<div class="gap-note" style="margin-top:12px"><input type="text" id="api-key-input" style="min-height:auto" placeholder="sk-ant-..." value="${escapeHtml(apiKey)}"></div>`:''}
+      <div class="nav">
+        <button class="btn btn-ghost" onclick="step=STEP_COMPOSER;render()">${t.back}</button>
+        <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();startPostGen(lastRefineNote)">${t.retry}</button>
+      </div></div>`;
+  }
+}
+
+function resultHTML(){
+  const t=T(), p=currentPost||{post:'',hooks:[]};
+  const hooks=(p.hooks||[]).map(h=>`<span class="chip">${escapeHtml(h)}</span>`).join('');
+  return `<div class="step active">
+    <div class="eyebrow">${t.result_h}</div>
+    <div style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:22px;white-space:pre-wrap;font-size:1.02rem">${escapeHtml(p.post)}</div>
+    <div style="margin-top:12px"><button class="btn btn-accent" id="copy-btn" onclick="copyPost()">${t.copy}</button></div>
+    ${hooks?`<div class="section-h">${t.alt_hooks}</div>${hooks}`:''}
+    <div class="section-h">${t.refine_post_label}</div>
+    <textarea id="post-refine" style="min-height:80px" placeholder="${t.refine_post_ph}"></textarea>
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="postInput='';postLink='';postImages=[];currentPost=null;step=STEP_COMPOSER;render()">${t.new_post}</button>
+      <button class="btn btn-primary" onclick="const n=document.getElementById('post-refine').value.trim();if(n)startPostGen(n)">${t.regen}</button>
+    </div>
+  </div>`;
+}
+
+function copyPost(){
+  if(!currentPost) return;
+  navigator.clipboard.writeText(currentPost.post).then(()=>{
+    const b=document.getElementById('copy-btn');
+    if(b){b.textContent=T().copied; setTimeout(()=>{if(b)b.textContent=T().copy;},2000);}
+  });
+}
+
+async function savePostHistory(){
+  try{
+    if(!window.storage) return;
+    let hist=[];
+    try{
+      const saved=await window.storage.get('voiceprint_posts');
+      if(saved&&saved.value) hist=JSON.parse(saved.value);
+    }catch(e){/* first post */}
+    hist.push({date:new Date().toISOString(),input:postInput.slice(0,300),post:currentPost.post});
+    if(hist.length>20) hist=hist.slice(-20);
+    await window.storage.set('voiceprint_posts', JSON.stringify(hist));
+  }catch(e){console.warn('post history save failed',e);}
+}
+
+/* ---------- boot: load saved profile if exists ---------- */
+(async function boot(){
+  await window.__authReady;
+  renderLayers();
+  try{
+    if(window.storage){
+      const saved=await window.storage.get('voiceprint_profile');
+      if(saved&&saved.value){
+        const obj=JSON.parse(saved.value);
+        profile=obj.profile; lang=obj.lang||'he';
+        approved=true; step=QUESTIONS.length+1;
+        setLang(lang);
+        return;
+      }
+    }
+  }catch(e){/* no saved profile — fresh start */}
+  render();
+})();
+</script>
+
+<script type="module">
+/* =========================================================
+   AUTH + STORAGE — Supabase (email magic-link login,
+   per-user profile + post history). Infrastructure only.
+   ========================================================= */
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+/* ---- login screen styles (kept minimal, matches the app look) ---- */
+const css = document.createElement('style');
+css.textContent = `
+#vp-auth{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000}
+#vp-auth .box{max-width:420px;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:34px 32px;text-align:center}
+#vp-auth h2{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.7rem;margin-bottom:8px}
+#vp-auth p{color:var(--ink-soft);margin-bottom:20px;font-size:.98rem}
+#vp-auth input{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:13px 15px;background:var(--paper);margin-bottom:12px;min-height:auto}
+#vp-auth input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+#vp-auth button{width:100%;border:0;font:inherit;font-weight:700;border-radius:999px;padding:13px;cursor:pointer;background:var(--ink);color:var(--paper)}
+#vp-auth button:disabled{opacity:.5;cursor:not-allowed}
+#vp-auth .msg{margin-top:14px;font-size:.9rem;color:var(--accent);font-weight:600}
+#vp-auth .msg.err{color:var(--danger)}
+#vp-logout{border:1.5px solid var(--line);background:transparent;color:var(--ink-soft);font:inherit;font-weight:600;font-size:.82rem;border-radius:999px;padding:6px 14px;cursor:pointer;margin-inline-start:10px}
+`;
+document.head.appendChild(css);
+
+const t = { title:'Voiceprint', sub:'הכניסי את המייל שלך ונשלח לך קישור כניסה.', ph:'you@example.com',
+  btn:'שליחת קישור כניסה', sent:'שלחנו קישור למייל. פתחי אותו כדי להיכנס.',
+  err:'משהו השתבש. נסי שוב.', bad:'כתובת מייל לא תקינה.',
+  noconf:'החיבור לשרת עדיין לא הוגדר. ראי את קובץ ההוראות (README).', logout:'יציאה' };
+
+const overlay = document.createElement('div');
+overlay.id = 'vp-auth';
+overlay.innerHTML = `
+  <div class="box">
+    <h2 class="serif">${t.title}</h2>
+    <p>${t.sub}</p>
+    <input id="vp-email" type="email" dir="ltr" placeholder="${t.ph}" autocomplete="email">
+    <button id="vp-send">${t.btn}</button>
+    <div class="msg" id="vp-msg" style="display:none"></div>
+  </div>`;
+document.body.appendChild(overlay);
+
+function showMsg(text, isErr){
+  const m = document.getElementById('vp-msg');
+  m.textContent = text; m.style.display='block';
+  m.className = 'msg' + (isErr ? ' err' : '');
+}
+
+/* ---- connect to Supabase using public config from the server ---- */
+let supabase = null;
+try {
+  const cfg = await (await fetch('/api/config')).json();
+  if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error('missing config');
+  supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+} catch (e) {
+  showMsg(t.noconf, true);
+}
+
+/* ---- storage backed by Supabase — same interface the app expects ---- */
+window.storage = {
+  async get(key){
+    const { data, error } = await supabase.from('kv_store').select('value').eq('key', key).maybeSingle();
+    if (error) throw error;
+    return data ? { value: data.value } : null;
+  },
+  async set(key, value){
+    const { data:{ user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('kv_store').upsert({ user_id: user.id, key, value }, { onConflict: 'user_id,key' });
+    if (error) throw error;
+  }
+};
+window.__getToken = async () => {
+  if (!supabase) return '';
+  const { data:{ session } } = await supabase.auth.getSession();
+  return session ? session.access_token : '';
+};
+
+const sendBtn = document.getElementById('vp-send');
+const emailInput = document.getElementById('vp-email');
+sendBtn.addEventListener('click', async () => {
+  const email = (emailInput.value||'').trim();
+  if (!email || !email.includes('@')) { showMsg(t.bad, true); return; }
+  if (!supabase) { showMsg(t.noconf, true); return; }
+  sendBtn.disabled = true;
+  try {
+    const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.origin } });
+    if (error) throw error;
+    showMsg(t.sent, false);
+  } catch(e){ showMsg(t.err, true); sendBtn.disabled = false; }
+});
+emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
+
+let done = false;
+function onAuthed(){
+  if (done) return; done = true;
+  overlay.remove();
+  const toggle = document.querySelector('.lang-toggle');
+  if (toggle && !document.getElementById('vp-logout')) {
+    const btn = document.createElement('button');
+    btn.id = 'vp-logout'; btn.textContent = t.logout;
+    btn.addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
+    toggle.parentNode.insertBefore(btn, toggle.nextSibling);
+  }
+  window.__resolveAuth();
+}
+
+if (supabase) {
+  const { data:{ session } } = await supabase.auth.getSession();
+  if (session) onAuthed();
+  supabase.auth.onAuthStateChange((_e, s) => { if (s) onAuthed(); });
+}
+</script>
+</body>
+</html>

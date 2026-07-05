@@ -1,0 +1,10 @@
+{
+  "name": "voiceprint-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Voiceprint — LinkedIn voice profiling and post writing, with a server-side Claude API key and per-user storage.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  }
+}

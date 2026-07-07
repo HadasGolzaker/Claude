@@ -223,9 +223,21 @@ body::before{
 }
 @keyframes glassdrift{from{transform:translate3d(-1.5%,-1%,0) scale(1.02)}to{transform:translate3d(1.5%,1.5%,0) scale(1.06)}}
 @media(prefers-reduced-motion:reduce){body::before{animation:none}}
-.serif{font-family:'Frank Ruhl Libre',serif}
-.q-title{font-size:1.72rem}
-.intro h2{font-size:2.5rem}
+.q-title{font-size:1.75rem}
+.intro h2{font-size:2.6rem}
+/* larger, readable type (body min 18px, titles min 21px) */
+body{font-weight:400}
+.q-sub,.char-note,.dna-list li,.idea-angle,.opt,.field-label{font-size:1rem}
+.idea-title{font-size:1.05rem}
+.chip{font-size:.95rem}
+.section-h{font-size:1.22rem}
+/* Hebrew tuning across all stages (Heebo, natural tracking, larger) */
+html[lang="he"] body{font-size:18px;line-height:1.7}
+html[lang="he"] .serif,html[lang="he"] .logo h1,html[lang="he"] .q-title,html[lang="he"] .section-h,html[lang="he"] .intro h2{letter-spacing:normal}
+html[lang="he"] .intro h2{font-size:2.3rem;line-height:1.2}
+html[lang="he"] .q-title{font-size:1.7rem;line-height:1.35}
+html[lang="he"] .section-h{font-size:1.3rem}
+html[lang="he"] .q-sub,html[lang="he"] .char-note,html[lang="he"] .dna-list li{font-size:1.02rem}
 
 .card{
   background:var(--panel);
@@ -292,6 +304,8 @@ textarea,input[type=text]{
 .idea-pill.open .idea-body{max-height:260px;padding:16px 18px}
 .idea-angle{margin-bottom:14px;color:var(--ink)}
 .idea-use{padding:8px 18px;font-size:.88rem}
+.do-list li{border-inline-start:3px solid #2fbf88;padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
+.dont-list li{border-inline-start:3px solid #e2617a;padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
 @keyframes ideaIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.idea-pill{animation:none}}
 
@@ -375,7 +389,7 @@ const I18N = {
     intro_p3:'אין תשובות נכונות. ככל שתהיי יותר את - הפרופיל יהיה יותר מדויק.',
     start:'מתחילים',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
-    write_lang_hint:'✍️ כתבי בשפה שבה את מפרסמת בלינקדאין',
+    write_lang_hint:'כתבי בשפה שבה את מפרסמת בלינקדאין',
     rank_note:'בחרי 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
     generate:'בנה את הפרופיל שלי',
     analyzing:['קוראת את התשובות שלך...','מזהה דפוסי שפה...','מצליבה מניעים מול תכונות...','מרכיבה את טביעת הקול...'],
@@ -385,15 +399,15 @@ const I18N = {
     refine_ph:'למשל: אני הרבה פחות זהירה ממה שכתבת, ואני אף פעם לא משתמשת באימוג׳ים',
     refine_btn:'עדכני את הפרופיל',
     approve_btn:'הפרופיל מדויק - אשרי ושמרי',
-    approved:'✓ הפרופיל נשמר. השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרי יהפוך לפוסט בקול שלך.',
+    approved:'הפרופיל נשמר. השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרי יהפוך לפוסט בקול שלך.',
     saved_local:'הפרופיל נשמר בהצלחה.',
     save_warn:'לא הצלחתי לשמור לאחסון קבוע - הפרופיל זמין בסשן הנוכחי בלבד.',
     err_api:'משהו השתבש בניתוח. נסי שוב.',
     retry:'נסי שוב',
     big5_h:'חמשת הממדים', motives_h:'מה מניע אותך', ennea_h:'טיפוס אניגרמה',
-    cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלך', gaps_h:'⚡ פערים ששווה לבדוק',
+    cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלך', gaps_h:'פערים ששווה לבדוק',
     local_h:'לוקאליזציה - שפה ותרבות', story_h:'סיפוריות',
-    dos_h:'✓ כן - כללי הכתיבה שלך', donts_h:'✗ לא - מה להימנע ממנו',
+    dos_h:'כן - כללי הכתיבה שלך', donts_h:'לא - מה להימנע ממנו',
     story_struct:'מבנה', story_moves:'מהלכים אופייניים', story_templates:'תבניות סיפור',
     ev:'על סמך',
     posts_label:'3-5 פוסטים שכתבת בעצמך', posts_small:'הדביקי אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
@@ -406,7 +420,7 @@ const I18N = {
     composer_h:'מה קרה היום?',
     composer_sub:'ספרי חופשי - אירוע, שיחה, מחשבה, תסכול, ניצחון קטן. הקלדה או הקלטה. אני אדאג שזה יישמע כמוך.',
     input_ph:'היום קרה משהו ש...',
-    rec_start:'🎙 הקלטה', rec_stop:'⏹ עצירה', rec_unsupported:'הקלטה עובדת רק בכרום',
+    rec_start:'הקלטה', rec_stop:'עצירה', rec_unsupported:'הקלטה עובדת רק בכרום',
     link_label:'לינק רלוונטי', link_small:'אופציונלי. אקרא אותו ואשלב מהתוכן.',
     img_label:'תמונות לפוסט', img_small:'אופציונלי.',
     gen_post:'כתבי לי את הפוסט',
@@ -417,8 +431,8 @@ const I18N = {
     ideas_use:'כתבי על זה ←', ideas_err:'לא הצלחתי להביא רעיונות. נסי שוב.',
     writing:['קוראת את מה שסיפרת...','טובלת את זה בקול שלך...','מחדדת את הפתיחה...','עוד שנייה...'],
     result_h:'הפוסט שלך',
-    copy:'העתקת הפוסט', copied:'✓ הועתק',
-    li_open:'📤 העתק ופתח לינקדאין', li_toast:'✓ הועתק - הדביקי בלינקדאין',
+    copy:'העתקת הפוסט', copied:'הועתק',
+    li_open:'העתק ופתח לינקדאין', li_toast:'הועתק - הדביקי בלינקדאין',
     alt_hooks:'פתיחות חלופיות (אם ההוק לא יושב)',
     refine_post_label:'רוצה לשנות משהו?',
     refine_post_ph:'למשל: קצרי בחצי, תורידי את האימוג׳ים, תסיימי בשאלה',
@@ -435,7 +449,7 @@ const I18N = {
     intro_p3:'There are no right answers. The more you sound like yourself, the sharper the profile.',
     start:'Let\'s begin',
     open_note:'Free writing, unedited. At least a few sentences.',
-    write_lang_hint:'✍️ Write in the language you post in on LinkedIn',
+    write_lang_hint:'Write in the language you post in on LinkedIn',
     rank_note:'Pick 3 in order of importance - click to select, click again to remove.',
     generate:'Build my profile',
     analyzing:['Reading your answers...','Detecting language patterns...','Cross-checking motives vs. traits...','Assembling your voiceprint...'],
@@ -445,15 +459,15 @@ const I18N = {
     refine_ph:'e.g. I\'m far less cautious than you wrote, and I never use emojis',
     refine_btn:'Update the profile',
     approve_btn:'It\'s accurate - approve & save',
-    approved:'✓ Profile saved. Next up: the post-writing screen - where anything you tell me becomes a post in your voice.',
+    approved:'Profile saved. Next up: the post-writing screen - where anything you tell me becomes a post in your voice.',
     saved_local:'Profile saved successfully.',
     save_warn:'Couldn\'t reach persistent storage - profile is available for this session only.',
     err_api:'Something went wrong during analysis. Try again.',
     retry:'Try again',
     big5_h:'The five dimensions', motives_h:'What drives you', ennea_h:'Enneagram type',
-    cog_h:'Thinking style', dna_h:'Your writing DNA', gaps_h:'⚡ Gaps worth checking',
+    cog_h:'Thinking style', dna_h:'Your writing DNA', gaps_h:'Gaps worth checking',
     local_h:'Localization - language & culture', story_h:'Storytelling',
-    dos_h:'✓ Do - your writing rules', donts_h:'✗ Don\'t - what to avoid',
+    dos_h:'Do - your writing rules', donts_h:'Don\'t - what to avoid',
     story_struct:'Structure', story_moves:'Signature moves', story_templates:'Story templates',
     ev:'based on',
     posts_label:'3-5 posts you wrote yourself', posts_small:'Paste them here, separated by an empty line. This is the strongest style calibration.',
@@ -466,7 +480,7 @@ const I18N = {
     composer_h:'What happened today?',
     composer_sub:'Tell it freely - an event, a conversation, a thought, a frustration, a small win. Type or record. I\'ll make it sound like you.',
     input_ph:'Today something happened that...',
-    rec_start:'🎙 Record', rec_stop:'⏹ Stop', rec_unsupported:'Recording works in Chrome only',
+    rec_start:'Record', rec_stop:'Stop', rec_unsupported:'Recording works in Chrome only',
     link_label:'Relevant link', link_small:'Optional. I\'ll read it and weave it in.',
     img_label:'Images for the post', img_small:'Optional.',
     gen_post:'Write my post',
@@ -477,8 +491,8 @@ const I18N = {
     ideas_use:'Write about this →', ideas_err:'Couldn\'t fetch ideas. Try again.',
     writing:['Reading what you told me...','Dipping it in your voice...','Sharpening the hook...','One more second...'],
     result_h:'Your post',
-    copy:'Copy post', copied:'✓ Copied',
-    li_open:'📤 Copy & open LinkedIn', li_toast:'✓ Copied - paste it in LinkedIn',
+    copy:'Copy post', copied:'Copied',
+    li_open:'Copy & open LinkedIn', li_toast:'Copied - paste it in LinkedIn',
     alt_hooks:'Alternative hooks (if the opener doesn\'t sit right)',
     refine_post_label:'Want to change something?',
     refine_post_ph:'e.g. cut it in half, drop the emojis, end with a question',
@@ -685,7 +699,7 @@ function questionHTML(q){
 
       <label class="field-label">${t.pic_label} <small>· ${t.pic_small}</small></label>
       <label class="upload-box"><input type="file" id="img-input" accept="image/png,image/jpeg,image/webp" multiple>
-        📷 ${t.pic_btn}</label>
+        ${t.pic_btn}</label>
       <div class="thumbs" id="thumbs">${uploads.images.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
 
       <label class="field-label">${t.about_label} <small>· ${t.about_small}</small></label>
@@ -917,17 +931,17 @@ function profileHTML(){
   const cg=p.cognitive||{};
   const dna=p.writing_dna||{};
   const dnaRows=[
-    ['🗣',dna.language],['📏',dna.sentence_length],['❗',dna.punctuation],['😀',dna.emoji],
-    ['🪝',dna.hook_style],['😏',dna.humor],['🔚',dna.endings]
-  ].filter(r=>r[1]).map(r=>`<li>${r[0]} ${r[1]}</li>`).join('');
+    dna.language,dna.sentence_length,dna.punctuation,dna.emoji,
+    dna.hook_style,dna.humor,dna.endings
+  ].filter(Boolean).map(v=>`<li>${v}</li>`).join('');
   const sigs=(dna.signature_phrases||[]).map(s=>`<span class="chip">"${s}"</span>`).join('');
-  const dos=(dna.do||[]).map(x=>`<li><b>✓</b> ${x}</li>`).join('');
-  const donts=(dna.dont||[]).map(x=>`<li><b>✗</b> ${x}</li>`).join('');
+  const dos=(dna.do||[]).map(x=>`<li>${x}</li>`).join('');
+  const donts=(dna.dont||[]).map(x=>`<li>${x}</li>`).join('');
 
   const loc=p.localization||{};
   const locRows=[
-    ['🌍',loc.audience],['🗣',loc.language_mix],['🎭',loc.cultural_markers],['🎩',loc.formality]
-  ].filter(r=>r[1]).map(r=>`<li>${r[0]} ${r[1]}</li>`).join('');
+    loc.audience,loc.language_mix,loc.cultural_markers,loc.formality
+  ].filter(Boolean).map(v=>`<li>${v}</li>`).join('');
 
   const st=p.storytelling||{};
   const stMoves=(st.signature_moves||[]).map(s=>`<span class="chip">${s}</span>`).join('');
@@ -954,9 +968,9 @@ function profileHTML(){
     <div style="margin-top:10px">${sigs}</div>
 
     <div class="section-h">${t.dos_h}</div>
-    <ul class="dna-list">${dos}</ul>
+    <ul class="dna-list do-list">${dos}</ul>
     <div class="section-h">${t.donts_h}</div>
-    <ul class="dna-list">${donts}</ul>
+    <ul class="dna-list dont-list">${donts}</ul>
 
     <div class="section-h">${t.local_h}</div>
     <ul class="dna-list">${locRows}</ul>
@@ -1033,7 +1047,7 @@ function composerHTML(){
     <input type="text" id="post-link" style="min-height:auto" placeholder="https://..." value="${escapeHtml(postLink)}">
 
     <label class="field-label">${t.img_label} <small>· ${t.img_small}</small></label>
-    <label class="upload-box"><input type="file" id="post-img" accept="image/png,image/jpeg,image/webp" multiple>📷</label>
+    <label class="upload-box"><input type="file" id="post-img" accept="image/png,image/jpeg,image/webp" multiple>+</label>
     <div class="thumbs">${postImages.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
 
     <div class="nav">
@@ -1126,10 +1140,11 @@ function renderIdeas(ideas){
   if(!box) return;
   if(!ideas.length){ box.innerHTML=`<div class="gap-note">${t.ideas_err}</div>`; return; }
   const cats=t.ideas_cats;
-  const grads=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'];
+  const catGrad={news:'var(--g-blue)',professional:'var(--g-orange)',personal:'var(--g-pink)',hobby:'var(--g-green)'};
   const pills=ideas.map((idea,idx)=>{
     const cat=cats[idea.category]||'';
-    return `<div class="idea-pill" style="--pg:${grads[idx%grads.length]};animation-delay:${idx*70}ms">
+    const pg=catGrad[idea.category]||'var(--g-lime)';
+    return `<div class="idea-pill" style="--pg:${pg};animation-delay:${idx*70}ms">
       <button class="idea-head" data-open="${idx}">
         <span class="idea-cat">${cat}</span>
         <span class="idea-title">${escapeHtml(idea.title||'')}</span>
@@ -1299,8 +1314,8 @@ css.textContent = `
 #vp-auth{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000}
 #vp-auth::before{content:'';position:absolute;inset:0;background:var(--grad);z-index:-1}
 #vp-auth .box{max-width:420px;width:100%;background:var(--panel);-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));border:1px solid var(--panel-border);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:var(--shadow)}
-#vp-auth h2{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.7rem;margin-bottom:8px}
-#vp-auth p{color:var(--ink-soft);margin-bottom:20px;font-size:.98rem}
+#vp-auth h2{font-family:'Bebas Neue','Heebo',sans-serif;font-weight:400;letter-spacing:.04em;font-size:2.2rem;margin-bottom:8px}
+#vp-auth p{color:var(--ink-soft);margin-bottom:20px;font-size:1rem}
 #vp-auth input{width:100%;font:inherit;border:1px solid var(--panel-border);border-radius:12px;padding:13px 15px;background:var(--field);color:var(--ink);margin-bottom:12px;min-height:auto}
 #vp-auth input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 #vp-auth button{width:100%;border:0;font:inherit;font-weight:700;border-radius:999px;padding:13px;cursor:pointer;background:var(--ink);color:var(--paper)}

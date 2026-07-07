@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voiceprint · טביעת קול</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#FBF9F4;
@@ -140,6 +140,86 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .gap-note{background:#FBF3E2;border:1.5px solid var(--amber);border-radius:10px;padding:14px 16px;margin-top:18px;font-size:.92rem}
 .error-box{background:#FBE9E9;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.92rem}
 .approved-banner{background:var(--accent);color:#fff;border-radius:10px;padding:18px 20px;margin-top:20px;font-weight:600}
+</style>
+
+<style>
+/* ==========================================================
+   GLASS AESTHETIC PASS — visual layer only (overrides above)
+   ========================================================== */
+:root{
+  --radius:20px;
+  --glass:rgba(255,255,255,.55);
+  --glass-soft:rgba(255,255,255,.40);
+  --glass-border:rgba(255,255,255,.72);
+  --line:rgba(120,118,105,.24);
+  --blur:18px;
+}
+body{
+  font-family:'Heebo',sans-serif;
+  font-size:18px;
+  line-height:1.62;
+  background:#EFEAE0;
+}
+html[lang="he"] body{font-size:19px}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(38% 46% at 14% 8%, rgba(14,91,71,.18), transparent 60%),
+    radial-gradient(42% 42% at 88% 16%, rgba(232,168,60,.16), transparent 60%),
+    radial-gradient(52% 52% at 62% 104%, rgba(14,91,71,.14), transparent 60%),
+    linear-gradient(160deg,#F5F1E8,#E7EEE8);
+}
+.serif{font-family:'Frank Ruhl Libre',serif}
+.q-title{font-size:1.72rem}
+.intro h2{font-size:2.5rem}
+
+.card{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));
+  border:1px solid var(--glass-border);border-radius:var(--radius);
+  box-shadow:0 14px 46px rgba(30,40,50,.12), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.layers{
+  background:var(--glass-soft);
+  -webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));
+  border:1px solid var(--glass-border);border-radius:var(--radius);
+  box-shadow:0 10px 34px rgba(30,40,50,.10), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.opt{
+  background:var(--glass-soft);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid var(--glass-border);border-radius:14px;
+}
+.opt:hover{border-color:var(--accent);background:rgba(255,255,255,.62)}
+.opt.selected{background:var(--accent-soft);border-color:var(--accent)}
+textarea,input[type=text]{
+  background:rgba(255,255,255,.5);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border:1px solid var(--glass-border);border-radius:14px;
+}
+.btn{border-radius:999px}
+.btn-ghost{
+  background:rgba(255,255,255,.4);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid var(--glass-border);color:var(--ink);
+}
+.btn-ghost:hover{background:rgba(255,255,255,.64)}
+.profile-summary{
+  background:rgba(228,240,234,.55);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+}
+.chip{
+  background:rgba(255,255,255,.5);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border:1px solid var(--glass-border);
+}
+.upload-box{background:rgba(255,255,255,.32);border:1.5px dashed var(--glass-border);border-radius:14px}
+.lang-toggle{background:rgba(255,255,255,.4);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-color:var(--glass-border)}
+.gap-note{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@media(prefers-reduced-motion:no-preference){
+  .card,.layers{transition:box-shadow .3s ease}
+}
 </style>
 </head>
 <body>
@@ -1104,8 +1184,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 /* ---- login screen styles (kept minimal, matches the app look) ---- */
 const css = document.createElement('style');
 css.textContent = `
-#vp-auth{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000}
-#vp-auth .box{max-width:420px;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:34px 32px;text-align:center}
+#vp-auth{position:fixed;inset:0;background:linear-gradient(160deg,#F5F1E8,#E7EEE8);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000}
+#vp-auth .box{max-width:420px;width:100%;background:var(--glass);-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));border:1px solid var(--glass-border);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:0 14px 46px rgba(30,40,50,.12)}
 #vp-auth h2{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.7rem;margin-bottom:8px}
 #vp-auth p{color:var(--ink-soft);margin-bottom:20px;font-size:.98rem}
 #vp-auth input{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:13px 15px;background:var(--paper);margin-bottom:12px;min-height:auto}

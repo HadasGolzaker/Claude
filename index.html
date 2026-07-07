@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voiceprint · טביעת קול</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700;900&family=Heebo:wght@400;500;600;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#FBF9F4;
@@ -161,45 +161,58 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --shadow:0 22px 60px rgba(24,34,44,.18);
   --highlight:inset 0 1px 0 rgba(255,255,255,.9);
   --amber-soft:rgba(232,168,60,.16);
+  --grad-primary:linear-gradient(135deg,#0E9E6E 0%,#37c98f 46%,#b6f24a 100%);
+  --on-primary:#0a1f16;
+  --g-blue:linear-gradient(135deg,#3a8bff,#38d0f5);
+  --g-orange:linear-gradient(135deg,#ff8a3c,#ff4d5e);
+  --g-pink:linear-gradient(135deg,#ff4db8,#9b5cff);
+  --g-green:linear-gradient(135deg,#12b886,#6be89a);
+  --g-lime:linear-gradient(135deg,#8fdc3a,#d6f24a);
   --grad:
-    radial-gradient(44% 52% at 10% 4%, rgba(14,91,71,.34), transparent 62%),
-    radial-gradient(48% 48% at 94% 10%, rgba(232,168,60,.30), transparent 62%),
-    radial-gradient(52% 54% at 82% 98%, rgba(14,91,71,.30), transparent 62%),
-    radial-gradient(46% 46% at 24% 92%, rgba(232,168,60,.24), transparent 62%),
+    radial-gradient(44% 52% at 10% 4%, rgba(14,91,71,.30), transparent 62%),
+    radial-gradient(48% 48% at 94% 10%, rgba(155,92,255,.16), transparent 62%),
+    radial-gradient(52% 54% at 82% 98%, rgba(14,91,71,.26), transparent 62%),
+    radial-gradient(46% 46% at 24% 92%, rgba(232,168,60,.22), transparent 62%),
     linear-gradient(160deg,#EFE9DC,#DBE7DE);
 }
 :root[data-theme="dark"]{
-  --paper:#161813;
-  --ink:#ECE8DE;
-  --ink-soft:#A7A599;
-  --card:#1c1f1a;
-  --accent:#46b394;
-  --accent-soft:rgba(70,179,148,.20);
-  --line:rgba(255,255,255,.14);
-  --bg:#0F110D;
-  --panel:rgba(30,34,29,.46);
-  --panel-soft:rgba(30,34,29,.34);
-  --panel-border:rgba(255,255,255,.16);
-  --field:rgba(18,20,16,.55);
-  --ghost:rgba(255,255,255,.08);
-  --ghost-hover:rgba(255,255,255,.16);
-  --summary-bg:rgba(70,179,148,.16);
-  --shadow:0 22px 60px rgba(0,0,0,.5);
-  --highlight:inset 0 1px 0 rgba(255,255,255,.08);
+  --paper:#17171B;
+  --ink:#ECEAF2;
+  --ink-soft:#9C9BA6;
+  --card:#1B1B21;
+  --accent:#5ad1a6;
+  --accent-soft:rgba(90,209,166,.20);
+  --line:rgba(255,255,255,.13);
+  --bg:#0C0C10;
+  --panel:rgba(34,34,42,.50);
+  --panel-soft:rgba(34,34,42,.36);
+  --panel-border:rgba(255,255,255,.14);
+  --field:rgba(16,16,22,.55);
+  --ghost:rgba(255,255,255,.07);
+  --ghost-hover:rgba(255,255,255,.15);
+  --summary-bg:rgba(90,209,166,.15);
+  --shadow:0 26px 70px rgba(0,0,0,.55);
+  --highlight:inset 0 1px 0 rgba(255,255,255,.07);
   --amber-soft:rgba(232,168,60,.14);
   --grad:
-    radial-gradient(44% 52% at 10% 4%, rgba(46,179,148,.26), transparent 62%),
-    radial-gradient(48% 48% at 94% 10%, rgba(232,168,60,.16), transparent 62%),
-    radial-gradient(52% 54% at 82% 98%, rgba(46,179,148,.22), transparent 62%),
-    radial-gradient(46% 46% at 24% 92%, rgba(232,168,60,.10), transparent 62%),
-    linear-gradient(160deg,#12140F,#0E1512);
+    radial-gradient(46% 52% at 8% 2%, rgba(120,92,255,.22), transparent 60%),
+    radial-gradient(46% 46% at 95% 8%, rgba(255,90,180,.16), transparent 60%),
+    radial-gradient(52% 54% at 85% 100%, rgba(60,200,160,.20), transparent 60%),
+    radial-gradient(42% 42% at 18% 96%, rgba(90,140,255,.16), transparent 60%),
+    linear-gradient(160deg,#101014,#0B0C10);
 }
 body{
-  font-family:'Heebo',sans-serif;
+  font-family:'Rubik','Heebo',sans-serif;
   font-size:18px;line-height:1.62;
   background:var(--bg);color:var(--ink);
 }
 html[lang="he"] body{font-size:19px}
+.serif,.logo h1,.q-title,.section-h,.intro h2{font-family:'Rubik','Heebo',sans-serif;letter-spacing:-.02em}
+.logo h1{font-weight:800}
+.q-title{font-weight:800}
+.intro h2{font-weight:800;line-height:1.08}
+.section-h{font-weight:700;letter-spacing:-.01em}
+.profile-summary{font-family:'Rubik','Heebo',sans-serif}
 body::before{
   content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
   background:var(--grad);
@@ -257,6 +270,14 @@ textarea,input[type=text]{
 .lang-toggle{background:var(--ghost);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-color:var(--panel-border)}
 .gap-note{background:var(--amber-soft);border-color:rgba(232,168,60,.45);color:var(--ink);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 :root[data-theme="dark"] .error-box{background:rgba(178,58,58,.18);color:#f0b4b4}
+
+/* vibrant accents (color reference) */
+.btn-primary,.btn-accent{background:var(--grad-primary);color:var(--on-primary)}
+.btn-primary:hover,.btn-accent:hover{filter:brightness(1.06)}
+.btn-primary:disabled{opacity:.4}
+.trait-fill{background:var(--grad-primary)}
+.approved-banner{background:var(--grad-primary);color:var(--on-primary)}
+.logo span{color:var(--accent)}
 
 /* header controls + theme toggle */
 .header-controls{display:flex;gap:12px;align-items:center}

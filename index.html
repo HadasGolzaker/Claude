@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voiceprint · טביעת קול</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#FBF9F4;
@@ -202,17 +202,17 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
     linear-gradient(160deg,#101014,#0B0C10);
 }
 body{
-  font-family:'Rubik','Heebo',sans-serif;
+  font-family:'Inter','Heebo',sans-serif;
   font-size:18px;line-height:1.62;
   background:var(--bg);color:var(--ink);
 }
 html[lang="he"] body{font-size:19px}
-.serif,.logo h1,.q-title,.section-h,.intro h2{font-family:'Rubik','Heebo',sans-serif;letter-spacing:-.02em}
+.serif,.logo h1,.q-title,.section-h,.intro h2{font-family:'Inter','Heebo',sans-serif;letter-spacing:-.02em}
 .logo h1{font-weight:800}
 .q-title{font-weight:800}
 .intro h2{font-weight:800;line-height:1.08}
 .section-h{font-weight:700;letter-spacing:-.01em}
-.profile-summary{font-family:'Rubik','Heebo',sans-serif}
+.profile-summary{font-family:'Inter','Heebo',sans-serif}
 body::before{
   content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
   background:var(--grad);
@@ -597,10 +597,11 @@ function renderLayers(){
   });
   const el = document.getElementById('layers-panel');
   el.innerHTML = `<h3>${lang==='he'?'שכבות הפרופיל':'Profile layers'}</h3>` +
-    LAYERS.map(L=>{
+    LAYERS.map((L,li)=>{
       const n = Math.min(filled[L.id]||0, L.slots);
+      const g=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'][li%5];
       let dots='';
-      for(let i=0;i<L.slots;i++) dots+=`<span class="dot ${i<n?'on':''}"></span>`;
+      for(let i=0;i<L.slots;i++) dots+=`<span class="dot ${i<n?'on':''}" style="${i<n?'background:'+g:''}"></span>`;
       return `<div class="layer"><span class="name">${L[lang]}</span><span class="dots">${dots}</span></div>`;
     }).join('');
 }
@@ -881,18 +882,20 @@ async function runGeneration(refineNote){
 function profileHTML(){
   const t=T(), p=profile;
   const traits=['openness','conscientiousness','extraversion','agreeableness','neuroticism'];
-  const bars = traits.map(tr=>{
+  const traitGrads=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'];
+  const bars = traits.map((tr,ti)=>{
     const d=p.big5[tr]||{score:3,evidence:''};
     return `<div class="trait-row">
       <span class="trait-name">${t.traits[tr]}</span>
-      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%"></div></div>
+      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%;background:${traitGrads[ti%traitGrads.length]}"></div></div>
       <span class="trait-score">${d.score}</span>
     </div>
     <div class="char-note" style="margin:-6px 0 12px">${t.ev}: ${d.evidence||''}</div>`;
   }).join('');
 
+  const motiveGrads=['var(--g-pink)','var(--g-blue)','var(--g-orange)'];
   const motives=(p.motives||[]).map((m,i)=>
-    `<span class="chip ${i===0?'hot':''}">${i+1}. ${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
+    `<span class="chip" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${i+1}. ${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
 
   const en=p.enneagram||{};
   const cg=p.cognitive||{};

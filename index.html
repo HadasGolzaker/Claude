@@ -147,79 +147,81 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
    GLASS AESTHETIC PASS — visual layer only (overrides above)
    ========================================================== */
 :root{
-  --radius:20px;
-  --glass:rgba(255,255,255,.55);
-  --glass-soft:rgba(255,255,255,.40);
-  --glass-border:rgba(255,255,255,.72);
-  --line:rgba(120,118,105,.24);
-  --blur:18px;
+  --radius:22px;
+  --glass:rgba(255,255,255,.42);
+  --glass-soft:rgba(255,255,255,.30);
+  --glass-border:rgba(255,255,255,.85);
+  --line:rgba(120,118,105,.22);
+  --blur:22px;
 }
 body{
   font-family:'Heebo',sans-serif;
   font-size:18px;
   line-height:1.62;
-  background:#EFEAE0;
+  background:#E9E3D6;
 }
 html[lang="he"] body{font-size:19px}
 body::before{
-  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
   background:
-    radial-gradient(38% 46% at 14% 8%, rgba(14,91,71,.18), transparent 60%),
-    radial-gradient(42% 42% at 88% 16%, rgba(232,168,60,.16), transparent 60%),
-    radial-gradient(52% 52% at 62% 104%, rgba(14,91,71,.14), transparent 60%),
-    linear-gradient(160deg,#F5F1E8,#E7EEE8);
+    radial-gradient(44% 52% at 10% 4%, rgba(14,91,71,.34), transparent 62%),
+    radial-gradient(48% 48% at 94% 10%, rgba(232,168,60,.30), transparent 62%),
+    radial-gradient(52% 54% at 82% 98%, rgba(14,91,71,.30), transparent 62%),
+    radial-gradient(46% 46% at 24% 92%, rgba(232,168,60,.24), transparent 62%),
+    radial-gradient(40% 40% at 52% 46%, rgba(14,91,71,.14), transparent 60%),
+    linear-gradient(160deg,#EFE9DC,#DBE7DE);
+  animation:glassdrift 26s ease-in-out infinite alternate;
 }
+@keyframes glassdrift{from{transform:translate3d(-1.5%,-1%,0) scale(1.02)}to{transform:translate3d(1.5%,1.5%,0) scale(1.06)}}
+@media(prefers-reduced-motion:reduce){body::before{animation:none}}
 .serif{font-family:'Frank Ruhl Libre',serif}
 .q-title{font-size:1.72rem}
 .intro h2{font-size:2.5rem}
 
 .card{
   background:var(--glass);
-  -webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%);
   border:1px solid var(--glass-border);border-radius:var(--radius);
-  box-shadow:0 14px 46px rgba(30,40,50,.12), inset 0 1px 0 rgba(255,255,255,.6);
+  box-shadow:0 22px 60px rgba(24,34,44,.18), inset 0 1px 0 rgba(255,255,255,.9);
 }
 .layers{
   background:var(--glass-soft);
-  -webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%);
   border:1px solid var(--glass-border);border-radius:var(--radius);
-  box-shadow:0 10px 34px rgba(30,40,50,.10), inset 0 1px 0 rgba(255,255,255,.6);
+  box-shadow:0 16px 44px rgba(24,34,44,.14), inset 0 1px 0 rgba(255,255,255,.9);
 }
 .opt{
   background:var(--glass-soft);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%);
   border:1px solid var(--glass-border);border-radius:14px;
 }
-.opt:hover{border-color:var(--accent);background:rgba(255,255,255,.62)}
-.opt.selected{background:var(--accent-soft);border-color:var(--accent)}
+.opt:hover{border-color:var(--accent);background:rgba(255,255,255,.58)}
+.opt.selected{background:rgba(228,240,234,.7);border-color:var(--accent)}
 textarea,input[type=text]{
-  background:rgba(255,255,255,.5);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  background:rgba(255,255,255,.42);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   border:1px solid var(--glass-border);border-radius:14px;
 }
 .btn{border-radius:999px}
 .btn-ghost{
-  background:rgba(255,255,255,.4);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  background:rgba(255,255,255,.34);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   border:1px solid var(--glass-border);color:var(--ink);
 }
-.btn-ghost:hover{background:rgba(255,255,255,.64)}
+.btn-ghost:hover{background:rgba(255,255,255,.6)}
 .profile-summary{
-  background:rgba(228,240,234,.55);
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  background:rgba(224,238,231,.5);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);
   border:1px solid var(--glass-border);
 }
 .chip{
-  background:rgba(255,255,255,.5);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  background:rgba(255,255,255,.42);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   border:1px solid var(--glass-border);
 }
-.upload-box{background:rgba(255,255,255,.32);border:1.5px dashed var(--glass-border);border-radius:14px}
-.lang-toggle{background:rgba(255,255,255,.4);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-color:var(--glass-border)}
-.gap-note{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-@media(prefers-reduced-motion:no-preference){
-  .card,.layers{transition:box-shadow .3s ease}
-}
+.upload-box{background:rgba(255,255,255,.24);border:1.5px dashed var(--glass-border);border-radius:14px}
+.lang-toggle{background:rgba(255,255,255,.34);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-color:var(--glass-border)}
+.gap-note{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 </style>
 </head>
 <body>

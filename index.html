@@ -5,30 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voiceprint · טביעת קול</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;500;700;900&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Noto+Serif:wght@600;700;800&family=Noto+Serif+Hebrew:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#FBF9F4;
-  --ink:#191A1E;
-  --ink-soft:#4A4B52;
-  --accent:#0E5B47;      /* deep ink-green */
-  --accent-soft:#E4F0EA;
-  --amber:#E8A83C;
-  --line:#E3E0D6;
-  --card:#FFFFFF;
+  --paper:#FAFAFA;
+  --ink:#000000;
+  --ink-soft:#6B6A61;
+  --accent:#FF6000;      /* vibe orange */
+  --accent-soft:#FFE4D4;
+  --amber:#B5793A;
+  --line:#DEDCD0;
+  --card:#FAFAFA;
   --danger:#B23A3A;
-  --radius:14px;
+  --radius:16px;
+  --font-serif:'Noto Serif Hebrew','Noto Serif',serif;
+  --font-sans:'Arimo',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family:'Assistant',sans-serif;
+  font-family:var(--font-sans);
   background:var(--paper);
   color:var(--ink);
   line-height:1.55;
   font-size:17px;
 }
-.serif{font-family:'Frank Ruhl Libre',serif}
+.serif{font-family:var(--font-serif)}
 
 /* ---------- layout ---------- */
 .app{max-width:1060px;margin:0 auto;padding:28px 20px 80px;display:grid;grid-template-columns:1fr 230px;gap:36px}
@@ -40,10 +42,10 @@ main{min-width:0}
 }
 
 /* ---------- header ---------- */
-header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.logo{display:flex;align-items:baseline;gap:10px}
-.logo h1{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.6rem;letter-spacing:-.01em}
-.logo span{color:var(--accent);font-weight:700;font-size:.85rem}
+header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
+.logo{display:flex;align-items:baseline;gap:10px;min-width:0}
+.logo h1{font-family:var(--font-serif);font-weight:700;font-size:1.6rem;letter-spacing:-.01em;flex-shrink:0}
+.logo span{color:var(--accent);font-weight:700;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lang-toggle{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
 .lang-toggle button{border:0;background:transparent;padding:6px 16px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
 .lang-toggle button.active{background:var(--ink);color:var(--paper)}
@@ -76,7 +78,7 @@ aside{position:sticky;top:24px;align-self:start}
 @media(prefers-reduced-motion:reduce){.step{animation:none}}
 
 .eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-.q-title{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:1.55rem;line-height:1.25;margin-bottom:8px}
+.q-title{font-family:var(--font-serif);font-weight:600;font-size:1.55rem;line-height:1.25;margin-bottom:8px}
 .q-sub{color:var(--ink-soft);margin-bottom:22px;font-size:.98rem}
 .lang-hint{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;margin-bottom:18px}
 
@@ -103,7 +105,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .field-label small{font-weight:400;color:var(--ink-soft)}
 
 /* nav */
-.nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:18px}
 .btn{border:0;font:inherit;font-weight:700;border-radius:999px;padding:12px 28px;cursor:pointer;transition:transform .1s}
 .btn:active{transform:scale(.98)}
 .btn-primary{background:var(--ink);color:var(--paper)}
@@ -113,7 +115,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .progress-label{font-size:.85rem;color:var(--ink-soft)}
 
 /* intro */
-.intro h2{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:2.3rem;line-height:1.15;margin-bottom:14px}
+.intro h2{font-family:var(--font-serif);font-weight:700;font-size:2.3rem;line-height:1.15;margin-bottom:14px}
 .intro p{color:var(--ink-soft);max-width:56ch;margin-bottom:12px}
 .intro .start-row{margin-top:26px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 
@@ -130,7 +132,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .trait-bar{flex:1;height:10px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
 .trait-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .8s ease}
 .trait-score{width:34px;text-align:center;font-weight:700;font-size:.9rem}
-.section-h{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:1.15rem;margin:26px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
+.section-h{font-family:var(--font-serif);font-weight:600;font-size:1.15rem;margin:26px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
 .chip{display:inline-block;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:5px 14px;margin:0 0 8px;margin-inline-end:8px;font-size:.88rem;font-weight:600}
 .chip.hot{border-color:var(--amber);background:#FBF3E2}
 .dna-list{list-style:none}
@@ -144,163 +146,141 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 
 <style>
 /* ==========================================================
-   GLASS AESTHETIC PASS — visual layer only (overrides above)
+   OPPO BRAND PASS — clean, flat, minimal (overrides above)
    ========================================================== */
 :root{
-  --radius:22px;
-  --blur:22px;
-  --line:rgba(120,118,105,.22);
-  --bg:#E9E3D6;
-  --panel:rgba(255,255,255,.42);
-  --panel-soft:rgba(255,255,255,.30);
-  --panel-border:rgba(255,255,255,.85);
-  --field:rgba(255,255,255,.42);
-  --ghost:rgba(255,255,255,.34);
-  --ghost-hover:rgba(255,255,255,.60);
-  --summary-bg:rgba(224,238,231,.5);
-  --shadow:0 22px 60px rgba(24,34,44,.18);
-  --highlight:inset 0 1px 0 rgba(255,255,255,.9);
-  --amber-soft:rgba(232,168,60,.16);
-  --grad-primary:linear-gradient(135deg,#0E9E6E 0%,#37c98f 46%,#b6f24a 100%);
-  --on-primary:#0a1f16;
-  --g-blue:linear-gradient(135deg,#3a8bff,#38d0f5);
-  --g-orange:linear-gradient(135deg,#ff8a3c,#ff4d5e);
-  --g-pink:linear-gradient(135deg,#ff4db8,#9b5cff);
-  --g-green:linear-gradient(135deg,#12b886,#6be89a);
-  --g-lime:linear-gradient(135deg,#8fdc3a,#d6f24a);
-  --grad:
-    radial-gradient(44% 52% at 10% 4%, rgba(14,91,71,.30), transparent 62%),
-    radial-gradient(48% 48% at 94% 10%, rgba(155,92,255,.16), transparent 62%),
-    radial-gradient(52% 54% at 82% 98%, rgba(14,91,71,.26), transparent 62%),
-    radial-gradient(46% 46% at 24% 92%, rgba(232,168,60,.22), transparent 62%),
-    linear-gradient(160deg,#EFE9DC,#DBE7DE);
+  --radius:16px;
+  --bg:#F2F1E8;
+  --paper:#FAFAFA;
+  --card:#FAFAFA;
+  --ink:#000000;
+  --ink-soft:#6B6A61;
+  --line:#DEDCD0;
+  --accent:#FF6000;        /* vibe orange */
+  --accent-soft:#FFE4D4;
+  --amber:#B5793A;
+  --amber-soft:#FEDCC6;    /* peach */
+  --danger:#B23A3A;
+  --danger-soft:#FBE9E9;
+  --lavender:#E4C4E1;
+  --olive:#C3C986;
+  --peach:#FEDCC6;
+  --shadow:0 1px 0 rgba(0,0,0,.03);
+  --hover-fill:#EEEDE3;
+  --g-blue:#E4C4E1;
+  --g-orange:#FF6000;
+  --g-pink:#FEDCC6;
+  --g-green:#C3C986;
+  --g-lime:#D8DC9E;
+  --on-primary:#000000;
 }
 :root[data-theme="dark"]{
-  --paper:#17171B;
-  --ink:#ECEAF2;
-  --ink-soft:#9C9BA6;
-  --card:#1B1B21;
-  --accent:#5ad1a6;
-  --accent-soft:rgba(90,209,166,.20);
-  --line:rgba(255,255,255,.13);
-  --bg:#0C0C10;
-  --panel:rgba(34,34,42,.50);
-  --panel-soft:rgba(34,34,42,.36);
-  --panel-border:rgba(255,255,255,.14);
-  --field:rgba(16,16,22,.55);
-  --ghost:rgba(255,255,255,.07);
-  --ghost-hover:rgba(255,255,255,.15);
-  --summary-bg:rgba(90,209,166,.15);
-  --shadow:0 26px 70px rgba(0,0,0,.55);
-  --highlight:inset 0 1px 0 rgba(255,255,255,.07);
-  --amber-soft:rgba(232,168,60,.14);
-  --grad:
-    radial-gradient(46% 52% at 8% 2%, rgba(120,92,255,.22), transparent 60%),
-    radial-gradient(46% 46% at 95% 8%, rgba(255,90,180,.16), transparent 60%),
-    radial-gradient(52% 54% at 85% 100%, rgba(60,200,160,.20), transparent 60%),
-    radial-gradient(42% 42% at 18% 96%, rgba(90,140,255,.16), transparent 60%),
-    linear-gradient(160deg,#101014,#0B0C10);
+  --bg:#000000;
+  --paper:#0D0D0C;
+  --card:#000000;
+  --ink:#FFFFFF;
+  --ink-soft:#A3A199;
+  --line:rgba(255,255,255,.16);
+  --accent:#FF6000;
+  --accent-soft:rgba(255,96,0,.20);
+  --amber:#E4B27C;
+  --amber-soft:rgba(254,220,198,.16);
+  --danger:#E27878;
+  --danger-soft:rgba(178,58,58,.20);
+  --shadow:0 1px 0 rgba(0,0,0,.4);
+  --hover-fill:rgba(255,255,255,.08);
+  --g-lime:#F5E14C;
 }
+html[lang="en"]{--font-serif:'Noto Serif','Noto Serif Hebrew',serif}
 body{
-  font-family:'Roboto','Heebo',sans-serif;
+  font-family:var(--font-sans);
   font-size:18px;line-height:1.62;
   background:var(--bg);color:var(--ink);
+  font-weight:400;
 }
-html[lang="he"] body{font-size:19px}
-/* titles: Hebrew -> Heebo bold; English -> Bebas Neue (no Hebrew glyphs) */
-.serif,.logo h1,.q-title,.section-h,.intro h2{font-family:'Heebo',sans-serif;font-weight:800;letter-spacing:-.01em}
+.serif,.logo h1,.q-title,.section-h,.intro h2{font-family:var(--font-serif)}
 .intro h2{line-height:1.08}
-html[lang="en"] .serif,html[lang="en"] .logo h1,html[lang="en"] .q-title,html[lang="en"] .section-h,html[lang="en"] .intro h2{font-family:'Bebas Neue',sans-serif;font-weight:400;letter-spacing:.03em}
 html[lang="en"] .logo h1{font-size:2rem}
-html[lang="en"] .q-title{font-size:2.1rem;line-height:1.1}
-html[lang="en"] .intro h2{font-size:3rem;line-height:1}
-html[lang="en"] .section-h{font-size:1.5rem}
-.profile-summary{font-family:'Roboto','Heebo',sans-serif}
-body::before{
-  content:'';position:fixed;inset:-10%;z-index:-1;pointer-events:none;
-  background:var(--grad);
-  animation:glassdrift 26s ease-in-out infinite alternate;
-}
-@keyframes glassdrift{from{transform:translate3d(-1.5%,-1%,0) scale(1.02)}to{transform:translate3d(1.5%,1.5%,0) scale(1.06)}}
-@media(prefers-reduced-motion:reduce){body::before{animation:none}}
-.q-title{font-size:1.75rem}
-.intro h2{font-size:2.6rem}
+html[lang="en"] .q-title{font-size:2rem;line-height:1.15}
+html[lang="en"] .intro h2{font-size:3rem;line-height:1.05}
+html[lang="en"] .section-h{font-size:1.4rem}
+.q-title{font-size:1.75rem;font-weight:600}
+.intro h2{font-size:2.6rem;font-weight:700}
 /* larger, readable type (body min 18px, titles min 21px) */
-body{font-weight:400}
 .q-sub,.char-note,.dna-list li,.idea-angle,.opt,.field-label{font-size:1rem}
-.idea-title{font-size:1.05rem}
-.chip{font-size:.95rem}
-.section-h{font-size:1.22rem}
-/* Hebrew tuning across all stages (Heebo, natural tracking, larger) */
+.idea-title{font-size:1.05rem;font-weight:600}
+.chip{font-size:.92rem;font-weight:500}
+.section-h{font-size:1.22rem;font-weight:600}
+.eyebrow{font-weight:600;font-size:.75rem}
+/* Hebrew tuning across all stages */
 html[lang="he"] body{font-size:18px;line-height:1.7}
-html[lang="he"] .serif,html[lang="he"] .logo h1,html[lang="he"] .q-title,html[lang="he"] .section-h,html[lang="he"] .intro h2{letter-spacing:normal}
 html[lang="he"] .intro h2{font-size:2.3rem;line-height:1.2}
 html[lang="he"] .q-title{font-size:1.7rem;line-height:1.35}
 html[lang="he"] .section-h{font-size:1.3rem}
 html[lang="he"] .q-sub,html[lang="he"] .char-note,html[lang="he"] .dna-list li{font-size:1.02rem}
+html[lang="en"] body{font-size:17px}
 
+/* ---------- flat cards & surfaces ---------- */
 .card{
-  background:var(--panel);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%);
-  border:1px solid var(--panel-border);border-radius:var(--radius);
-  box-shadow:var(--shadow),var(--highlight);
+  background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);
 }
 .layers{
-  background:var(--panel-soft);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(150%);backdrop-filter:blur(var(--blur)) saturate(150%);
-  border:1px solid var(--panel-border);border-radius:var(--radius);
-  box-shadow:var(--shadow),var(--highlight);
+  background:var(--card);
+  border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);
 }
 .opt{
-  background:var(--panel-soft);
-  -webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%);
-  border:1px solid var(--panel-border);border-radius:14px;
+  background:var(--paper);
+  border:1.5px solid var(--line);border-radius:14px;
 }
-.opt:hover{border-color:var(--accent);background:var(--ghost-hover)}
+.opt:hover{border-color:var(--ink);background:var(--hover-fill)}
 .opt.selected{background:var(--accent-soft);border-color:var(--accent)}
 textarea,input[type=text]{
-  background:var(--field);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
-  border:1px solid var(--panel-border);border-radius:14px;color:var(--ink);
+  background:var(--paper);
+  border:1.5px solid var(--line);border-radius:12px;color:var(--ink);
 }
-.btn{border-radius:999px}
+
+/* ---------- buttons: black primary pill, outline secondary, grey hover ---------- */
+.btn{border-radius:999px;font-weight:600}
+.btn-primary{background:var(--ink);color:var(--bg)}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.35}
 .btn-ghost{
-  background:var(--ghost);
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-  border:1px solid var(--panel-border);color:var(--ink);
+  background:transparent;
+  border:1.5px solid var(--ink);color:var(--ink);
 }
-.btn-ghost:hover{background:var(--ghost-hover)}
+.btn-ghost:hover{background:var(--hover-fill)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{filter:brightness(1.06)}
 .profile-summary{
-  background:var(--summary-bg);
-  -webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%);
-  border:1px solid var(--panel-border);
+  background:var(--accent-soft);
+  border:1px solid var(--line);
 }
 .chip{
-  background:var(--field);
-  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
-  border:1px solid var(--panel-border);
+  background:var(--paper);
+  border:1.5px solid var(--line);
 }
-.chip.hot{background:var(--amber-soft)}
-.upload-box{background:var(--ghost);border:1.5px dashed var(--panel-border);border-radius:14px}
-.lang-toggle{background:var(--ghost);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-color:var(--panel-border)}
-.gap-note{background:var(--amber-soft);border-color:rgba(232,168,60,.45);color:var(--ink);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-:root[data-theme="dark"] .error-box{background:rgba(178,58,58,.18);color:#f0b4b4}
+.chip.hot{background:var(--peach);border-color:var(--peach)}
+.upload-box{background:var(--paper);border:2px dashed var(--line);border-radius:14px}
+.upload-box:hover{border-color:var(--accent)}
+.lang-toggle{border-color:var(--ink)}
+.gap-note{background:var(--amber-soft);border-color:var(--amber);color:var(--ink)}
+.error-box{background:var(--danger-soft);border-color:var(--danger);color:var(--danger)}
+:root[data-theme="dark"] .error-box{background:var(--danger-soft);color:var(--danger)}
 
-/* vibrant accents (color reference) */
-.btn-primary,.btn-accent{background:var(--grad-primary);color:var(--on-primary)}
-.btn-primary:hover,.btn-accent:hover{filter:brightness(1.06)}
-.btn-primary:disabled{opacity:.4}
-.trait-fill{background:var(--grad-primary)}
-.approved-banner{background:var(--grad-primary);color:var(--on-primary)}
+.trait-fill{background:var(--accent)}
+.approved-banner{background:var(--accent);color:#fff}
 .logo span{color:var(--accent)}
 
-/* brainstorm idea pills (image 1) */
+/* brainstorm idea pills — brand palette per category */
 .idea-pills{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-.idea-pill{border-radius:16px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.12);animation:ideaIn .5s cubic-bezier(.2,.7,.2,1) both}
-.idea-head{width:100%;text-align:start;border:0;cursor:pointer;background:var(--pg);color:#12141a;font:inherit;padding:14px 18px;display:flex;flex-direction:column;gap:2px}
-.idea-cat{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;opacity:.72}
-.idea-title{font-weight:800;font-size:1.02rem;line-height:1.25}
-.idea-body{max-height:0;overflow:hidden;background:var(--panel);-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));transition:max-height .35s ease,padding .35s ease;padding:0 18px}
+.idea-pill{border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);animation:ideaIn .5s cubic-bezier(.2,.7,.2,1) both}
+.idea-head{width:100%;text-align:start;border:0;cursor:pointer;background:var(--pg);color:#000;font:inherit;padding:14px 18px;display:flex;flex-direction:column;gap:2px}
+.idea-cat{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.66}
+.idea-title{font-weight:600;font-size:1.02rem;line-height:1.25}
+.idea-body{max-height:0;overflow:hidden;background:var(--card);transition:max-height .35s ease,padding .35s ease;padding:0 18px}
 .idea-pill.open .idea-body{max-height:260px;padding:16px 18px}
 .idea-angle{margin-bottom:14px;color:var(--ink)}
 .idea-use{padding:8px 18px;font-size:.88rem}
@@ -310,8 +290,9 @@ textarea,input[type=text]{
 @media(prefers-reduced-motion:reduce){.idea-pill{animation:none}}
 
 /* header controls + theme toggle */
-.header-controls{display:flex;gap:12px;align-items:center}
-.theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--panel-border);background:var(--ghost);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
+.header-controls{display:flex;gap:12px;align-items:center;flex-shrink:0}
+.theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
+.theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}
 .theme-toggle .sun{display:none}
 :root[data-theme="dark"] .theme-toggle .moon{display:none}
@@ -383,60 +364,60 @@ const FEEDS = {
 const I18N = {
   he:{
     tagline:'טביעת קול', back:'חזרה', next:'המשך', of:'מתוך',
-    intro_h:'לפני שנכתוב פוסט אחד - בואי נלמד איך את נשמעת.',
-    intro_p1:'עשר שאלות. חלקן קצרות, חלקן פתוחות. מהתשובות ייבנה פרופיל בחמש שכבות: אישיות (Big 5), מניעים וערכים, טיפוס אניגרמה, סגנון חשיבה, וה-DNA של הכתיבה שלך.',
-    intro_p2:'טיפ חשוב: על שאלות הכתיבה החופשית, כתבי בשפה שבה את מפרסמת בלינקדאין. שאר השאלות - באיזו שפה שנוח לך.',
-    intro_p3:'אין תשובות נכונות. ככל שתהיי יותר את - הפרופיל יהיה יותר מדויק.',
-    start:'מתחילים',
+    intro_h:'לפני שנכתוב פוסט אחד - בואו נלמד איך נשמע הקול שלכם.',
+    intro_p1:'עשר שאלות. חלקן קצרות, חלקן פתוחות. מהתשובות ייבנה פרופיל בחמש שכבות: אישיות (Big 5), מניעים וערכים, טיפוס אניגרמה, סגנון חשיבה, וה-DNA של הכתיבה שלכם.',
+    intro_p2:'טיפ חשוב: על שאלות הכתיבה החופשית, כתבו בשפה שבה אתם מפרסמים בלינקדאין. שאר השאלות - באיזו שפה שנוח לכם.',
+    intro_p3:'אין תשובות נכונות. ככל שהתשובות יהיו אמיתיות יותר - הפרופיל יהיה מדויק יותר.',
+    start:'מתחילים ←',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
-    write_lang_hint:'כתבי בשפה שבה את מפרסמת בלינקדאין',
-    rank_note:'בחרי 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
-    generate:'בנה את הפרופיל שלי',
-    analyzing:['קוראת את התשובות שלך...','מזהה דפוסי שפה...','מצליבה מניעים מול תכונות...','מרכיבה את טביעת הקול...'],
-    profile_h:'טביעת הקול שלך',
-    profile_sub:'ככה אני קוראת אותך. עברי על זה - ואם משהו לא מדויק, תקני אותי למטה.',
-    refine_label:'משהו לא מדויק? כתבי מה לתקן:',
-    refine_ph:'למשל: אני הרבה פחות זהירה ממה שכתבת, ואני אף פעם לא משתמשת באימוג׳ים',
-    refine_btn:'עדכני את הפרופיל',
-    approve_btn:'הפרופיל מדויק - אשרי ושמרי',
-    approved:'הפרופיל נשמר. השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרי יהפוך לפוסט בקול שלך.',
+    write_lang_hint:'כתבו בשפה שבה אתם מפרסמים בלינקדאין',
+    rank_note:'בחרו 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
+    generate:'בנו את הפרופיל שלי',
+    analyzing:['קוראים את התשובות שלכם...','מזהים דפוסי שפה...','מצליבים מניעים מול תכונות...','מרכיבים את טביעת הקול...'],
+    profile_h:'טביעת הקול שלכם',
+    profile_sub:'ככה נראה הפרופיל שלכם. עברו עליו - ואם משהו לא מדויק, תקנו אותו למטה.',
+    refine_label:'משהו לא מדויק? כתבו מה לתקן:',
+    refine_ph:'למשל: הטון שלי פחות רשמי ממה שכתבתם, ואימוג׳ים אף פעם לא נכנסים לפוסטים שלי',
+    refine_btn:'עדכנו את הפרופיל',
+    approve_btn:'הפרופיל מדויק - אשרו ושמרו',
+    approved:'הפרופיל נשמר. השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרו יהפוך לפוסט בקול שלכם.',
     saved_local:'הפרופיל נשמר בהצלחה.',
     save_warn:'לא הצלחתי לשמור לאחסון קבוע - הפרופיל זמין בסשן הנוכחי בלבד.',
-    err_api:'משהו השתבש בניתוח. נסי שוב.',
-    retry:'נסי שוב',
-    big5_h:'חמשת הממדים', motives_h:'מה מניע אותך', ennea_h:'טיפוס אניגרמה',
-    cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלך', gaps_h:'פערים ששווה לבדוק',
+    err_api:'משהו השתבש בניתוח. נסו שוב.',
+    retry:'נסו שוב',
+    big5_h:'חמשת הממדים', motives_h:'מה מניע אתכם', ennea_h:'טיפוס אניגרמה',
+    cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלכם', gaps_h:'פערים ששווה לבדוק',
     local_h:'לוקאליזציה - שפה ותרבות', story_h:'סיפוריות',
-    dos_h:'כן - כללי הכתיבה שלך', donts_h:'לא - מה להימנע ממנו',
+    dos_h:'כן - כללי הכתיבה שלכם', donts_h:'לא - מה להימנע ממנו',
     story_struct:'מבנה', story_moves:'מהלכים אופייניים', story_templates:'תבניות סיפור',
     ev:'על סמך',
-    posts_label:'3-5 פוסטים שכתבת בעצמך', posts_small:'הדביקי אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
-    posts_ph:'הדביקי כאן פוסטים אמיתיים שלך מלינקדאין...',
-    pic_label:'תמונת הפרופיל שלך', pic_small:'אופציונלי. מחקרים מראים שבחירת תמונת פרופיל מנבאת תכונות אישיות.',
+    posts_label:'3-5 פוסטים שכתבתם בעצמכם', posts_small:'הדביקו אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
+    posts_ph:'הדביקו כאן פוסטים אמיתיים שלכם מלינקדאין...',
+    pic_label:'תמונת הפרופיל שלכם', pic_small:'אופציונלי. מחקרים מראים שבחירת תמונת פרופיל מנבאת תכונות אישיות.',
     pic_btn:'העלאת תמונה (אפשר גם צילומי מסך של פוסטים)',
-    about_label:'ה-About שלך מלינקדאין', about_small:'אופציונלי.',
-    about_ph:'הדביקי כאן...',
+    about_label:'ה-About שלכם מלינקדאין', about_small:'אופציונלי.',
+    about_ph:'הדביקו כאן...',
     to_composer:'למסך כתיבת הפוסטים ←',
     composer_h:'מה קרה היום?',
-    composer_sub:'ספרי חופשי - אירוע, שיחה, מחשבה, תסכול, ניצחון קטן. הקלדה או הקלטה. אני אדאג שזה יישמע כמוך.',
+    composer_sub:'ספרו חופשי - אירוע, שיחה, מחשבה, תסכול, ניצחון קטן. הקלדה או הקלטה. אני אדאג שזה יישמע כמוכם.',
     input_ph:'היום קרה משהו ש...',
     rec_start:'הקלטה', rec_stop:'עצירה', rec_unsupported:'הקלטה עובדת רק בכרום',
     link_label:'לינק רלוונטי', link_small:'אופציונלי. אקרא אותו ואשלב מהתוכן.',
     img_label:'תמונות לפוסט', img_small:'אופציונלי.',
-    gen_post:'כתבי לי את הפוסט',
-    ideas_btn:'אין לי על מה לכתוב - תני לי רעיונות',
-    ideas_h:'רעיונות לפוסט - בחרי אחד וזה יכנס למעלה',
-    ideas_loading:['סורקת מה קורה היום...','מצליבה מול הפרופיל שלך...','מרכיבה רעיונות בקול שלך...'],
+    gen_post:'כתבו לי את הפוסט',
+    ideas_btn:'אין לי על מה לכתוב - תנו לי רעיונות',
+    ideas_h:'רעיונות לפוסט - בחרו אחד וזה יכנס למעלה',
+    ideas_loading:['סורקים מה קורה היום...','מצליבים מול הפרופיל שלכם...','מרכיבים רעיונות בקול שלכם...'],
     ideas_cats:{news:'מהחדשות',professional:'מקצועי',personal:'אישי',hobby:'תחביבים'},
-    ideas_use:'כתבי על זה ←', ideas_err:'לא הצלחתי להביא רעיונות. נסי שוב.',
-    writing:['קוראת את מה שסיפרת...','טובלת את זה בקול שלך...','מחדדת את הפתיחה...','עוד שנייה...'],
-    result_h:'הפוסט שלך',
+    ideas_use:'כתבו על זה ←', ideas_err:'לא הצלחתי להביא רעיונות. נסו שוב.',
+    writing:['קוראים את מה שסיפרתם...','טובלים את זה בקול שלכם...','מחדדים את הפתיחה...','עוד שנייה...'],
+    result_h:'הפוסט שלכם',
     copy:'העתקת הפוסט', copied:'הועתק',
-    li_open:'העתק ופתח לינקדאין', li_toast:'הועתק - הדביקי בלינקדאין',
+    li_open:'העתיקו ופתחו לינקדאין', li_toast:'הועתק - הדביקו בלינקדאין',
     alt_hooks:'פתיחות חלופיות (אם ההוק לא יושב)',
     refine_post_label:'רוצה לשנות משהו?',
-    refine_post_ph:'למשל: קצרי בחצי, תורידי את האימוג׳ים, תסיימי בשאלה',
-    regen:'עדכני את הפוסט',
+    refine_post_ph:'למשל: קצרו בחצי, תורידו את האימוג׳ים, תסיימו בשאלה',
+    regen:'עדכנו את הפוסט',
     new_post:'+ פוסט חדש',
     back_profile:'לפרופיל',
     traits:{openness:'פתיחות לחוויה',conscientiousness:'מצפוניות',extraversion:'מוחצנות',agreeableness:'נעימות',neuroticism:'נוירוטיות'},
@@ -447,7 +428,7 @@ const I18N = {
     intro_p1:'Ten questions. Some quick, some open. From your answers we\'ll build a five-layer profile: personality (Big 5), motives & values, Enneagram type, thinking style, and your writing DNA.',
     intro_p2:'Important tip: on the free-writing questions, write in the language you post in on LinkedIn. Everything else - whatever feels natural.',
     intro_p3:'There are no right answers. The more you sound like yourself, the sharper the profile.',
-    start:'Let\'s begin',
+    start:'Let\'s begin →',
     open_note:'Free writing, unedited. At least a few sentences.',
     write_lang_hint:'Write in the language you post in on LinkedIn',
     rank_note:'Pick 3 in order of importance - click to select, click again to remove.',
@@ -506,27 +487,27 @@ const I18N = {
 /* ---------- questions ---------- */
 const QUESTIONS = [
  {id:'q1', type:'open', writeLang:true,
-  he:{ey:'שאלה 1 · חימום', t:'ספרי על רגע מהחודשים האחרונים שבו הרגשת בשיא שלך מקצועית.',
-      s:'מה קרה? מי היה שם? מה זה עשה לך? כתבי כמו שהיית מספרת לחבר.'},
+  he:{ey:'שאלה 1 · חימום', t:'ספרו על רגע מהחודשים האחרונים שבו הרגשתם בשיא שלכם מקצועית.',
+      s:'מה קרה? מי היה שם? מה זה עשה לכם? כתבו כמו שהייתם מספרים לחבר.'},
   en:{ey:'Question 1 · Warm-up', t:'Tell me about a recent moment when you felt at your professional best.',
       s:'What happened? Who was there? What did it do to you? Write like you\'d tell a friend.'}},
 
  {id:'q2', type:'single',
-  he:{ey:'שאלה 2 · תפיסת עולם', t:'איזה משפט הכי קרוב לאיך שאת רואה את העולם?', s:'בחרי אחד, גם אם כמה מדברים אליך.'},
+  he:{ey:'שאלה 2 · תפיסת עולם', t:'איזה משפט הכי קרוב לאיך שאתם רואים את העולם?', s:'בחרו אחד, גם אם כמה מדברים אליכם.'},
   en:{ey:'Question 2 · Worldview', t:'Which sentence is closest to how you see the world?', s:'Pick one, even if several resonate.'},
   opts:[
    {v:'e1', he:'טוב זה לא מספיק כשאפשר להגיע למצוין', en:'Good isn\'t enough when excellent is possible'},
-   {v:'e2', he:'אני מה שאני נותנת לאחרים', en:'I am what I give to others'},
+   {v:'e2', he:'לתת לאחרים - זה מה שמגדיר אותי', en:'I am what I give to others'},
    {v:'e3', he:'אני התוצאות וההישגים שלי', en:'I am my results and achievements'},
-   {v:'e4', he:'עדיף אותנטית ושונה מאשר רגילה', en:'Better authentic and different than ordinary'},
+   {v:'e4', he:'עדיפה אותנטיות ושונות על פני שגרתיות', en:'Better authentic and different than ordinary'},
    {v:'e5', he:'ידע והבנה הם השריון שלי', en:'Knowledge and understanding are my armor'},
-   {v:'e6', he:'צפי לטוב, אבל תמיד תהיי מוכנה לגרוע', en:'Hope for the best, always prepare for the worst'},
+   {v:'e6', he:'לצפות לטוב, אבל תמיד להיות מוכנים לגרוע', en:'Hope for the best, always prepare for the worst'},
    {v:'e7', he:'החיים מלאים אפשרויות - חייבים לחוות הכל', en:'Life is full of possibilities - I must experience it all'},
-   {v:'e8', he:'או שאת מובילה, או שמובילים אותך', en:'Either you lead, or you are led'},
+   {v:'e8', he:'או להוביל, או להיות מובלים', en:'Either you lead, or you are led'},
    {v:'e9', he:'שלווה והרמוניה שוות יותר מכל ניצחון', en:'Peace and harmony are worth more than any victory'}]},
 
  {id:'q3', type:'rank', max:3,
-  he:{ey:'שאלה 3 · מניעים', t:'מה הכי מניע אותך?', s:''},
+  he:{ey:'שאלה 3 · מניעים', t:'מה הכי מניע אתכם?', s:''},
   en:{ey:'Question 3 · Motives', t:'What drives you most?', s:''},
   opts:[
    {v:'achievement', he:'להצליח ולהוכיח יכולת', en:'Achieving and proving ability'},
@@ -541,55 +522,55 @@ const QUESTIONS = [
    {v:'material',    he:'ביטחון כלכלי ורמת חיים', en:'Financial security and lifestyle'}]},
 
  {id:'q4', type:'single',
-  he:{ey:'שאלה 4 · תרחיש', t:'נחת עלייך פרויקט ענק עם דדליין לא הגיוני. מה קורה אצלך בראש קודם כל?', s:''},
+  he:{ey:'שאלה 4 · תרחיש', t:'נחת עליכם פרויקט ענק עם דדליין לא הגיוני. מה קורה אצלכם בראש קודם כל?', s:''},
   en:{ey:'Question 4 · Scenario', t:'A huge project lands on you with an impossible deadline. What happens in your head first?', s:''},
   opts:[
-   {v:'plan',     he:'פותחת מסמך ומפרקת הכל לשלבים ולוחות זמנים', en:'I open a doc and break everything into steps and timelines'},
-   {v:'flow',     he:'צוללת פנימה ומתחילה - הסדר יסתדר תוך כדי', en:'I dive in and start - order will emerge on the way'},
-   {v:'stress',   he:'הלב מתחיל לדפוק - צריכה רגע לעכל לפני שזזה', en:'My heart races - I need a moment to process before moving'},
-   {v:'recruit',  he:'ישר חושבת את מי לגייס ואיך לחלק את זה', en:'I immediately think who to recruit and how to split it'}]},
+   {v:'plan',     he:'לפתוח מסמך ולפרק הכל לשלבים ולוחות זמנים', en:'I open a doc and break everything into steps and timelines'},
+   {v:'flow',     he:'לצלול פנימה ולהתחיל - הסדר יסתדר תוך כדי', en:'I dive in and start - order will emerge on the way'},
+   {v:'stress',   he:'הלב מתחיל לדפוק - צריך רגע לעכל לפני שממשיכים', en:'My heart races - I need a moment to process before moving'},
+   {v:'recruit',  he:'לחשוב מיד את מי לגייס ואיך לחלק את זה', en:'I immediately think who to recruit and how to split it'}]},
 
  {id:'q5', type:'single',
-  he:{ey:'שאלה 5 · אנרגיה', t:'אחרי שבוע אינטנסיבי - מה באמת ממלא אותך מחדש?', s:''},
+  he:{ey:'שאלה 5 · אנרגיה', t:'אחרי שבוע אינטנסיבי - מה באמת ממלא אתכם מחדש?', s:''},
   en:{ey:'Question 5 · Energy', t:'After an intense week - what actually recharges you?', s:''},
   opts:[
-   {v:'people', he:'ערב טוב עם אנשים שאני אוהבת', en:'A good evening with people I love'},
+   {v:'people', he:'ערב טוב עם אנשים אהובים', en:'A good evening with people I love'},
    {v:'alone',  he:'זמן לבד, בשקט, בלי אף אחד', en:'Time alone, quiet, nobody around'},
    {v:'novel',  he:'משהו חדש שלא ניסיתי - מקום, חוויה, טעם', en:'Something new I haven\'t tried - a place, an experience, a taste'},
    {v:'close',  he:'לסגור את כל הפינות הפתוחות ולהתחיל שבוע נקי', en:'Closing every open loop and starting the week clean'}]},
 
  {id:'q6', type:'open', writeLang:true,
-  he:{ey:'שאלה 6 · דגימת כתיבה', t:'מישהו שאל אותך בלינקדאין: "מה הדבר הכי חשוב שלמדת בקריירה שלך?"',
-      s:'כתבי את התשובה בדיוק כמו שהיית מפרסמת אותה. זו השאלה הכי חשובה בשאלון.'},
+  he:{ey:'שאלה 6 · דגימת כתיבה', t:'מישהו שאל אתכם בלינקדאין: "מה הדבר הכי חשוב שלמדתם בקריירה שלכם?"',
+      s:'כתבו את התשובה בדיוק כמו שהייתם מפרסמים אותה. זו השאלה הכי חשובה בשאלון.'},
   en:{ey:'Question 6 · Writing sample', t:'Someone asked you on LinkedIn: "What\'s the most important thing you\'ve learned in your career?"',
       s:'Write the answer exactly as you would publish it. This is the most important question here.'}},
 
  {id:'q7', type:'single',
-  he:{ey:'שאלה 7 · חדש מול מוכר', t:'יצא כלי חדש שכולם מדברים עליו. את...', s:''},
+  he:{ey:'שאלה 7 · חדש מול מוכר', t:'יצא כלי חדש שכולם מדברים עליו. אתם...', s:''},
   en:{ey:'Question 7 · New vs. familiar', t:'A new tool comes out and everyone\'s talking about it. You...', s:''},
   opts:[
-   {v:'first',  he:'קופצת ראשונה לנסות, עוד לפני שקראתי ביקורות', en:'Jump in first, before even reading reviews'},
-   {v:'curious',he:'סקרנית - קוראת, שואלת, ואז מנסה', en:'Curious - I read, ask around, then try'},
-   {v:'wait',   he:'מחכה שיוכיח את עצמו אצל אחרים', en:'Wait until it proves itself with others'},
-   {v:'stay',   he:'נשארת עם מה שעובד לי. אם זה לא שבור...', en:'Stick with what works for me. If it ain\'t broke...'}]},
+   {v:'first',  he:'קופצים ראשונים לנסות, עוד לפני שקראתי ביקורות', en:'Jump in first, before even reading reviews'},
+   {v:'curious',he:'סקרנים - קוראים, שואלים, ואז מנסים', en:'Curious - I read, ask around, then try'},
+   {v:'wait',   he:'מחכים שיוכיח את עצמו אצל אחרים', en:'Wait until it proves itself with others'},
+   {v:'stay',   he:'נשארים עם מה שעובד לי. אם זה לא שבור...', en:'Stick with what works for me. If it ain\'t broke...'}]},
 
  {id:'q8', type:'single',
-  he:{ey:'שאלה 8 · ביקורת', t:'פרסמת פוסט, ומישהו כתב תגובה ביקורתית ומזלזלת. מה הכי קרוב למה שתעשי?', s:''},
+  he:{ey:'שאלה 8 · ביקורת', t:'פרסמתם פוסט, ומישהו כתב תגובה ביקורתית ומזלזלת. מה הכי קרוב למה שתעשו?', s:''},
   en:{ey:'Question 8 · Criticism', t:'You published a post and someone left a dismissive, critical comment. What\'s closest to what you\'d do?', s:''},
   opts:[
-   {v:'humor', he:'עונה בהומור ומפרקת את המתח', en:'Reply with humor and defuse it'},
-   {v:'facts', he:'עונה עניינית, עם נתונים ונימוקים', en:'Reply factually, with data and reasoning'},
-   {v:'ignore',he:'מוחקת/מתעלמת וממשיכה הלאה', en:'Delete/ignore and move on'},
-   {v:'sits',  he:'עונה בנימוס, אבל זה יושב לי בראש כל היום', en:'Reply politely, but it sits in my head all day'}]},
+   {v:'humor', he:'עונים בהומור ומפרקים את המתח', en:'Reply with humor and defuse it'},
+   {v:'facts', he:'עונים עניינית, עם נתונים ונימוקים', en:'Reply factually, with data and reasoning'},
+   {v:'ignore',he:'מוחקים/מתעלמים וממשיכים הלאה', en:'Delete/ignore and move on'},
+   {v:'sits',  he:'עונים בנימוס, אבל זה יושב לי בראש כל היום', en:'Reply politely, but it sits in my head all day'}]},
 
  {id:'q9', type:'open',
-  he:{ey:'שאלה 9 · הקורא האידיאלי', t:'דמייני את האדם האחד שהכי היית רוצה שיקרא את הפוסטים שלך.',
-      s:'מי הוא? ומה היית רוצה שיקרה אצלו - שירגיש, יחשוב או יעשה - אחרי הקריאה?'},
+  he:{ey:'שאלה 9 · הקורא האידיאלי', t:'דמיינו את האדם האחד שהכי הייתם רוצים שיקרא את הפוסטים שלכם.',
+      s:'מי הוא? ומה הייתם רוצים שיקרה אצלו - שירגיש, יחשוב או יעשה - אחרי הקריאה?'},
   en:{ey:'Question 9 · The ideal reader', t:'Picture the one person you\'d most want reading your posts.',
       s:'Who are they? And what do you want to happen for them - feel, think or do - after reading?'}},
 
  {id:'q10', type:'uploads',
-  he:{ey:'שאלה 10 · הראיות', t:'עכשיו החלק שמכייל הכל: החומרים האמיתיים שלך.', s:''},
+  he:{ey:'שאלה 10 · הראיות', t:'עכשיו החלק שמכייל הכל: החומרים האמיתיים שלכם.', s:''},
   en:{ey:'Question 10 · The evidence', t:'Now the part that calibrates everything: your real materials.', s:''}}
 ];
 
@@ -668,7 +649,7 @@ function introHTML(){
     <p><b>${t.intro_p2}</b></p>
     <p>${t.intro_p3}</p>
     <div class="start-row">
-      <button class="btn btn-primary" onclick="step=0;render()">${t.start} ←</button>
+      <button class="btn btn-primary" onclick="step=0;render()">${t.start}</button>
     </div>
   </div>`;
 }
@@ -900,7 +881,7 @@ async function runGeneration(refineNote){
       ${String(err&&err.message).includes('fetch')?`
       <div class="gap-note" style="margin-top:14px">
         <b>${lang==='he'?'פתרון: מפתח API אישי':'Fix: personal API key'}</b><br>
-        ${lang==='he'?'הקובץ רץ מחוץ ל-Claude, אז צריך מפתח משלך (אותו אחד מהגנרטור). הוא לא נשמר בשום מקום - רק בזיכרון של העמוד.':'The file runs outside Claude, so it needs your own key. It is not stored anywhere - memory only.'}<br>
+        ${lang==='he'?'הקובץ רץ מחוץ ל-Claude, אז צריך מפתח משלכם (אותו אחד מהגנרטור). הוא לא נשמר בשום מקום - רק בזיכרון של העמוד.':'The file runs outside Claude, so it needs your own key. It is not stored anywhere - memory only.'}<br>
         <input type="text" id="api-key-input" style="min-height:auto;margin-top:8px" placeholder="sk-ant-..." value="${apiKey}">
       </div>`:''}
       <div class="nav"><button class="btn btn-ghost" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
@@ -1090,8 +1071,8 @@ function wireComposer(){
     recog.onerror=e=>{
       recog=null;
       const msg = lang==='he'
-        ? (e.error==='not-allowed' ? 'הדפדפן חסם גישה למיקרופון. בדקי את אייקון המנעול ליד הכתובת ואשרי מיקרופון.'
-           : 'ההקלטה נכשלה ('+e.error+'). כשהקובץ רץ מקומית או בתוך תצוגה מוטמעת, כרום חוסם את שירות הזיהוי - ראי הסבר בצ׳אט.')
+        ? (e.error==='not-allowed' ? 'הדפדפן חסם גישה למיקרופון. בדקו את אייקון המנעול ליד הכתובת ואשרו מיקרופון.'
+           : 'ההקלטה נכשלה ('+e.error+'). כשהקובץ רץ מקומית או בתוך תצוגה מוטמעת, כרום חוסם את שירות הזיהוי - ראו הסבר בצ׳אט.')
         : (e.error==='not-allowed' ? 'The browser blocked microphone access. Check the lock icon near the address bar.'
            : 'Recording failed ('+e.error+').');
       const box=document.querySelector('.step');
@@ -1312,40 +1293,80 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const css = document.createElement('style');
 css.textContent = `
 #vp-auth{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000}
-#vp-auth::before{content:'';position:absolute;inset:0;background:var(--grad);z-index:-1}
-#vp-auth .box{max-width:420px;width:100%;background:var(--panel);-webkit-backdrop-filter:blur(var(--blur));backdrop-filter:blur(var(--blur));border:1px solid var(--panel-border);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:var(--shadow)}
-#vp-auth h2{font-family:'Bebas Neue','Heebo',sans-serif;font-weight:400;letter-spacing:.04em;font-size:2.2rem;margin-bottom:8px}
+#vp-auth .box{max-width:420px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:var(--shadow)}
+#vp-auth h2{font-family:var(--font-serif);font-weight:600;letter-spacing:normal;font-size:2rem;margin-bottom:8px}
 #vp-auth p{color:var(--ink-soft);margin-bottom:20px;font-size:1rem}
-#vp-auth input{width:100%;font:inherit;border:1px solid var(--panel-border);border-radius:12px;padding:13px 15px;background:var(--field);color:var(--ink);margin-bottom:12px;min-height:auto}
+#vp-auth input{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--paper);color:var(--ink);margin-bottom:12px;min-height:auto}
 #vp-auth input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
-#vp-auth button{width:100%;border:0;font:inherit;font-weight:700;border-radius:999px;padding:13px;cursor:pointer;background:var(--ink);color:var(--paper)}
-#vp-auth button:disabled{opacity:.5;cursor:not-allowed}
+#vp-send{width:100%;border:0;font:inherit;font-weight:600;border-radius:999px;padding:13px;cursor:pointer;background:var(--ink);color:var(--bg)}
+#vp-send:disabled{opacity:.5;cursor:not-allowed}
 #vp-auth .msg{margin-top:14px;font-size:.9rem;color:var(--accent);font-weight:600}
 #vp-auth .msg.err{color:var(--danger)}
+#vp-auth-controls{position:fixed;top:24px;right:24px;display:flex;align-items:center;gap:12px;direction:ltr;z-index:1001}
 #vp-logout{border:1.5px solid var(--line);background:transparent;color:var(--ink-soft);font:inherit;font-weight:600;font-size:.82rem;border-radius:999px;padding:6px 14px;cursor:pointer;margin-inline-start:10px}
 `;
 document.head.appendChild(css);
 
-const t = { title:'Voiceprint', sub:'הכניסי את המייל שלך ונשלח לך קישור כניסה.', ph:'you@example.com',
-  btn:'שליחת קישור כניסה', sent:'שלחנו קישור למייל. פתחי אותו כדי להיכנס.',
-  err:'משהו השתבש. נסי שוב.', bad:'כתובת מייל לא תקינה.',
-  noconf:'החיבור לשרת עדיין לא הוגדר. ראי את קובץ ההוראות (README).', logout:'יציאה' };
+const AUTH_I18N = {
+  he:{ title:'Voiceprint', sub:'הכניסו את המייל שלכם ונשלח לכם קישור כניסה.', ph:'you@example.com',
+    btn:'שליחת קישור כניסה', sent:'שלחנו קישור למייל. פתחו אותו כדי להיכנס.',
+    err:'משהו השתבש. נסו שוב.', bad:'כתובת מייל לא תקינה.',
+    noconf:'החיבור לשרת עדיין לא הוגדר. ראו את קובץ ההוראות (README).', logout:'יציאה' },
+  en:{ title:'Voiceprint', sub:'Enter your email and we\'ll send you a login link.', ph:'you@example.com',
+    btn:'Send login link', sent:'We\'ve sent a link to your email. Open it to log in.',
+    err:'Something went wrong. Please try again.', bad:'Invalid email address.',
+    noconf:'The server connection isn\'t set up yet. See the instructions file (README).', logout:'Log out' }
+};
+let authLang = (typeof lang !== 'undefined' && (lang==='he'||lang==='en')) ? lang : 'he';
+const AT = () => AUTH_I18N[authLang];
 
 const overlay = document.createElement('div');
 overlay.id = 'vp-auth';
 overlay.innerHTML = `
+  <div id="vp-auth-controls">
+    <button class="theme-toggle" id="vp-theme-btn" type="button" aria-label="light/dark">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <div class="lang-toggle" id="vp-lang-toggle">
+      <button type="button" data-l="he" class="${authLang==='he'?'active':''}">עברית</button>
+      <button type="button" data-l="en" class="${authLang==='en'?'active':''}">English</button>
+    </div>
+  </div>
   <div class="box">
-    <h2 class="serif">${t.title}</h2>
-    <p>${t.sub}</p>
-    <input id="vp-email" type="email" dir="ltr" placeholder="${t.ph}" autocomplete="email">
-    <button id="vp-send">${t.btn}</button>
+    <h2 class="serif" id="vp-title">${AT().title}</h2>
+    <p id="vp-sub">${AT().sub}</p>
+    <input id="vp-email" type="email" dir="ltr" placeholder="${AT().ph}" autocomplete="email">
+    <button id="vp-send">${AT().btn}</button>
     <div class="msg" id="vp-msg" style="display:none"></div>
   </div>`;
 document.body.appendChild(overlay);
 
-function showMsg(text, isErr){
+function refreshAuthText(){
+  document.getElementById('vp-sub').textContent = AT().sub;
+  document.getElementById('vp-email').placeholder = AT().ph;
+  document.getElementById('vp-send').textContent = AT().btn;
+  document.querySelectorAll('#vp-lang-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.l===authLang));
+  if (lastMsgKey) showMsg(lastMsgKey, lastMsgErr);
+}
+
+document.getElementById('vp-lang-toggle').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-l]');
+  if (!b) return;
+  authLang = b.dataset.l;
+  refreshAuthText();
+  if (typeof setLang === 'function') setLang(authLang);
+  else { document.documentElement.lang = authLang; document.documentElement.dir = authLang==='he' ? 'rtl' : 'ltr'; }
+});
+document.getElementById('vp-theme-btn').addEventListener('click', () => {
+  if (typeof toggleTheme === 'function') toggleTheme();
+});
+
+let lastMsgKey = null, lastMsgErr = false;
+function showMsg(key, isErr){
+  lastMsgKey = key; lastMsgErr = isErr;
   const m = document.getElementById('vp-msg');
-  m.textContent = text; m.style.display='block';
+  m.textContent = AT()[key]; m.style.display='block';
   m.className = 'msg' + (isErr ? ' err' : '');
 }
 
@@ -1356,7 +1377,7 @@ try {
   if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error('missing config');
   supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
 } catch (e) {
-  showMsg(t.noconf, true);
+  showMsg('noconf', true);
 }
 
 /* ---- storage backed by Supabase — same interface the app expects ---- */
@@ -1382,14 +1403,14 @@ const sendBtn = document.getElementById('vp-send');
 const emailInput = document.getElementById('vp-email');
 sendBtn.addEventListener('click', async () => {
   const email = (emailInput.value||'').trim();
-  if (!email || !email.includes('@')) { showMsg(t.bad, true); return; }
-  if (!supabase) { showMsg(t.noconf, true); return; }
+  if (!email || !email.includes('@')) { showMsg('bad', true); return; }
+  if (!supabase) { showMsg('noconf', true); return; }
   sendBtn.disabled = true;
   try {
     const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.origin } });
     if (error) throw error;
-    showMsg(t.sent, false);
-  } catch(e){ showMsg(t.err, true); sendBtn.disabled = false; }
+    showMsg('sent', false);
+  } catch(e){ showMsg('err', true); sendBtn.disabled = false; }
 });
 emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
 
@@ -1400,7 +1421,7 @@ function onAuthed(){
   const toggle = document.querySelector('.lang-toggle');
   if (toggle && !document.getElementById('vp-logout')) {
     const btn = document.createElement('button');
-    btn.id = 'vp-logout'; btn.textContent = t.logout;
+    btn.id = 'vp-logout'; btn.textContent = AT().logout;
     btn.addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); });
     toggle.parentNode.insertBefore(btn, toggle.nextSibling);
   }

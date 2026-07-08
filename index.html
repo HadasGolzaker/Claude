@@ -187,13 +187,13 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --accent:#FF6000;
   --accent-soft:rgba(255,96,0,.20);
   --amber:#E4B27C;
-  --amber-soft:rgba(254,220,198,.16);
+  --amber-soft:rgba(254,220,198,.26);
   --danger:#E27878;
   --danger-soft:rgba(178,58,58,.20);
   --lavender:#E4C4E1;
-  --lavender-soft:rgba(228,196,225,.16);
+  --lavender-soft:rgba(228,196,225,.26);
   --olive:#C3C986;
-  --olive-soft:rgba(195,201,134,.16);
+  --olive-soft:rgba(195,201,134,.26);
   --peach:#FEDCC6;
   --shadow:0 1px 0 rgba(0,0,0,.4);
   --hover-fill:rgba(255,255,255,.08);
@@ -292,8 +292,8 @@ textarea,input[type=text]{
 .idea-pill.open .idea-body{max-height:260px;padding:16px 18px}
 .idea-angle{margin-bottom:14px;color:var(--ink)}
 .idea-use{padding:8px 18px;font-size:.88rem}
-.do-list li{border-inline-start:3px solid #2fbf88;padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
-.dont-list li{border-inline-start:3px solid #e2617a;padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
+.do-list li{border-inline-start:3px solid var(--olive);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
+.dont-list li{border-inline-start:3px solid var(--ink);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
 @keyframes ideaIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.idea-pill{animation:none}}
 
@@ -996,7 +996,7 @@ function profileHTML(){
     ${st.note?`<div class="char-note">${st.note}</div>`:''}
     ${gaps}
 
-    ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:var(--ink);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
+    ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:#000;margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
     <div class="section-h">${t.refine_label}</div>
     <textarea id="refine-ta" style="min-height:90px" placeholder="${t.refine_ph}"></textarea>
     <div class="nav">

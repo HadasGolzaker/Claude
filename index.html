@@ -603,6 +603,7 @@ function setLang(l){
   document.getElementById('btn-en').classList.toggle('active', l==='en');
   document.getElementById('tagline').textContent = T().tagline;
   renderLayers(); render();
+  if(profile && profile._lang && profile._lang!==l) translateProfile(l);
 }
 
 /* ---------- sidebar ---------- */
@@ -877,6 +878,7 @@ async function runGeneration(refineNote){
       content=buildUserContent();
     }
     profile = await callClaude(content);
+    profile._lang = lang;
     clearInterval(loadTimer);
     step=QUESTIONS.length+1; approved=false; render();
   }catch(err){
@@ -894,6 +896,28 @@ async function runGeneration(refineNote){
       <div class="nav"><button class="btn btn-ghost" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
       <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
   }
+}
+
+/* keep the generated profile in sync with the UI language — this only
+   re-translates the tool's own analysis text, never the user's answers
+   or the ghostwritten post (that stays in the person's real voice) */
+async function translateProfile(target){
+  if(!profile) return;
+  const onProfileStep = step===QUESTIONS.length+1;
+  const card = document.getElementById('main-card');
+  if(onProfileStep && card){
+    card.innerHTML = `<div class="step active loading"><div class="pulse"></div><p>${target==='he'?'מתרגם את הפרופיל...':'Translating your profile...'}</p></div>`;
+  }
+  try{
+    const content=[{type:'text',text:
+      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nTranslate every free-text/descriptive value into ${target==='he'?'Hebrew':'English'}. Keep the exact same JSON schema, field names, scores and structure — this is a pure translation, not a re-analysis. Respond with ONLY the translated JSON, no fences.`}];
+    const translated = await callClaude(content);
+    translated._lang = target;
+    profile = translated;
+  }catch(err){
+    console.error('profile translation failed:',err);
+  }
+  if(step===QUESTIONS.length+1) render();
 }
 
 /* ---------- profile view ---------- */
@@ -1279,6 +1303,7 @@ async function savePostHistory(){
       if(saved&&saved.value){
         const obj=JSON.parse(saved.value);
         profile=obj.profile; lang=obj.lang||'he';
+        if(profile && !profile._lang) profile._lang = lang;
         approved=true; step=QUESTIONS.length+1;
         setLang(lang);
         return;

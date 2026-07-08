@@ -10,7 +10,7 @@
 :root{
   --paper:#FAFAFA;
   --ink:#000000;
-  --ink-soft:#6B6A61;
+  --ink-soft:#000000;
   --accent:#FF6000;      /* vibe orange */
   --accent-soft:#FFE4D4;
   --amber:#B5793A;
@@ -45,7 +45,7 @@ main{min-width:0}
 header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px}
 .logo{display:flex;align-items:baseline;gap:10px;min-width:0}
 .logo h1{font-family:var(--font-serif);font-weight:700;font-size:1.6rem;letter-spacing:-.01em;flex-shrink:0}
-.logo span{color:var(--accent);font-weight:700;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logo span{color:var(--ink);font-weight:700;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lang-toggle{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
 .lang-toggle button{border:0;background:transparent;padding:6px 16px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
 .lang-toggle button.active{background:var(--ink);color:var(--paper)}
@@ -77,16 +77,16 @@ aside{position:sticky;top:24px;align-self:start}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.step{animation:none}}
 
-.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
 .q-title{font-family:var(--font-serif);font-weight:600;font-size:1.55rem;line-height:1.25;margin-bottom:8px}
 .q-sub{color:var(--ink-soft);margin-bottom:22px;font-size:.98rem}
-.lang-hint{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;margin-bottom:18px}
+.lang-hint{display:inline-flex;align-items:center;gap:8px;background:var(--lavender-soft);color:var(--ink);border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;margin-bottom:18px}
 
 /* options */
 .opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
-.opt:hover{border-color:var(--accent)}
-.opt.selected{border-color:var(--accent);background:var(--accent-soft)}
-.opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.opt:hover{background:var(--hover-fill)}
+.opt.selected{border-color:var(--accent);border-width:2px;background:var(--paper)}
+.opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--lavender);color:#000;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
 
 textarea,input[type=text]{
   width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;
@@ -126,7 +126,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .loading p{color:var(--ink-soft)}
 
 /* profile view */
-.profile-summary{background:var(--accent-soft);border-radius:10px;padding:20px 22px;margin-bottom:24px;font-size:1.05rem}
+.profile-summary{background:var(--lavender-soft);border-radius:10px;padding:20px 22px;margin-bottom:24px;font-size:1.05rem}
 .trait-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
 .trait-name{width:170px;font-weight:600;font-size:.92rem;flex-shrink:0}
 .trait-bar{flex:1;height:10px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
@@ -138,7 +138,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .dna-list{list-style:none}
 .dna-list li{padding:8px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
 .dna-list li:last-child{border:0}
-.dna-list b{color:var(--accent)}
+.dna-list b{color:var(--ink)}
 .gap-note{background:#FBF3E2;border:1.5px solid var(--amber);border-radius:10px;padding:14px 16px;margin-top:18px;font-size:.92rem}
 .error-box{background:#FBE9E9;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.92rem}
 .approved-banner{background:var(--accent);color:#fff;border-radius:10px;padding:18px 20px;margin-top:20px;font-weight:600}
@@ -154,7 +154,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --paper:#FAFAFA;
   --card:#FAFAFA;
   --ink:#000000;
-  --ink-soft:#6B6A61;
+  --ink-soft:#000000;
   --line:#DEDCD0;
   --accent:#FF6000;        /* vibe orange */
   --accent-soft:#FFE4D4;
@@ -163,7 +163,9 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --danger:#B23A3A;
   --danger-soft:#FBE9E9;
   --lavender:#E4C4E1;
+  --lavender-soft:#F4E9F3;
   --olive:#C3C986;
+  --olive-soft:#F0F1E1;
   --peach:#FEDCC6;
   --shadow:0 1px 0 rgba(0,0,0,.03);
   --hover-fill:#EEEDE3;
@@ -179,7 +181,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --paper:#0D0D0C;
   --card:#000000;
   --ink:#FFFFFF;
-  --ink-soft:#A3A199;
+  --ink-soft:#FFFFFF;
   --line:rgba(255,255,255,.16);
   --accent:#FF6000;
   --accent-soft:rgba(255,96,0,.20);
@@ -187,6 +189,11 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --amber-soft:rgba(254,220,198,.16);
   --danger:#E27878;
   --danger-soft:rgba(178,58,58,.20);
+  --lavender:#E4C4E1;
+  --lavender-soft:rgba(228,196,225,.16);
+  --olive:#C3C986;
+  --olive-soft:rgba(195,201,134,.16);
+  --peach:#FEDCC6;
   --shadow:0 1px 0 rgba(0,0,0,.4);
   --hover-fill:rgba(255,255,255,.08);
   --g-lime:#F5E14C;
@@ -235,8 +242,8 @@ html[lang="en"] body{font-size:17px}
   background:var(--paper);
   border:1.5px solid var(--line);border-radius:14px;
 }
-.opt:hover{border-color:var(--ink);background:var(--hover-fill)}
-.opt.selected{background:var(--accent-soft);border-color:var(--accent)}
+.opt:hover{background:var(--hover-fill)}
+.opt.selected{background:var(--paper);border-color:var(--accent);border-width:2px}
 textarea,input[type=text]{
   background:var(--paper);
   border:1.5px solid var(--line);border-radius:12px;color:var(--ink);
@@ -255,7 +262,7 @@ textarea,input[type=text]{
 .btn-accent{background:var(--accent);color:#fff}
 .btn-accent:hover{filter:brightness(1.06)}
 .profile-summary{
-  background:var(--accent-soft);
+  background:var(--lavender-soft);
   border:1px solid var(--line);
 }
 .chip{
@@ -272,7 +279,7 @@ textarea,input[type=text]{
 
 .trait-fill{background:var(--accent)}
 .approved-banner{background:var(--accent);color:#fff}
-.logo span{color:var(--accent)}
+.logo span{color:var(--ink)}
 
 /* brainstorm idea pills — brand palette per category */
 .idea-pills{display:flex;flex-direction:column;gap:10px;margin-top:8px}
@@ -906,7 +913,7 @@ function profileHTML(){
 
   const motiveGrads=['var(--g-pink)','var(--g-blue)','var(--g-orange)'];
   const motives=(p.motives||[]).map((m,i)=>
-    `<span class="chip" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${i+1}. ${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
+    `<span class="chip" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
 
   const en=p.enneagram||{};
   const cg=p.cognitive||{};
@@ -964,7 +971,7 @@ function profileHTML(){
     ${st.note?`<div class="char-note">${st.note}</div>`:''}
     ${gaps}
 
-    ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:var(--accent);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
+    ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:var(--ink);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
     <div class="section-h">${t.refine_label}</div>
     <textarea id="refine-ta" style="min-height:90px" placeholder="${t.refine_ph}"></textarea>
     <div class="nav">
@@ -1300,7 +1307,7 @@ css.textContent = `
 #vp-auth input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 #vp-send{width:100%;border:0;font:inherit;font-weight:600;border-radius:999px;padding:13px;cursor:pointer;background:var(--ink);color:var(--bg)}
 #vp-send:disabled{opacity:.5;cursor:not-allowed}
-#vp-auth .msg{margin-top:14px;font-size:.9rem;color:var(--accent);font-weight:600}
+#vp-auth .msg{margin-top:14px;font-size:.9rem;color:var(--ink);font-weight:600}
 #vp-auth .msg.err{color:var(--danger)}
 #vp-auth-controls{position:fixed;top:24px;right:24px;display:flex;align-items:center;gap:12px;direction:ltr;z-index:1001}
 #vp-logout{border:1.5px solid var(--line);background:transparent;color:var(--ink-soft);font:inherit;font-weight:600;font-size:.82rem;border-radius:999px;padding:6px 14px;cursor:pointer;margin-inline-start:10px}

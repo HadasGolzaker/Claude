@@ -134,6 +134,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .trait-score{width:34px;text-align:center;font-weight:700;font-size:.9rem}
 .section-h{font-family:var(--font-serif);font-weight:600;font-size:1.15rem;margin:26px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
 .chip{display:inline-block;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:5px 14px;margin:0 0 8px;margin-inline-end:8px;font-size:.88rem;font-weight:600}
+.chip-block{display:block;border-radius:16px;padding:14px 18px;margin:0 0 10px;line-height:1.45}
 .chip.hot{border-color:var(--amber);background:#FBF3E2}
 .dna-list{list-style:none}
 .dna-list li{padding:8px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
@@ -937,7 +938,7 @@ function profileHTML(){
 
   const motiveGrads=['var(--g-pink)','var(--g-blue)','var(--g-orange)'];
   const motives=(p.motives||[]).map((m,i)=>
-    `<span class="chip" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
+    `<span class="chip chip-block" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
 
   const en=p.enneagram||{};
   const cg=p.cognitive||{};

@@ -300,8 +300,27 @@ textarea,input[type=text]{
 
 /* header controls + theme toggle */
 .header-controls{display:flex;gap:12px;align-items:center;flex-shrink:0}
-#profile-picker{display:none;font:inherit;font-weight:600;font-size:.9rem;border:1.5px solid var(--ink);border-radius:999px;padding:7px 12px;background:transparent;color:var(--ink);cursor:pointer;max-width:150px}
-@media(max-width:600px){#profile-picker{max-width:110px}}
+#profile-picker{display:none;font:inherit;font-weight:600;font-size:.9rem;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;background:transparent;color:var(--ink);cursor:pointer;max-width:170px}
+@media(max-width:600px){#profile-picker{max-width:120px}}
+#profile-del{display:none}
+/* collapsed full-profile accordion */
+.profile-acc{border:1.5px solid var(--line);border-radius:14px;background:var(--paper);margin:6px 0 4px}
+.profile-acc>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;font-family:var(--font-serif);font-weight:600;font-size:1.15rem}
+.profile-acc>summary::-webkit-details-marker{display:none}
+.profile-acc>summary::after{content:'+';font-weight:600;font-size:1.4rem;line-height:1}
+.profile-acc[open]>summary::after{content:'−'}
+.profile-acc .acc-body{padding:0 18px 18px}
+/* delete-profile confirmation */
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:disabled{opacity:.35;cursor:not-allowed}
+#vp-del{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1200}
+#vp-del .box{max-width:440px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:var(--shadow)}
+#vp-del h2{font-family:var(--font-serif);font-weight:600;font-size:1.7rem;margin-bottom:10px}
+#vp-del p{margin-bottom:14px}
+#vp-del .del-type{font-weight:700;margin-bottom:8px}
+#vp-del input{width:100%;font:inherit;font-weight:700;letter-spacing:.12em;text-align:center;direction:ltr;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto}
+#vp-del input:focus{outline:2px solid var(--danger);outline-offset:1px;border-color:var(--danger)}
+#vp-del .row{display:flex;gap:12px;justify-content:center;margin-top:20px}
 /* intro name/country fields */
 .intro-fields{margin-top:24px;max-width:440px}
 .intro-fields input,.intro-fields select{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto;margin-bottom:4px;resize:none}
@@ -331,6 +350,9 @@ function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme
     <div class="logo"><h1>Voiceprint</h1><span id="tagline">טביעת קול</span></div>
     <div class="header-controls">
       <select id="profile-picker" aria-label="profile"></select>
+      <button class="theme-toggle" id="profile-del" type="button" aria-label="delete profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </button>
       <div class="lang-toggle">
         <button id="btn-he" class="active" onclick="setLang('he')">עברית</button>
         <button id="btn-en" onclick="setLang('en')">English</button>
@@ -391,6 +413,11 @@ const I18N = {
     country_label:'מדינה (מכייל את מודל התרבות)',
     country_ph:'בחרו מדינה',
     add_profile:'+ פרופיל חדש',
+    full_profile:'הפרופיל המלא',
+    del_title:'מחיקת פרופיל',
+    del_warn:'הפעולה תמחק לצמיתות את הפרופיל {name}. אי אפשר לשחזר אותה.',
+    del_type:'כדי לאשר, כתבו DELETE (באותיות גדולות):',
+    del_btn:'מחיקה סופית', del_cancel:'ביטול',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
     write_lang_hint:'כתבו בשפה שבה אתם מפרסמים בלינקדאין',
     rank_note:'בחרו 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
@@ -456,6 +483,11 @@ const I18N = {
     country_label:'Country (calibrates the culture model)',
     country_ph:'Select a country',
     add_profile:'+ New profile',
+    full_profile:'Full profile',
+    del_title:'Delete profile',
+    del_warn:'This will permanently delete the profile {name}. It cannot be undone.',
+    del_type:'To confirm, type DELETE in capital letters:',
+    del_btn:'Delete forever', del_cancel:'Cancel',
     open_note:'Free writing, unedited. At least a few sentences.',
     write_lang_hint:'Write in the language you post in on LinkedIn',
     rank_note:'Pick 3 in order of importance - click to select, click again to remove.',
@@ -639,12 +671,59 @@ function setLang(l){
 function renderProfilePicker(){
   const sel=document.getElementById('profile-picker');
   if(!sel) return;
+  const del=document.getElementById('profile-del');
   const list=profilesStore.profiles;
-  if(!list.length){ sel.style.display='none'; return; }
+  if(!list.length){ sel.style.display='none'; if(del) del.style.display='none'; return; }
   sel.style.display='inline-block';
+  sel.dir = lang==='he' ? 'rtl' : 'ltr'; /* text follows UI language; position stays fixed */
   sel.innerHTML=list.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')
     +`<option value="__new">${T().add_profile}</option>`;
   sel.value=activeProfileId||'__new';
+  if(del) del.style.display=activeProfileId?'flex':'none';
+}
+
+/* ---------- delete profile (bin icon -> type-DELETE confirmation) ---------- */
+function openDeleteModal(){
+  const t=T();
+  const entry=profilesStore.profiles.find(p=>p.id===activeProfileId);
+  if(!entry) return;
+  const ov=document.createElement('div');
+  ov.id='vp-del';
+  ov.innerHTML=`<div class="box">
+    <h2>${t.del_title}</h2>
+    <p>${t.del_warn.replace('{name}','<b>'+escapeHtml(entry.name)+'</b>')}</p>
+    <p class="del-type">${t.del_type}</p>
+    <input id="vp-del-input" type="text" autocomplete="off" spellcheck="false" placeholder="DELETE">
+    <div class="row">
+      <button class="btn btn-ghost" id="vp-del-cancel">${t.del_cancel}</button>
+      <button class="btn btn-danger" id="vp-del-confirm" disabled>${t.del_btn}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  const inp=ov.querySelector('#vp-del-input');
+  const confirm=ov.querySelector('#vp-del-confirm');
+  inp.addEventListener('input',()=>{ confirm.disabled = inp.value!=='DELETE'; });
+  ov.querySelector('#vp-del-cancel').addEventListener('click',()=>ov.remove());
+  confirm.addEventListener('click',async()=>{
+    if(inp.value!=='DELETE') return;
+    ov.remove();
+    await deleteActiveProfile();
+  });
+  inp.focus();
+}
+
+async function deleteActiveProfile(){
+  const id=activeProfileId;
+  if(!id) return;
+  profilesStore.profiles=profilesStore.profiles.filter(p=>p.id!==id);
+  const next=profilesStore.profiles[0];
+  if(next){
+    switchProfile(next.id); /* persists the new activeId */
+  }else{
+    profilesStore.activeId=null; activeProfileId=null;
+    try{ await persistProfiles(); }catch(e){ console.warn('storage failed',e); }
+    startNewProfile();
+  }
 }
 
 function switchProfile(id){
@@ -676,6 +755,7 @@ document.getElementById('profile-picker').addEventListener('change',e=>{
   const v=e.target.value;
   if(v==='__new') startNewProfile(); else switchProfile(v);
 });
+document.getElementById('profile-del').addEventListener('click',openDeleteModal);
 
 /* ---------- sidebar ---------- */
 function renderLayers(){
@@ -956,9 +1036,28 @@ async function callClaude(content, useSearch, maxTokens){
   const data = await response.json();
   if(data.error) throw new Error(data.error.message||'API error');
   const txt = (data.content||[]).filter(i=>i.type==='text').map(i=>i.text).join('\n');
-  const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
-  if(start===-1||end===-1) throw new Error('No JSON in response');
-  return JSON.parse(txt.slice(start,end+1));
+  return extractJSON(txt);
+}
+
+/* pull the first complete top-level JSON object out of a text blob,
+   ignoring any commentary the model may have added before/after it */
+function extractJSON(txt){
+  const start = txt.indexOf('{');
+  if(start===-1) throw new Error('No JSON in response');
+  let depth=0, inStr=false, esc=false;
+  for(let i=start;i<txt.length;i++){
+    const ch=txt[i];
+    if(inStr){
+      if(esc) esc=false;
+      else if(ch==='\\') esc=true;
+      else if(ch==='"') inStr=false;
+    }else{
+      if(ch==='"') inStr=true;
+      else if(ch==='{') depth++;
+      else if(ch==='}'){ depth--; if(depth===0) return JSON.parse(txt.slice(start,i+1)); }
+    }
+  }
+  throw new Error('No JSON in response');
 }
 
 function generateHTML(){
@@ -1089,8 +1188,11 @@ function profileHTML(){
   return `<div class="step active">
     <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
     <div class="profile-summary serif">${p.summary||''}</div>
-    <p class="q-sub">${t.profile_sub}</p>
+    ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
 
+    <details class="profile-acc"${approved?'':' open'}>
+      <summary>${t.full_profile}</summary>
+      <div class="acc-body">
     <div class="section-h">${t.big5_h}</div>${bars}
     <div class="section-h">${t.motives_h}</div>${motives}
     <div class="section-h">${t.ennea_h}</div>
@@ -1119,6 +1221,8 @@ function profileHTML(){
     ${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}
     ${st.note?`<div class="char-note">${st.note}</div>`:''}
     ${gaps}
+      </div>
+    </details>
 
     ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:#000;margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
     <div class="section-h">${t.refine_label}</div>

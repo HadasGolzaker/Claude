@@ -86,7 +86,8 @@ aside{position:sticky;top:24px;align-self:start}
 /* options */
 .opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
 .opt:hover{background:var(--hover-fill)}
-.opt.selected{border-color:var(--accent);border-width:2px;background:var(--paper)}
+.opt.selected{border-color:var(--accent);background:var(--accent);color:#000;font-weight:600}
+.opt.selected:hover{background:var(--accent)}
 .opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--lavender);color:#000;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
 
 textarea,input[type=text]{
@@ -245,7 +246,8 @@ html[lang="en"] body{font-size:17px}
   border:1.5px solid var(--line);border-radius:14px;
 }
 .opt:hover{background:var(--hover-fill)}
-.opt.selected{background:var(--paper);border-color:var(--accent);border-width:2px}
+.opt.selected{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.opt.selected:hover{background:var(--accent)}
 textarea,input[type=text]{
   background:var(--paper);
   border:1.5px solid var(--line);border-radius:12px;color:var(--ink);
@@ -304,12 +306,14 @@ textarea,input[type=text]{
 @media(max-width:600px){#profile-picker{max-width:120px}}
 #profile-del{display:none}
 /* collapsed full-profile accordion */
-.profile-acc{border:1.5px solid var(--line);border-radius:14px;background:var(--paper);margin:6px 0 4px}
-.profile-acc>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;font-family:var(--font-serif);font-weight:600;font-size:1.15rem}
-.profile-acc>summary::-webkit-details-marker{display:none}
-.profile-acc>summary::after{content:'+';font-weight:600;font-size:1.4rem;line-height:1}
-.profile-acc[open]>summary::after{content:'−'}
-.profile-acc .acc-body{padding:0 18px 18px}
+/* profile category tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.tab-btn{font:inherit;font-weight:600;font-size:.9rem;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
+.tab-btn:hover{background:var(--hover-fill)}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#000}
+.tab-panel{display:none;padding-top:6px}
+.tab-panel.active{display:block}
+.always-open{margin-top:8px}
 /* delete-profile confirmation */
 .btn-danger{background:var(--danger);color:#fff}
 .btn-danger:disabled{opacity:.35;cursor:not-allowed}
@@ -326,6 +330,32 @@ textarea,input[type=text]{
 .intro-fields input,.intro-fields select{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto;margin-bottom:4px;resize:none}
 .intro-fields select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 .intro-fields .field-label{margin:14px 0 8px}
+/* searchable country combobox */
+.combo{position:relative}
+.combo-list{position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:20;max-height:240px;overflow-y:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:4px}
+.combo-list[hidden]{display:none}
+.combo-opt{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.98rem}
+.combo-opt:hover,.combo-opt.active{background:var(--accent);color:#000}
+.combo-empty{padding:10px 12px;color:var(--ink-soft);font-size:.92rem}
+/* Q3 drag-and-drop ranking */
+.rank-wrap{display:flex;flex-direction:column;gap:18px;margin-bottom:8px}
+.rank-cap{font-size:.85rem;font-weight:700;margin-bottom:8px}
+.rank-slots{display:flex;flex-direction:column;gap:10px}
+.rank-slot{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:12px;padding:8px 12px;min-height:58px;transition:border-color .15s,background .15s}
+.rank-slot.over{border-color:var(--accent);background:var(--accent-soft)}
+.rank-slot.filled{border-style:solid}
+.slot-num{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.92rem}
+.slot-empty{color:var(--ink-soft);font-size:.9rem;opacity:.7}
+.rank-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:20px}
+.rank-chip{border:1.5px solid var(--line);background:var(--paper);border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:grab;user-select:none;touch-action:none}
+.rank-chip:hover{background:var(--hover-fill)}
+.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:#000;border-radius:10px}
+.rank-chip.in-slot:hover{background:var(--accent)}
+.rank-chip.dragging{opacity:.4}
+.rank-chip .chip-x{margin-inline-start:8px;font-weight:700;opacity:.6}
+/* Q10 no-LinkedIn toggle */
+.no-li-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.95rem;cursor:pointer;margin-bottom:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
+.no-li-toggle input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
 .theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
 .theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}
@@ -411,7 +441,8 @@ const I18N = {
     name_label:'השם שלכם (זה יהיה שם הפרופיל)',
     name_ph:'למשל: דנה',
     country_label:'מדינה (מכייל את מודל התרבות)',
-    country_ph:'בחרו מדינה',
+    country_ph:'חיפוש מדינה...',
+    country_none:'לא נמצאה מדינה',
     add_profile:'+ פרופיל חדש',
     full_profile:'הפרופיל המלא',
     del_title:'מחיקת פרופיל',
@@ -420,7 +451,8 @@ const I18N = {
     del_btn:'מחיקה סופית', del_cancel:'ביטול',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
     write_lang_hint:'כתבו בשפה שבה אתם מפרסמים בלינקדאין',
-    rank_note:'בחרו 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
+    rank_note:'גררו 3 מניעים לפי סדר חשיבות (או הקליקו כדי לשבץ). אפשר לגרור בין המקומות כדי לשנות סדר.',
+    rank_slots_cap:'הדירוג שלכם', rank_pool_cap:'המניעים לבחירה', rank_drop:'גררו לכאן',
     generate:'בנו את הפרופיל שלי',
     analyzing:['קוראים את התשובות שלכם...','מזהים דפוסי שפה...','מצליבים מניעים מול תכונות...','מרכיבים את טביעת הקול...'],
     profile_h:'טביעת הקול שלכם',
@@ -445,6 +477,11 @@ const I18N = {
     pic_label:'תמונת הפרופיל שלכם', pic_small:'אופציונלי. מחקרים מראים שבחירת תמונת פרופיל מנבאת תכונות אישיות.',
     pic_btn:'העלאת תמונה (אפשר גם צילומי מסך של פוסטים)',
     about_label:'ה-About שלכם מלינקדאין', about_small:'אופציונלי.',
+    no_li:'אין לי פרופיל לינקדאין',
+    alt_posts_label:'דוגמה לכתיבה שלכם', alt_posts_small:'כל טקסט שכתבתם - אימייל, הודעה, פוסט בכל מקום. זה הכיול הכי חזק של הסגנון.',
+    alt_posts_ph:'הדביקו כאן משהו שכתבתם בעצמכם...',
+    alt_about_label:'ספרו על עצמכם ועל מה שאתם עושים', alt_about_small:'אופציונלי.',
+    alt_about_ph:'מי אתם, במה אתם עוסקים, ועל מה תרצו לכתוב...',
     about_ph:'הדביקו כאן...',
     to_composer:'למסך כתיבת הפוסטים ←',
     composer_h:'מה קרה היום?',
@@ -481,7 +518,8 @@ const I18N = {
     name_label:'Your name (this will be the profile name)',
     name_ph:'e.g. Dana',
     country_label:'Country (calibrates the culture model)',
-    country_ph:'Select a country',
+    country_ph:'Search a country...',
+    country_none:'No country found',
     add_profile:'+ New profile',
     full_profile:'Full profile',
     del_title:'Delete profile',
@@ -490,7 +528,8 @@ const I18N = {
     del_btn:'Delete forever', del_cancel:'Cancel',
     open_note:'Free writing, unedited. At least a few sentences.',
     write_lang_hint:'Write in the language you post in on LinkedIn',
-    rank_note:'Pick 3 in order of importance - click to select, click again to remove.',
+    rank_note:'Drag 3 motives in order of importance (or click to place). Drag between slots to reorder.',
+    rank_slots_cap:'Your ranking', rank_pool_cap:'Motives to choose from', rank_drop:'Drop here',
     generate:'Build my profile',
     analyzing:['Reading your answers...','Detecting language patterns...','Cross-checking motives vs. traits...','Assembling your voiceprint...'],
     profile_h:'Your Voiceprint',
@@ -515,6 +554,11 @@ const I18N = {
     pic_label:'Your profile picture', pic_small:'Optional. Research shows profile-picture choice predicts personality traits.',
     pic_btn:'Upload image (screenshots of posts work too)',
     about_label:'Your LinkedIn About', about_small:'Optional.',
+    no_li:'I don\'t have a LinkedIn profile',
+    alt_posts_label:'A sample of your writing', alt_posts_small:'Any text you wrote - an email, a message, a post anywhere. This is the strongest style calibration.',
+    alt_posts_ph:'Paste something you wrote yourself...',
+    alt_about_label:'Tell us about yourself and what you do', alt_about_small:'Optional.',
+    alt_about_ph:'Who you are, what you do, and what you\'d like to write about...',
     about_ph:'Paste here...',
     to_composer:'To the post-writing screen →',
     composer_h:'What happened today?',
@@ -637,7 +681,7 @@ const QUESTIONS = [
 let lang = 'he';
 let step = -1; /* -1 = intro */
 const answers = {};   /* qid -> value */
-let uploads = {posts:'', about:'', images:[]}; /* images: [{media_type,data}] */
+let uploads = {posts:'', about:'', images:[], noLinkedIn:false}; /* images: [{media_type,data}] */
 let profile = null;
 let approved = false;
 let apiKey = '';
@@ -744,7 +788,7 @@ function startNewProfile(){
   activeProfileId=null;
   profile=null; approved=false;
   Object.keys(answers).forEach(k=>delete answers[k]);
-  uploads={posts:'',about:'',images:[]};
+  uploads={posts:'',about:'',images:[],noLinkedIn:false};
   profileName=''; profileCountry='';
   currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
   step=-1;
@@ -811,7 +855,10 @@ function introHTML(){
       <label class="field-label" for="intro-name">${t.name_label}</label>
       <input type="text" id="intro-name" placeholder="${t.name_ph}" value="${escapeHtml(profileName)}">
       <label class="field-label" for="intro-country">${t.country_label}</label>
-      <select id="intro-country"></select>
+      <div class="combo">
+        <input type="text" id="intro-country" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" placeholder="${t.country_ph}">
+        <div class="combo-list" id="country-list" role="listbox" hidden></div>
+      </div>
     </div>
     <div class="start-row">
       <button class="btn btn-primary" id="start-btn" onclick="step=0;render()" disabled>${t.start}</button>
@@ -822,23 +869,53 @@ function introHTML(){
 function wireIntro(){
   const n=document.getElementById('intro-name');
   const c=document.getElementById('intro-country');
+  const listEl=document.getElementById('country-list');
   const b=document.getElementById('start-btn');
-  let opts=`<option value="">${T().country_ph}</option>`;
+  const loc=lang==='he'?'he':'en';
+  let items;
   try{
-    const loc=lang==='he'?'he':'en';
     const dn=new Intl.DisplayNames([loc],{type:'region'});
-    const items=COUNTRY_CODES.map(code=>({code,label:dn.of(code)||code}));
-    items.sort((a,b2)=>a.label.localeCompare(b2.label,loc));
-    opts+=items.map(i=>`<option value="${i.code}">${i.label}</option>`).join('');
-  }catch(e){
-    opts+=COUNTRY_CODES.map(code=>`<option value="${code}">${code}</option>`).join('');
+    items=COUNTRY_CODES.map(code=>({code,label:dn.of(code)||code}));
+  }catch(e){ items=COUNTRY_CODES.map(code=>({code,label:code})); }
+  items.sort((a,b2)=>a.label.localeCompare(b2.label,loc));
+
+  let activeIdx=-1, filtered=items;
+  const setName=()=>{ profileName=n.value.trim(); b.disabled=!profileName; };
+  n.addEventListener('input',setName);
+
+  /* show the current country's name in the field (not the code) */
+  if(profileCountry){ const cur=items.find(i=>i.code===profileCountry); if(cur) c.value=cur.label; }
+
+  function renderList(){
+    if(!filtered.length){ listEl.innerHTML=`<div class="combo-empty">${T().country_none}</div>`; }
+    else listEl.innerHTML=filtered.map((i,idx)=>`<div class="combo-opt${idx===activeIdx?' active':''}" role="option" data-code="${i.code}">${i.label}</div>`).join('');
   }
-  c.innerHTML=opts;
-  c.value=profileCountry||'';
-  const upd=()=>{ profileName=n.value.trim(); profileCountry=c.value; b.disabled=!profileName; };
-  n.addEventListener('input',upd);
-  c.addEventListener('change',upd);
-  upd();
+  function open(){ listEl.hidden=false; c.setAttribute('aria-expanded','true'); renderList(); }
+  function close(){ listEl.hidden=true; c.setAttribute('aria-expanded','false'); activeIdx=-1; }
+  function filter(){
+    const q=c.value.trim().toLowerCase();
+    filtered=q?items.filter(i=>i.label.toLowerCase().includes(q)):items;
+    activeIdx=-1; open();
+  }
+  function pick(code){
+    const it=items.find(i=>i.code===code); if(!it) return;
+    profileCountry=code; c.value=it.label; close();
+  }
+
+  c.addEventListener('focus',()=>{ filtered=items; open(); });
+  c.addEventListener('input',()=>{ profileCountry=''; filter(); });
+  c.addEventListener('keydown',e=>{
+    if(listEl.hidden && (e.key==='ArrowDown'||e.key==='ArrowUp')){ filter(); return; }
+    if(e.key==='ArrowDown'){ e.preventDefault(); activeIdx=Math.min(activeIdx+1,filtered.length-1); renderList(); scrollActive(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); activeIdx=Math.max(activeIdx-1,0); renderList(); scrollActive(); }
+    else if(e.key==='Enter'){ if(activeIdx>-1&&filtered[activeIdx]){ e.preventDefault(); pick(filtered[activeIdx].code); } }
+    else if(e.key==='Escape'){ close(); }
+  });
+  function scrollActive(){ const el=listEl.querySelector('.combo-opt.active'); if(el) el.scrollIntoView({block:'nearest'}); }
+  listEl.addEventListener('mousedown',e=>{ const o=e.target.closest('.combo-opt'); if(o){ e.preventDefault(); pick(o.dataset.code); } });
+  document.addEventListener('mousedown',e=>{ if(!e.target.closest('.combo')) close(); });
+
+  setName();
 }
 
 function questionHTML(q){
@@ -854,24 +931,41 @@ function questionHTML(q){
   }
   if(q.type==='rank'){
     const sel = answers[q.id]||[];
-    body = `<div class="char-note" style="margin-bottom:12px">${t.rank_note}</div>`+
-      q.opts.map(o=>{
-        const idx = sel.indexOf(o.v);
-        return `<button class="opt ${idx>-1?'selected':''}" data-v="${o.v}">${o[lang]}${idx>-1?`<span class="rank-badge">${idx+1}</span>`:''}</button>`;
-      }).join('');
+    const label=v=>{const o=q.opts.find(x=>x.v===v);return o?o[lang]:v;};
+    const slots=[];
+    for(let i=0;i<q.max;i++){
+      const v=sel[i];
+      slots.push(`<div class="rank-slot ${v?'filled':''}" data-slot="${i}">
+        <span class="slot-num">${i+1}</span>
+        ${v?`<div class="rank-chip in-slot" draggable="true" data-v="${v}">${label(v)}<span class="chip-x">✕</span></div>`
+            :`<span class="slot-empty">${t.rank_drop}</span>`}
+      </div>`);
+    }
+    const pool=q.opts.filter(o=>!sel.includes(o.v))
+      .map(o=>`<div class="rank-chip" draggable="true" data-v="${o.v}">${o[lang]}</div>`).join('');
+    body = `<div class="char-note" style="margin-bottom:14px">${t.rank_note}</div>
+      <div class="rank-wrap">
+        <div><div class="rank-cap">${t.rank_slots_cap}</div><div class="rank-slots" id="rank-slots">${slots.join('')}</div></div>
+        <div><div class="rank-cap">${t.rank_pool_cap}</div><div class="rank-pool" id="rank-pool">${pool}</div></div>
+      </div>`;
   }
   if(q.type==='uploads'){
+    const noLi=uploads.noLinkedIn;
+    const postsLabel=noLi?t.alt_posts_label:t.posts_label, postsSmall=noLi?t.alt_posts_small:t.posts_small, postsPh=noLi?t.alt_posts_ph:t.posts_ph;
+    const aboutLabel=noLi?t.alt_about_label:t.about_label, aboutSmall=noLi?t.alt_about_small:t.about_small, aboutPh=noLi?t.alt_about_ph:t.about_ph;
     body = `
-      <label class="field-label">${t.posts_label} <small>· ${t.posts_small}</small></label>
-      <textarea id="posts-ta" placeholder="${t.posts_ph}">${uploads.posts}</textarea>
+      <label class="no-li-toggle"><input type="checkbox" id="no-li" ${noLi?'checked':''}> ${t.no_li}</label>
+
+      <label class="field-label">${postsLabel} <small>· ${postsSmall}</small></label>
+      <textarea id="posts-ta" placeholder="${postsPh}">${uploads.posts}</textarea>
 
       <label class="field-label">${t.pic_label} <small>· ${t.pic_small}</small></label>
       <label class="upload-box"><input type="file" id="img-input" accept="image/png,image/jpeg,image/webp" multiple>
         ${t.pic_btn}</label>
       <div class="thumbs" id="thumbs">${uploads.images.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
 
-      <label class="field-label">${t.about_label} <small>· ${t.about_small}</small></label>
-      <textarea id="about-ta" style="min-height:90px" placeholder="${t.about_ph}">${uploads.about}</textarea>`;
+      <label class="field-label">${aboutLabel} <small>· ${aboutSmall}</small></label>
+      <textarea id="about-ta" style="min-height:90px" placeholder="${aboutPh}">${uploads.about}</textarea>`;
   }
 
   const isLast = step===QUESTIONS.length-1;
@@ -899,17 +993,10 @@ function wireQuestion(q){
       answers[q.id]=b.dataset.v; render();
     }));
   }
-  if(q.type==='rank'){
-    document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
-      let sel=answers[q.id]||[];
-      const v=b.dataset.v, i=sel.indexOf(v);
-      if(i>-1) sel.splice(i,1);
-      else if(sel.length<q.max) sel.push(v);
-      answers[q.id]=sel; render();
-    }));
-  }
+  if(q.type==='rank'){ wireRank(q); }
   if(q.type==='uploads'){
     const pt=document.getElementById('posts-ta'), ab=document.getElementById('about-ta');
+    document.getElementById('no-li').addEventListener('change',e=>{ uploads.noLinkedIn=e.target.checked; render(); });
     pt.addEventListener('input',()=>{uploads.posts=pt.value;refreshNext(q);renderLayers();});
     ab.addEventListener('input',()=>{uploads.about=ab.value;});
     document.getElementById('img-input').addEventListener('change',async e=>{
@@ -931,12 +1018,60 @@ function refreshNext(q){
   if(b) b.disabled = !answered(q.id);
 }
 
+/* ---------- Q3 drag-and-drop ranking ---------- */
+function wireRank(q){
+  const slotsEl=document.getElementById('rank-slots');
+  const poolEl=document.getElementById('rank-pool');
+  const getSel=()=>answers[q.id]||[];
+  const setSel=arr=>{ answers[q.id]=arr; render(); };
+
+  /* place a value at a target slot index; compact array, keep order,
+     bump any displaced value rather than losing it */
+  function place(v, slotIdx){
+    let sel=getSel().slice();
+    sel=sel.filter(x=>x!==v);                 /* remove from wherever it was */
+    if(slotIdx==null || slotIdx>=q.max) slotIdx=Math.min(sel.length,q.max-1);
+    sel.splice(slotIdx,0,v);
+    if(sel.length>q.max) sel=sel.slice(0,q.max);
+    setSel(sel);
+  }
+  function remove(v){ setSel(getSel().filter(x=>x!==v)); }
+
+  /* click fallback: pool chip -> first empty slot; slot chip -> back to pool */
+  poolEl.querySelectorAll('.rank-chip').forEach(ch=>{
+    ch.addEventListener('click',()=>{ if(getSel().length<q.max) place(ch.dataset.v,null); });
+  });
+  slotsEl.querySelectorAll('.rank-chip.in-slot').forEach(ch=>{
+    ch.addEventListener('click',()=>remove(ch.dataset.v));
+  });
+
+  /* drag and drop */
+  let dragV=null;
+  document.querySelectorAll('.rank-chip').forEach(ch=>{
+    ch.addEventListener('dragstart',e=>{ dragV=ch.dataset.v; ch.classList.add('dragging'); try{e.dataTransfer.setData('text/plain',ch.dataset.v);e.dataTransfer.effectAllowed='move';}catch(_){} });
+    ch.addEventListener('dragend',()=>{ dragV=null; ch.classList.remove('dragging'); });
+  });
+  slotsEl.querySelectorAll('.rank-slot').forEach(slot=>{
+    slot.addEventListener('dragover',e=>{ e.preventDefault(); slot.classList.add('over'); });
+    slot.addEventListener('dragleave',()=>slot.classList.remove('over'));
+    slot.addEventListener('drop',e=>{ e.preventDefault(); slot.classList.remove('over');
+      const v=dragV||e.dataTransfer.getData('text/plain'); if(v) place(v,+slot.dataset.slot); });
+  });
+  poolEl.addEventListener('dragover',e=>{ e.preventDefault(); });
+  poolEl.addEventListener('drop',e=>{ e.preventDefault();
+    const v=dragV||e.dataTransfer.getData('text/plain'); if(v) remove(v); });
+}
+
 /* =========================================================
    PROFILE ENGINE — Claude API
    ========================================================= */
 
 const CODEX = `
-You are a personality-profiling engine for a LinkedIn ghostwriting platform. Build a profile from questionnaire answers using these frameworks:
+You are an expert personality psychologist profiling a person for a LinkedIn ghostwriting platform. Your job is to READ A PERSON, not to summarize a form.
+
+CRITICAL — INFER, DON'T ECHO: Never restate or lightly paraphrase what the user wrote. Every insight must be an INFERENCE that goes beyond the surface of their answers — read between the lines, connect signals across different questions, name the underlying trait/drive/tension the person may not even see about themselves. If a line could be produced just by rephrasing one answer, it is wrong; replace it with what that answer REVEALS about who they are. Write with the specificity and quiet authority of a psychologist who has just understood someone — concrete, human, occasionally surprising, never generic horoscope language.
+
+Build the profile from the questionnaire answers using these frameworks:
 
 BIG 5 — score each 1-5 using both closed answers AND language markers in free text (open-vocabulary method, Park et al. 2014):
 - Extraversion: social words, exclamation marks, emojis, short energetic sentences, calls to action vs. reflective first-person, longer sentences, ellipses.
@@ -985,10 +1120,10 @@ If profile pictures are provided, use profile-image research: positive emotion +
 
 CROSS-CHECKING: actively look for contradictions between closed answers and free-text style (e.g., claims introvert but writes with high-energy social markers). List them in "gaps".
 
-Respond with ONLY valid JSON, no markdown fences, no preamble. Be concise — short phrases, not paragraphs. JSON schema:
+Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items to short phrases, BUT the "summary" and each "evidence" must be real inference (see below), not restated answers. JSON schema:
 {
- "summary": "3-4 sentence portrait in {LANG}, warm, second person",
- "big5": {"openness":{"score":1-5,"evidence":"short"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
+ "summary": "A 4-6 sentence psychological portrait in {LANG}, second person, warm but insightful. Describe who this person IS — their defining tension, what drives them under the surface, how they come across vs. how they may feel inside, and what makes their voice distinct. It should feel like being truly seen, not like a summary of a questionnaire. Do NOT quote their answers back.",
+ "big5": {"openness":{"score":1-5,"evidence":"one sentence naming the behavioral SIGNAL you inferred this from and what it implies — not a restatement of an answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
  "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short"} x3],
  "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
  "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
@@ -1007,12 +1142,14 @@ function buildUserContent(){
     return `Q ${q.id} (${q.en.t}):\n${a}`;
   }).join('\n\n');
 
+  const noLi=uploads.noLinkedIn;
   let text = CODEX.replaceAll('{LANG}', lang==='he'?'Hebrew':'English')
     + '\n\n=== USER CONTEXT ===\nName: ' + (profileName||'-')
     + '\nCountry/market: ' + (countryName(profileCountry,'en')||'not specified')
+    + (noLi?'\nNote: this person does NOT have a LinkedIn profile — the writing sample below is general (not LinkedIn posts), so weight it as their natural voice and infer the LinkedIn fit rather than assuming existing LinkedIn habits.':'')
     + '\n\n=== QUESTIONNAIRE ANSWERS ===\n' + qa;
-  if(uploads.posts.trim()) text += '\n\n=== USER\'S REAL LINKEDIN POSTS (strongest style signal) ===\n'+uploads.posts.trim();
-  if(uploads.about.trim()) text += '\n\n=== LINKEDIN ABOUT ===\n'+uploads.about.trim();
+  if(uploads.posts.trim()) text += (noLi?'\n\n=== USER\'S WRITING SAMPLE (general, not from LinkedIn — strongest style signal) ===\n':'\n\n=== USER\'S REAL LINKEDIN POSTS (strongest style signal) ===\n')+uploads.posts.trim();
+  if(uploads.about.trim()) text += (noLi?'\n\n=== ABOUT THE USER (self-described) ===\n':'\n\n=== LINKEDIN ABOUT ===\n')+uploads.about.trim();
 
   const content=[{type:'text',text}];
   uploads.images.forEach(im=>content.push({type:'image',source:{type:'base64',media_type:im.media_type,data:im.data}}));
@@ -1185,44 +1322,35 @@ function profileHTML(){
 
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
+  const tabs=[
+    {id:'big5', label:t.big5_h, body:bars},
+    {id:'motives', label:t.motives_h, body:motives||'—'},
+    {id:'ennea', label:t.ennea_h, body:`<span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span><div class="char-note">${en.core||''}</div>`},
+    {id:'cog', label:t.cog_h, body:`<span class="chip">${cg.convergent_divergent||''}</span> <span class="chip">${cg.systemizer_empathizer||''}</span><div class="char-note">${cg.note||''}</div>`},
+    {id:'local', label:t.local_h, body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<div class="char-note">${loc.note}</div>`:''}`},
+    {id:'story', label:t.story_h, body:`${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<div class="char-note">${st.note}</div>`:''}`}
+  ];
+  const tabBar=`<div class="tabs" role="tablist">${tabs.map((tb,i)=>`<button class="tab-btn${i===0?' active':''}" data-tab="${tb.id}">${tb.label}</button>`).join('')}</div>`;
+  const tabPanels=tabs.map((tb,i)=>`<div class="tab-panel${i===0?' active':''}" id="tab-${tb.id}">${tb.body}</div>`).join('');
+
   return `<div class="step active">
     <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
     <div class="profile-summary serif">${p.summary||''}</div>
     ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
 
-    <details class="profile-acc"${approved?'':' open'}>
-      <summary>${t.full_profile}</summary>
-      <div class="acc-body">
-    <div class="section-h">${t.big5_h}</div>${bars}
-    <div class="section-h">${t.motives_h}</div>${motives}
-    <div class="section-h">${t.ennea_h}</div>
-    <span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span>
-    <div class="char-note">${en.core||''}</div>
-    <div class="section-h">${t.cog_h}</div>
-    <span class="chip">${cg.convergent_divergent||''}</span>
-    <span class="chip">${cg.systemizer_empathizer||''}</span>
-    <div class="char-note">${cg.note||''}</div>
-    <div class="section-h">${t.dna_h}</div>
-    <ul class="dna-list">${dnaRows}</ul>
-    <div style="margin-top:10px">${sigs}</div>
+    ${tabBar}
+    ${tabPanels}
 
-    <div class="section-h">${t.dos_h}</div>
-    <ul class="dna-list do-list">${dos}</ul>
-    <div class="section-h">${t.donts_h}</div>
-    <ul class="dna-list dont-list">${donts}</ul>
-
-    <div class="section-h">${t.local_h}</div>
-    <ul class="dna-list">${locRows}</ul>
-    ${loc.note?`<div class="char-note">${loc.note}</div>`:''}
-
-    <div class="section-h">${t.story_h}</div>
-    ${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}
-    ${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}
-    ${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}
-    ${st.note?`<div class="char-note">${st.note}</div>`:''}
+    <div class="always-open">
+      <div class="section-h">${t.dna_h}</div>
+      <ul class="dna-list">${dnaRows}</ul>
+      <div style="margin-top:10px">${sigs}</div>
+      <div class="section-h">${t.dos_h}</div>
+      <ul class="dna-list do-list">${dos}</ul>
+      <div class="section-h">${t.donts_h}</div>
+      <ul class="dna-list dont-list">${donts}</ul>
+    </div>
     ${gaps}
-      </div>
-    </details>
 
     ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:#000;margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
     <div class="section-h">${t.refine_label}</div>
@@ -1235,6 +1363,11 @@ function profileHTML(){
 }
 
 function wireRefine(){
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    const id=btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+id));
+  }));
   const rb=document.getElementById('refine-btn');
   const ab=document.getElementById('approve-btn');
   if(rb) rb.addEventListener('click',()=>{

@@ -1223,7 +1223,7 @@ async function callClaude(content, useSearch, maxTokens){
     headers,
     body:JSON.stringify({
       model:'claude-sonnet-4-6',
-      max_tokens:maxTokens||4000,
+      max_tokens:maxTokens||8000,
       messages:[{role:'user',content}],
       ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
     })
@@ -1231,6 +1231,9 @@ async function callClaude(content, useSearch, maxTokens){
   const data = await response.json();
   if(data.error) throw new Error(data.error.message||'API error');
   const txt = (data.content||[]).filter(i=>i.type==='text').map(i=>i.text).join('\n');
+  /* a cut-off response (hit the token cap) leaves the JSON unterminated;
+     say so plainly instead of the cryptic "No JSON in response" */
+  if(data.stop_reason==='max_tokens') throw new Error('The response was cut off (reached the length limit). Try again.');
   return extractJSON(txt);
 }
 

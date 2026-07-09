@@ -4,11 +4,6 @@
  * Requests are only forwarded for signed-in users, so nobody can
  * abuse the key by hitting this endpoint anonymously.
  */
-// Allow up to 60s for a full profile generation (large JSON output) before
-// Vercel times the function out. Without this, Hobby caps at ~10s and a long
-// generation returns a gateway timeout instead of the profile.
-export const config = { maxDuration: 60 };
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: { message: 'Method not allowed' } });

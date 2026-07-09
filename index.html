@@ -1228,8 +1228,20 @@ async function callClaude(content, useSearch, maxTokens){
       ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
     })
   });
-  const data = await response.json();
+  /* read as text first: a timed-out or crashed serverless function returns an
+     HTML/plain error page, and response.json() would blow up with a cryptic
+     "Unexpected token" instead of a usable message */
+  const raw = await response.text();
+  let data;
+  try{ data = JSON.parse(raw); }
+  catch(_){
+    const snippet = raw.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,120);
+    if(response.status===504 || /timeout|timed out/i.test(raw))
+      throw new Error('The server took too long and timed out. Please try again.');
+    throw new Error('Server error (HTTP '+response.status+'): '+(snippet||'no details'));
+  }
   if(data.error) throw new Error(data.error.message||'API error');
+  if(!response.ok) throw new Error('Server error (HTTP '+response.status+')');
   const txt = (data.content||[]).filter(i=>i.type==='text').map(i=>i.text).join('\n');
   /* a cut-off response (hit the token cap) leaves the JSON unterminated;
      say so plainly instead of the cryptic "No JSON in response" */

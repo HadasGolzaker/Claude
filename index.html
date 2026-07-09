@@ -11,8 +11,8 @@
   --paper:#FAFAFA;
   --ink:#000000;
   --ink-soft:#000000;
-  --accent:#FF6000;      /* vibe orange */
-  --accent-soft:#FFE4D4;
+  --accent:#E4C4E1;      /* soft lavender — primary accent */
+  --accent-soft:#F4E9F3;
   --amber:#B5793A;
   --line:#DEDCD0;
   --card:#FAFAFA;
@@ -112,7 +112,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .btn-primary{background:var(--ink);color:var(--paper)}
 .btn-primary:disabled{opacity:.35;cursor:not-allowed}
 .btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line)}
-.btn-accent{background:var(--accent);color:#fff}
+.btn-accent{background:var(--accent);color:#000}
 .progress-label{font-size:.85rem;color:var(--ink-soft)}
 
 /* intro */
@@ -143,7 +143,7 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .dna-list b{color:var(--ink)}
 .gap-note{background:#FBF3E2;border:1.5px solid var(--amber);border-radius:10px;padding:14px 16px;margin-top:18px;font-size:.92rem}
 .error-box{background:#FBE9E9;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.92rem}
-.approved-banner{background:var(--accent);color:#fff;border-radius:10px;padding:18px 20px;margin-top:20px;font-weight:600}
+.approved-banner{background:var(--accent);color:#000;border-radius:10px;padding:18px 20px;margin-top:20px;font-weight:600}
 </style>
 
 <style>
@@ -158,8 +158,8 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --ink:#000000;
   --ink-soft:#000000;
   --line:#DEDCD0;
-  --accent:#FF6000;        /* vibe orange */
-  --accent-soft:#FFE4D4;
+  --accent:#E4C4E1;        /* soft lavender — primary accent */
+  --accent-soft:#F4E9F3;
   --amber:#B5793A;
   --amber-soft:#FEDCC6;    /* peach */
   --danger:#B23A3A;
@@ -185,8 +185,8 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
   --ink:#FFFFFF;
   --ink-soft:#FFFFFF;
   --line:rgba(255,255,255,.16);
-  --accent:#FF6000;
-  --accent-soft:rgba(255,96,0,.20);
+  --accent:#E4C4E1;
+  --accent-soft:rgba(228,196,225,.24);
   --amber:#E4B27C;
   --amber-soft:rgba(254,220,198,.26);
   --danger:#E27878;
@@ -261,7 +261,7 @@ textarea,input[type=text]{
   border:1.5px solid var(--ink);color:var(--ink);
 }
 .btn-ghost:hover{background:var(--hover-fill)}
-.btn-accent{background:var(--accent);color:#fff}
+.btn-accent{background:var(--accent);color:#000}
 .btn-accent:hover{filter:brightness(1.06)}
 .profile-summary{
   background:var(--lavender-soft);
@@ -300,6 +300,13 @@ textarea,input[type=text]{
 
 /* header controls + theme toggle */
 .header-controls{display:flex;gap:12px;align-items:center;flex-shrink:0}
+#profile-picker{display:none;font:inherit;font-weight:600;font-size:.9rem;border:1.5px solid var(--ink);border-radius:999px;padding:7px 12px;background:transparent;color:var(--ink);cursor:pointer;max-width:150px}
+@media(max-width:600px){#profile-picker{max-width:110px}}
+/* intro name/country fields */
+.intro-fields{margin-top:24px;max-width:440px}
+.intro-fields input,.intro-fields select{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto;margin-bottom:4px;resize:none}
+.intro-fields select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.intro-fields .field-label{margin:14px 0 8px}
 .theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
 .theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}
@@ -323,6 +330,7 @@ function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme
   <header>
     <div class="logo"><h1>Voiceprint</h1><span id="tagline">טביעת קול</span></div>
     <div class="header-controls">
+      <select id="profile-picker" aria-label="profile"></select>
       <div class="lang-toggle">
         <button id="btn-he" class="active" onclick="setLang('he')">עברית</button>
         <button id="btn-en" onclick="setLang('en')">English</button>
@@ -378,6 +386,11 @@ const I18N = {
     intro_p2:'טיפ חשוב: על שאלות הכתיבה החופשית, כתבו בשפה שבה אתם מפרסמים בלינקדאין. שאר השאלות - באיזו שפה שנוח לכם.',
     intro_p3:'אין תשובות נכונות. ככל שהתשובות יהיו אמיתיות יותר - הפרופיל יהיה מדויק יותר.',
     start:'מתחילים ←',
+    name_label:'השם שלכם (זה יהיה שם הפרופיל)',
+    name_ph:'למשל: דנה',
+    country_label:'מדינה (מכייל את מודל התרבות)',
+    country_ph:'בחרו מדינה',
+    add_profile:'+ פרופיל חדש',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
     write_lang_hint:'כתבו בשפה שבה אתם מפרסמים בלינקדאין',
     rank_note:'בחרו 3 לפי סדר חשיבות - הקליקו כדי לבחור, קליק נוסף מבטל.',
@@ -438,6 +451,11 @@ const I18N = {
     intro_p2:'Important tip: on the free-writing questions, write in the language you post in on LinkedIn. Everything else - whatever feels natural.',
     intro_p3:'There are no right answers. The more you sound like yourself, the sharper the profile.',
     start:'Let\'s begin →',
+    name_label:'Your name (this will be the profile name)',
+    name_ph:'e.g. Dana',
+    country_label:'Country (calibrates the culture model)',
+    country_ph:'Select a country',
+    add_profile:'+ New profile',
     open_note:'Free writing, unedited. At least a few sentences.',
     write_lang_hint:'Write in the language you post in on LinkedIn',
     rank_note:'Pick 3 in order of importance - click to select, click again to remove.',
@@ -594,6 +612,15 @@ let apiKey = '';
 let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
 const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3;
 
+/* ---------- multi-profile state ---------- */
+let profileName='', profileCountry='';
+let profilesStore={activeId:null,profiles:[]}; /* persisted under 'voiceprint_profiles' */
+let activeProfileId=null; /* null while composing a brand-new profile */
+const genId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+async function persistProfiles(){ if(window.storage) await window.storage.set('voiceprint_profiles', JSON.stringify(profilesStore)); }
+const COUNTRY_CODES=('AF,AL,DZ,AD,AO,AG,AR,AM,AU,AT,AZ,BS,BH,BD,BB,BY,BE,BZ,BJ,BT,BO,BA,BW,BR,BN,BG,BF,BI,KH,CM,CA,CV,CF,TD,CL,CN,CO,KM,CG,CD,CR,CI,HR,CU,CY,CZ,DK,DJ,DM,DO,EC,EG,SV,GQ,ER,EE,SZ,ET,FJ,FI,FR,GA,GM,GE,DE,GH,GR,GD,GT,GN,GW,GY,HT,HN,HK,HU,IS,IN,ID,IR,IQ,IE,IL,IT,JM,JP,JO,KZ,KE,KI,KW,KG,LA,LV,LB,LS,LR,LY,LI,LT,LU,MG,MW,MY,MV,ML,MT,MH,MR,MU,MX,FM,MD,MC,MN,ME,MA,MZ,MM,NA,NR,NP,NL,NZ,NI,NE,NG,KP,MK,NO,OM,PK,PW,PA,PG,PY,PE,PH,PL,PT,QA,RO,RU,RW,KN,LC,VC,WS,SM,ST,SA,SN,RS,SC,SL,SG,SK,SI,SB,SO,ZA,KR,SS,ES,LK,SD,SR,SE,CH,SY,TW,TJ,TZ,TH,TL,TG,TO,TT,TN,TR,TM,TV,UG,UA,AE,GB,US,UY,UZ,VU,VA,VE,VN,YE,ZM,ZW').split(',');
+function countryName(code,inLang){ if(!code) return ''; try{ return new Intl.DisplayNames([inLang||'en'],{type:'region'}).of(code)||code; }catch(e){ return code; } }
+
 const T = () => I18N[lang];
 
 /* ---------- language ---------- */
@@ -604,9 +631,51 @@ function setLang(l){
   document.getElementById('btn-he').classList.toggle('active', l==='he');
   document.getElementById('btn-en').classList.toggle('active', l==='en');
   document.getElementById('tagline').textContent = T().tagline;
-  renderLayers(); render();
+  renderLayers(); renderProfilePicker(); render();
   if(profile && profile._lang && profile._lang!==l) translateProfile(l);
 }
+
+/* ---------- profile picker (header) ---------- */
+function renderProfilePicker(){
+  const sel=document.getElementById('profile-picker');
+  if(!sel) return;
+  const list=profilesStore.profiles;
+  if(!list.length){ sel.style.display='none'; return; }
+  sel.style.display='inline-block';
+  sel.innerHTML=list.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('')
+    +`<option value="__new">${T().add_profile}</option>`;
+  sel.value=activeProfileId||'__new';
+}
+
+function switchProfile(id){
+  const entry=profilesStore.profiles.find(p=>p.id===id);
+  if(!entry) return;
+  activeProfileId=id; profilesStore.activeId=id;
+  persistProfiles().catch(()=>{});
+  profile=entry.profile; profileName=entry.name; profileCountry=entry.country||'';
+  if(profile && !profile._lang) profile._lang=entry.lang||lang;
+  approved=true;
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
+  step=QUESTIONS.length+1;
+  renderProfilePicker(); renderLayers(); render();
+  if(profile && profile._lang!==lang) translateProfile(lang);
+}
+
+function startNewProfile(){
+  activeProfileId=null;
+  profile=null; approved=false;
+  Object.keys(answers).forEach(k=>delete answers[k]);
+  uploads={posts:'',about:'',images:[]};
+  profileName=''; profileCountry='';
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
+  step=-1;
+  renderProfilePicker(); renderLayers(); render();
+}
+
+document.getElementById('profile-picker').addEventListener('change',e=>{
+  const v=e.target.value;
+  if(v==='__new') startNewProfile(); else switchProfile(v);
+});
 
 /* ---------- sidebar ---------- */
 function renderLayers(){
@@ -641,7 +710,7 @@ function answered(qid){
 /* ---------- render ---------- */
 function render(){
   const card = document.getElementById('main-card');
-  if(step===-1){ card.innerHTML = introHTML(); return; }
+  if(step===-1){ card.innerHTML = introHTML(); wireIntro(); return; }
   if(step===QUESTIONS.length){ card.innerHTML = generateHTML(); return; }
   if(step===QUESTIONS.length+1){ card.innerHTML = profileHTML(); wireRefine(); return; }
   if(step===STEP_COMPOSER){ card.innerHTML = composerHTML(); wireComposer(); return; }
@@ -658,10 +727,38 @@ function introHTML(){
     <p>${t.intro_p1}</p>
     <p><b>${t.intro_p2}</b></p>
     <p>${t.intro_p3}</p>
+    <div class="intro-fields">
+      <label class="field-label" for="intro-name">${t.name_label}</label>
+      <input type="text" id="intro-name" placeholder="${t.name_ph}" value="${escapeHtml(profileName)}">
+      <label class="field-label" for="intro-country">${t.country_label}</label>
+      <select id="intro-country"></select>
+    </div>
     <div class="start-row">
-      <button class="btn btn-primary" onclick="step=0;render()">${t.start}</button>
+      <button class="btn btn-primary" id="start-btn" onclick="step=0;render()" disabled>${t.start}</button>
     </div>
   </div>`;
+}
+
+function wireIntro(){
+  const n=document.getElementById('intro-name');
+  const c=document.getElementById('intro-country');
+  const b=document.getElementById('start-btn');
+  let opts=`<option value="">${T().country_ph}</option>`;
+  try{
+    const loc=lang==='he'?'he':'en';
+    const dn=new Intl.DisplayNames([loc],{type:'region'});
+    const items=COUNTRY_CODES.map(code=>({code,label:dn.of(code)||code}));
+    items.sort((a,b2)=>a.label.localeCompare(b2.label,loc));
+    opts+=items.map(i=>`<option value="${i.code}">${i.label}</option>`).join('');
+  }catch(e){
+    opts+=COUNTRY_CODES.map(code=>`<option value="${code}">${code}</option>`).join('');
+  }
+  c.innerHTML=opts;
+  c.value=profileCountry||'';
+  const upd=()=>{ profileName=n.value.trim(); profileCountry=c.value; b.disabled=!profileName; };
+  n.addEventListener('input',upd);
+  c.addEventListener('change',upd);
+  upd();
 }
 
 function questionHTML(q){
@@ -786,6 +883,7 @@ LOCALIZATION — language & culture fit (from writing language, phrasing, cultur
 - cultural_markers: local references, idioms, humor style, sensibilities that fit their audience.
 - formality: how formal/informal and how they address the reader (ata/at, plural, first-name energy).
 - note: one short line on how to keep a post culturally native to them.
+The user's declared country/market (see USER CONTEXT) is a strong anchor for this section — combine it with the language evidence rather than stereotyping from the country alone.
 Use Hofstede's 6 cultural dimensions as an analytical lens (describe qualitatively, don't output scores): power distance (formal/hierarchical address vs flat/informal), individualism vs collectivism (personal-achievement framing vs group/team framing), masculinity vs femininity (assertive/competitive tone vs modest/consensus-seeking), uncertainty avoidance (confident absolute claims vs hedged/exploratory framing), long-term vs short-term orientation (patient/pragmatic framing vs quick-win/immediate framing), indulgence vs restraint (expressive/celebratory tone vs measured/reserved). Let whichever dimensions are actually visible in their writing sharpen audience, cultural_markers and formality — don't force all six if the evidence doesn't support them.
 
 STORYTELLING — how they narrate (from Q1, Q6, Q9 and posts):
@@ -830,6 +928,8 @@ function buildUserContent(){
   }).join('\n\n');
 
   let text = CODEX.replaceAll('{LANG}', lang==='he'?'Hebrew':'English')
+    + '\n\n=== USER CONTEXT ===\nName: ' + (profileName||'-')
+    + '\nCountry/market: ' + (countryName(profileCountry,'en')||'not specified')
     + '\n\n=== QUESTIONNAIRE ANSWERS ===\n' + qa;
   if(uploads.posts.trim()) text += '\n\n=== USER\'S REAL LINKEDIN POSTS (strongest style signal) ===\n'+uploads.posts.trim();
   if(uploads.about.trim()) text += '\n\n=== LINKEDIN ABOUT ===\n'+uploads.about.trim();
@@ -891,6 +991,8 @@ async function runGeneration(refineNote){
     }
     profile = await callClaude(content);
     profile._lang = lang;
+    profile._name = profileName;
+    profile._country = profileCountry;
     clearInterval(loadTimer);
     step=QUESTIONS.length+1; approved=false; render();
   }catch(err){
@@ -927,6 +1029,9 @@ async function translateProfile(target){
     const translated = await callClaude(content, false, 8000);
     translated._lang = target;
     profile = translated;
+    /* keep the stored copy in sync so we don't re-translate on every visit */
+    const entry = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null;
+    if(entry){ entry.profile=profile; entry.lang=target; persistProfiles().catch(()=>{}); }
   }catch(err){
     console.error('profile translation failed:',err);
     failed=true; errMsg=(err&&err.message)||'';
@@ -982,7 +1087,7 @@ function profileHTML(){
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
   return `<div class="step active">
-    <div class="eyebrow">${t.profile_h}</div>
+    <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
     <div class="profile-summary serif">${p.summary||''}</div>
     <p class="q-sub">${t.profile_sub}</p>
 
@@ -1042,25 +1147,34 @@ function wireRefine(){
 async function saveProfile(){
   const t=T();
   approved=true;
+  const name=(profileName||'').trim() || ((lang==='en'?'Profile ':'פרופיל ')+(profilesStore.profiles.length+1));
+  let entry = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null;
+  if(!entry){
+    entry={id:genId()};
+    profilesStore.profiles.push(entry);
+    activeProfileId=entry.id;
+  }
+  entry.name=name; entry.country=profileCountry||''; entry.lang=lang;
+  entry.profile=profile; entry.savedAt=new Date().toISOString();
+  profilesStore.activeId=activeProfileId;
+  profileName=name;
   try{
-    if(window.storage){
-      await window.storage.set('voiceprint_profile', JSON.stringify({profile,lang,savedAt:new Date().toISOString()}));
-    }
+    await persistProfiles();
   }catch(err){
     console.warn('storage failed',err);
-    render();
+    render(); renderProfilePicker();
     const card=document.getElementById('main-card');
     card.insertAdjacentHTML('beforeend',`<div class="gap-note">${t.save_warn}</div>`);
     return;
   }
-  render();
+  render(); renderProfilePicker();
 }
 
 /* =========================================================
    POST COMPOSER — phase 3
    ========================================================= */
 
-function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function composerHTML(){
   const t=T();
@@ -1319,11 +1433,29 @@ async function savePostHistory(){
   renderLayers();
   try{
     if(window.storage){
-      const saved=await window.storage.get('voiceprint_profile');
+      const saved=await window.storage.get('voiceprint_profiles');
       if(saved&&saved.value){
-        const obj=JSON.parse(saved.value);
-        profile=obj.profile; lang=obj.lang||'he';
-        if(profile && !profile._lang) profile._lang = lang;
+        profilesStore=JSON.parse(saved.value);
+        if(!Array.isArray(profilesStore.profiles)) profilesStore={activeId:null,profiles:[]};
+      }else{
+        /* migrate the old single-profile format into the profiles list */
+        const old=await window.storage.get('voiceprint_profile');
+        if(old&&old.value){
+          const obj=JSON.parse(old.value);
+          if(obj.profile){
+            const entry={id:genId(),name:(obj.lang==='en'?'Profile 1':'פרופיל 1'),country:'',
+              lang:obj.lang||'he',profile:obj.profile,savedAt:obj.savedAt||new Date().toISOString()};
+            profilesStore={activeId:entry.id,profiles:[entry]};
+            await persistProfiles();
+          }
+        }
+      }
+      const entry=profilesStore.profiles.find(p=>p.id===profilesStore.activeId)||profilesStore.profiles[0];
+      if(entry){
+        activeProfileId=entry.id; profilesStore.activeId=entry.id;
+        profile=entry.profile; profileName=entry.name; profileCountry=entry.country||'';
+        lang=entry.lang||'he';
+        if(profile && !profile._lang) profile._lang=lang;
         approved=true; step=QUESTIONS.length+1;
         setLang(lang);
         return;

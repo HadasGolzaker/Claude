@@ -37,8 +37,10 @@ body{
 [dir="ltr"] .app{grid-template-columns:1fr 230px}
 main{min-width:0}
 @media(max-width:820px){
-  .app{grid-template-columns:1fr;gap:18px}
+  .app,[dir="ltr"] .app{grid-template-columns:1fr;gap:18px}
   aside{order:-1}
+  header{flex-wrap:wrap}
+  .header-controls{flex-wrap:wrap;justify-content:flex-end}
 }
 
 /* ---------- header ---------- */
@@ -62,10 +64,10 @@ aside{position:sticky;top:24px;align-self:start}
 .layer .dot.on{background:var(--accent);transform:scale(1.15)}
 .layer .name{font-weight:600;font-size:.9rem}
 @media(max-width:820px){
-  aside{position:static}
-  .layers{display:flex;gap:12px;overflow-x:auto;padding:12px}
+  aside{position:static;min-width:0}
+  .layers{display:flex;gap:12px;overflow-x:auto;padding:12px;min-width:0}
   .layers h3{display:none}
-  .layer{flex-direction:column;border-bottom:0;min-width:86px;gap:5px;text-align:center}
+  .layer{flex-direction:column;border-bottom:0;min-width:86px;flex:0 0 auto;gap:5px;text-align:center}
   .layer .dots{margin:0}
   .layer .name{font-size:.75rem}
 }
@@ -362,6 +364,62 @@ textarea,input[type=text]{
 .theme-toggle .sun{display:none}
 :root[data-theme="dark"] .theme-toggle .moon{display:none}
 :root[data-theme="dark"] .theme-toggle .sun{display:block}
+
+/* ============================================================
+   MOBILE — phones (≤600px)
+   ============================================================ */
+@media(max-width:600px){
+  html,body{overflow-x:hidden}
+  body{font-size:17px}
+  html[lang="he"] body{font-size:17px}
+  .app{padding:18px 14px 56px;gap:14px}
+
+  /* header: logo row, controls wrap neatly on the same side below it */
+  header{flex-wrap:wrap;gap:10px;margin-bottom:6px}
+  .logo{flex:1 1 auto}
+  .logo h1{font-size:1.4rem}
+  html[lang="en"] .logo h1{font-size:1.6rem}
+  .header-controls{flex-wrap:wrap;justify-content:flex-end;gap:8px;flex:1 1 100%}
+  .lang-toggle button{padding:6px 13px;font-size:.9rem}
+  #profile-picker{max-width:44vw;padding:7px 12px}
+  .theme-toggle{width:38px;height:38px}
+  #vp-logout{font-size:.8rem;padding:6px 12px;margin-inline-start:0}
+
+  /* cards & type */
+  .card{padding:22px 16px}
+  .q-title{font-size:1.42rem}
+  html[lang="en"] .q-title{font-size:1.55rem}
+  .intro h2{font-size:1.9rem}
+  html[lang="en"] .intro h2{font-size:2.1rem}
+  html[lang="he"] .intro h2{font-size:1.85rem}
+  html[lang="en"] .section-h,.section-h{font-size:1.15rem}
+
+  /* nav row: keep buttons reachable, allow wrap */
+  .nav{gap:10px;flex-wrap:wrap}
+  .btn{padding:11px 20px}
+  .progress-label{order:3;flex:1 1 100%;text-align:center;margin-top:2px}
+
+  /* profile category tabs scroll sideways instead of stacking tall */
+  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .tab-btn{flex:0 0 auto;white-space:nowrap}
+  .trait-name{width:120px;font-size:.86rem}
+
+  /* login overlay */
+  #vp-auth{padding:16px}
+  #vp-auth .box{padding:26px 20px}
+  #vp-auth-controls{top:12px;inset-inline-end:12px;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 24px)}
+
+  /* delete modal */
+  #vp-del .box{padding:26px 20px}
+  #vp-del .row{flex-wrap:wrap}
+
+  /* Q3 ranking + chips comfortable for touch */
+  .rank-chip{font-size:.9rem;padding:9px 13px}
+  .rank-slot{min-height:54px}
+
+  /* larger tap targets on options */
+  .opt{padding:15px 16px}
+}
 </style>
 <script>
 /* set theme before paint (no flash); follows saved choice or system preference */

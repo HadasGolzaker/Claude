@@ -1841,11 +1841,18 @@ document.getElementById('vp-theme-btn').addEventListener('click', () => {
   if (typeof toggleTheme === 'function') toggleTheme();
 });
 
-let lastMsgKey = null, lastMsgErr = false;
-function showMsg(key, isErr){
-  lastMsgKey = key; lastMsgErr = isErr;
+let lastMsgKey = null, lastMsgErr = false, lastMsgDetail = '';
+function showMsg(key, isErr, detail){
+  lastMsgKey = key; lastMsgErr = isErr; lastMsgDetail = detail||'';
   const m = document.getElementById('vp-msg');
-  m.textContent = AT()[key]; m.style.display='block';
+  m.textContent = AT()[key];
+  if(lastMsgDetail){
+    const s=document.createElement('small');
+    s.style.cssText='display:block;margin-top:6px;opacity:.7;font-weight:400';
+    s.textContent=lastMsgDetail;
+    m.appendChild(s);
+  }
+  m.style.display='block';
   m.className = 'msg' + (isErr ? ' err' : '');
 }
 
@@ -1889,7 +1896,7 @@ sendBtn.addEventListener('click', async () => {
     const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.origin } });
     if (error) throw error;
     showMsg('sent', false);
-  } catch(e){ showMsg('err', true); sendBtn.disabled = false; }
+  } catch(e){ showMsg('err', true, (e&&e.message)||String(e)); sendBtn.disabled = false; }
 });
 emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
 

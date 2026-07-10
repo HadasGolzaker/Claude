@@ -1224,6 +1224,9 @@ async function callClaude(content, useSearch, maxTokens){
     body:JSON.stringify({
       model:'claude-sonnet-4-6',
       max_tokens:maxTokens||8000,
+      /* no pre-answer "thinking" — cuts latency so generation finishes
+         well inside the serverless time limit */
+      thinking:{type:'disabled'},
       messages:[{role:'user',content}],
       ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
     })

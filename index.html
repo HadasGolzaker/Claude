@@ -345,18 +345,18 @@ textarea,input[type=text]{
 .rank-slots{display:flex;flex-direction:column;gap:10px}
 .rank-slot{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:12px;padding:8px 12px;min-height:58px;transition:border-color .15s,background .15s}
 .rank-slot.filled{border-style:solid;border-color:var(--accent)}
+.rank-slot.over{border-color:var(--accent);border-style:solid;background:var(--accent-soft)}
 .slot-num{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.92rem}
 .slot-empty{color:var(--ink-soft);font-size:.9rem;opacity:.7}
-.rank-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:20px}
-.rank-pool.pool-done{opacity:.45;pointer-events:none}
-.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:pointer;user-select:none;text-align:start}
+.rank-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;border:1.5px dashed transparent;border-radius:12px;padding:6px;transition:border-color .15s,background .15s}
+.rank-pool.over{border-color:var(--accent);background:var(--accent-soft)}
+.rank-pool.pool-done{opacity:.55}
+.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:grab;user-select:none;text-align:start;touch-action:none}
 .rank-chip:hover{background:var(--hover-fill)}
-.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:#000;border-radius:10px;cursor:default}
+.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:#000;border-radius:10px}
 .rank-chip.in-slot:hover{background:var(--accent)}
-.rank-ctrls{display:flex;gap:5px;margin-inline-start:auto;flex-shrink:0}
-.rank-ctrl{width:34px;height:34px;flex-shrink:0;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;font:inherit;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-.rank-ctrl:hover{background:var(--hover-fill)}
-.rank-ctrl:disabled{opacity:.3;cursor:not-allowed}
+.rank-chip.drag-source{opacity:.35}
+.rank-ghost{border:1.5px solid var(--accent);background:var(--accent);color:#000;border-radius:10px;padding:9px 15px;font-weight:600;font-size:.92rem;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:.95;cursor:grabbing;display:flex;align-items:center}
 /* Q10 no-LinkedIn toggle */
 .no-li-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.95rem;cursor:pointer;margin-bottom:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
 .no-li-toggle input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
@@ -511,8 +511,8 @@ const I18N = {
     del_btn:'מחיקה סופית', del_cancel:'ביטול',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
     write_lang_hint:'כתבו בשפה שבה אתם מפרסמים בלינקדאין',
-    rank_note:'הקליקו על 3 מניעים לפי סדר החשיבות. השתמשו בחצים ▲▼ כדי לשנות סדר, וב-✕ כדי להסיר.',
-    rank_slots_cap:'הדירוג שלכם', rank_pool_cap:'המניעים לבחירה', rank_drop:'לחצו על מניע מהרשימה',
+    rank_note:'גררו 3 מניעים אל המקומות לפי סדר החשיבות. גררו בין המקומות כדי לשנות סדר, או בחזרה לרשימה כדי להסיר.',
+    rank_slots_cap:'הדירוג שלכם', rank_pool_cap:'המניעים לבחירה', rank_drop:'גררו לכאן מניע',
     generate:'בנו את הפרופיל שלי',
     analyzing:['קוראים את התשובות שלכם...','מזהים דפוסי שפה...','מצליבים מניעים מול תכונות...','מרכיבים את טביעת הקול...'],
     profile_h:'טביעת הקול שלכם',
@@ -588,8 +588,8 @@ const I18N = {
     del_btn:'Delete forever', del_cancel:'Cancel',
     open_note:'Free writing, unedited. At least a few sentences.',
     write_lang_hint:'Write in the language you post in on LinkedIn',
-    rank_note:'Tap 3 motives in order of importance. Use ▲▼ to reorder and ✕ to remove.',
-    rank_slots_cap:'Your ranking', rank_pool_cap:'Motives to choose from', rank_drop:'Tap a motive from the list',
+    rank_note:'Drag 3 motives into the slots in order of importance. Drag between slots to reorder, or back to the list to remove.',
+    rank_slots_cap:'Your ranking', rank_pool_cap:'Motives to choose from', rank_drop:'Drag a motive here',
     generate:'Build my profile',
     analyzing:['Reading your answers...','Detecting language patterns...','Cross-checking motives vs. traits...','Assembling your voiceprint...'],
     profile_h:'Your Voiceprint',
@@ -999,17 +999,12 @@ function questionHTML(q){
       const v=sel[i];
       slots.push(`<div class="rank-slot ${v?'filled':''}" data-slot="${i}">
         <span class="slot-num">${i+1}</span>
-        ${v?`<span class="rank-chip in-slot">${label(v)}</span>
-             <span class="rank-ctrls">
-               <button type="button" class="rank-ctrl" data-move="up" data-v="${v}" ${i===0?'disabled':''} aria-label="up">▲</button>
-               <button type="button" class="rank-ctrl" data-move="down" data-v="${v}" ${i===sel.length-1?'disabled':''} aria-label="down">▼</button>
-               <button type="button" class="rank-ctrl" data-rm="${v}" aria-label="remove">✕</button>
-             </span>`
+        ${v?`<span class="rank-chip in-slot" data-v="${v}">${label(v)}</span>`
             :`<span class="slot-empty">${t.rank_drop}</span>`}
       </div>`);
     }
     const pool=q.opts.filter(o=>!sel.includes(o.v))
-      .map(o=>`<button type="button" class="rank-chip" data-v="${o.v}">${o[lang]}</button>`).join('');
+      .map(o=>`<span class="rank-chip" data-v="${o.v}">${o[lang]}</span>`).join('');
     const poolDone = sel.length>=q.max;
     body = `<div class="char-note" style="margin-bottom:14px">${t.rank_note}</div>
       <div class="rank-wrap">
@@ -1087,21 +1082,73 @@ function refreshNext(q){
 }
 
 /* ---------- Q3 drag-and-drop ranking ---------- */
-/* tap-to-rank: reliable on touch and desktop alike (HTML5 drag isn't).
-   tap a pool option -> next slot; ▲/▼ reorder; ✕ removes back to the pool */
+/* Custom POINTER-based drag (mouse + touch), not native HTML5 DnD which is
+   flaky and doesn't work on touch. Drag a motive into a numbered slot to
+   rank it, drag between slots to reorder, drag back to the pool to remove.
+   A plain tap on a pool option also places it (convenience). */
 function wireRank(q){
+  const slotsEl=document.getElementById('rank-slots');
+  const poolEl=document.getElementById('rank-pool');
   const getSel=()=>answers[q.id]||[];
   const setSel=arr=>{ answers[q.id]=arr; render(); };
-  function place(v){ const sel=getSel().slice(); if(sel.includes(v)||sel.length>=q.max) return; sel.push(v); setSel(sel); }
-  function remove(v){ setSel(getSel().filter(x=>x!==v)); }
-  function move(v,dir){
-    const sel=getSel().slice(); const i=sel.indexOf(v); if(i<0) return;
-    const j=i+(dir==='up'?-1:1); if(j<0||j>=sel.length) return;
-    [sel[i],sel[j]]=[sel[j],sel[i]]; setSel(sel);
+  function placeAt(v, slotIdx){
+    let sel=getSel().filter(x=>x!==v);
+    if(slotIdx==null||slotIdx<0) slotIdx=sel.length;
+    slotIdx=Math.max(0,Math.min(slotIdx, sel.length, q.max-1));
+    sel.splice(slotIdx,0,v);
+    if(sel.length>q.max) sel=sel.slice(0,q.max);
+    setSel(sel);
   }
-  document.querySelectorAll('#rank-pool .rank-chip').forEach(b=>b.addEventListener('click',()=>place(b.dataset.v)));
-  document.querySelectorAll('#rank-slots [data-move]').forEach(b=>b.addEventListener('click',()=>move(b.dataset.v,b.dataset.move)));
-  document.querySelectorAll('#rank-slots [data-rm]').forEach(b=>b.addEventListener('click',()=>remove(b.dataset.rm)));
+  function remove(v){ setSel(getSel().filter(x=>x!==v)); }
+
+  let drag=null;
+  function clearOver(){ slotsEl.querySelectorAll('.rank-slot').forEach(s=>s.classList.remove('over')); poolEl.classList.remove('over'); }
+  function targetAt(x,y){
+    drag.ghost.style.display='none';
+    const el=document.elementFromPoint(x,y);
+    drag.ghost.style.display='';
+    return el;
+  }
+  function onMove(e){
+    if(!drag) return;
+    e.preventDefault();
+    drag.moved=true;
+    drag.ghost.style.left=(e.clientX-drag.dx)+'px';
+    drag.ghost.style.top=(e.clientY-drag.dy)+'px';
+    const el=targetAt(e.clientX,e.clientY);
+    clearOver();
+    const slot=el&&el.closest('.rank-slot');
+    if(slot) slot.classList.add('over');
+    else if(el&&el.closest('#rank-pool')) poolEl.classList.add('over');
+  }
+  function onUp(e){
+    window.removeEventListener('pointermove',onMove);
+    window.removeEventListener('pointerup',onUp);
+    if(!drag) return;
+    const {v,ghost,moved}=drag;
+    const el=targetAt(e.clientX,e.clientY);
+    ghost.remove(); clearOver(); drag=null;
+    const slot=el&&el.closest('.rank-slot');
+    if(slot) placeAt(v, +slot.dataset.slot);          /* onto a slot -> rank there */
+    else if(getSel().includes(v)) remove(v);          /* a ranked chip dragged off the slots -> remove */
+    else if(!moved) placeAt(v,null);                  /* a tap on a pool option -> place */
+    else render();                                    /* pool option dropped nowhere -> restore */
+  }
+  function onDown(e){
+    if(e.button!=null && e.button>0) return;
+    const chip=e.currentTarget, v=chip.dataset.v;
+    e.preventDefault();
+    const r=chip.getBoundingClientRect();
+    const ghost=chip.cloneNode(true);
+    ghost.classList.add('rank-ghost');
+    ghost.style.cssText='position:fixed;left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;margin:0;pointer-events:none;z-index:2000';
+    document.body.appendChild(ghost);
+    chip.classList.add('drag-source');
+    drag={v,ghost,dx:e.clientX-r.left,dy:e.clientY-r.top,moved:false};
+    window.addEventListener('pointermove',onMove,{passive:false});
+    window.addEventListener('pointerup',onUp);
+  }
+  document.querySelectorAll('.rank-chip[data-v]').forEach(chip=>chip.addEventListener('pointerdown',onDown));
 }
 
 /* =========================================================

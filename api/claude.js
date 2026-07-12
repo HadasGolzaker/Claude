@@ -1,9 +1,12 @@
 /*
  * Server-side proxy to the Anthropic (Claude) API.
  * The secret ANTHROPIC_API_KEY lives here, never in the browser.
- * Requests are only forwarded for signed-in users, so nobody can
- * abuse the key by hitting this endpoint anonymously.
+ * Requests are only forwarded for signed-in users.
+ * Streams the response so long generations don't hit the 60s timeout.
  */
+
+export const config = { runtime: 'nodejs', maxDuration: 60 };
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: { message: 'Method not allowed' } });
@@ -26,36 +29,53 @@ export default async function handler(req, res) {
     res.status(401).json({ error: { message: 'Not authenticated.' } });
     return;
   }
+
   try {
-    const userResp = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: { Authorization: `Bearer ${token}`, apikey: supabaseAnonKey },
+    const userCheck = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: { apikey: supabaseAnonKey, Authorization: `Bearer ${token}` },
     });
-    if (!userResp.ok) {
-      res.status(401).json({ error: { message: 'Invalid or expired session.' } });
+    if (!userCheck.ok) {
+      res.status(401).json({ error: { message: 'Not authenticated.' } });
       return;
     }
-  } catch (e) {
-    res.status(401).json({ error: { message: 'Could not verify session.' } });
+  } catch (err) {
+    res.status(401).json({ error: { message: 'Auth check failed.' } });
     return;
   }
 
-  // 2) Forward the request to Anthropic with the secret key.
+  // 2) Forward the request to Claude WITH streaming enabled.
   try {
-    const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-    const anthropicResp = await fetch('https://api.anthropic.com/v1/messages', {
+    const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
       },
-      body,
+      body: JSON.stringify({ ...req.body, stream: true }),
     });
-    const text = await anthropicResp.text();
-    res.status(anthropicResp.status);
-    res.setHeader('Content-Type', 'application/json');
-    res.send(text);
-  } catch (e) {
-    res.status(502).json({ error: { message: 'Failed to reach the Anthropic API: ' + ((e && e.message) || 'unknown error') } });
+
+    if (!upstream.ok || !upstream.body) {
+      const errText = await upstream.text();
+      res.status(upstream.status || 500).json({ error: { message: errText || 'Claude request failed' } });
+      return;
+    }
+
+    // 3) Pipe Claude's stream straight to the browser.
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+
+    const reader = upstream.body.getReader();
+    const decoder = new TextDecoder();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      res.write(decoder.decode(value, { stream: true }));
+      if (typeof res.flush === 'function') res.flush();
+    }
+    res.end();
+  } catch (err) {
+    res.status(500).json({ error: { message: String((err && err.message) || err) } });
   }
 }

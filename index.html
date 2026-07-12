@@ -344,17 +344,19 @@ textarea,input[type=text]{
 .rank-cap{font-size:.85rem;font-weight:700;margin-bottom:8px}
 .rank-slots{display:flex;flex-direction:column;gap:10px}
 .rank-slot{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:12px;padding:8px 12px;min-height:58px;transition:border-color .15s,background .15s}
-.rank-slot.over{border-color:var(--accent);background:var(--accent-soft)}
-.rank-slot.filled{border-style:solid}
+.rank-slot.filled{border-style:solid;border-color:var(--accent)}
 .slot-num{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.92rem}
 .slot-empty{color:var(--ink-soft);font-size:.9rem;opacity:.7}
 .rank-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:20px}
-.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:grab;user-select:none;touch-action:none}
+.rank-pool.pool-done{opacity:.45;pointer-events:none}
+.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:pointer;user-select:none;text-align:start}
 .rank-chip:hover{background:var(--hover-fill)}
-.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:#000;border-radius:10px}
+.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:#000;border-radius:10px;cursor:default}
 .rank-chip.in-slot:hover{background:var(--accent)}
-.rank-chip.dragging{opacity:.4}
-.rank-chip .chip-x{margin-inline-start:8px;font-weight:700;opacity:.6}
+.rank-ctrls{display:flex;gap:5px;margin-inline-start:auto;flex-shrink:0}
+.rank-ctrl{width:34px;height:34px;flex-shrink:0;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;font:inherit;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.rank-ctrl:hover{background:var(--hover-fill)}
+.rank-ctrl:disabled{opacity:.3;cursor:not-allowed}
 /* Q10 no-LinkedIn toggle */
 .no-li-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.95rem;cursor:pointer;margin-bottom:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
 .no-li-toggle input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
@@ -509,8 +511,8 @@ const I18N = {
     del_btn:'מחיקה סופית', del_cancel:'ביטול',
     open_note:'כתיבה חופשית, בלי לערוך. לפחות כמה משפטים.',
     write_lang_hint:'כתבו בשפה שבה אתם מפרסמים בלינקדאין',
-    rank_note:'גררו 3 מניעים לפי סדר חשיבות (או הקליקו כדי לשבץ). אפשר לגרור בין המקומות כדי לשנות סדר.',
-    rank_slots_cap:'הדירוג שלכם', rank_pool_cap:'המניעים לבחירה', rank_drop:'גררו לכאן',
+    rank_note:'הקליקו על 3 מניעים לפי סדר החשיבות. השתמשו בחצים ▲▼ כדי לשנות סדר, וב-✕ כדי להסיר.',
+    rank_slots_cap:'הדירוג שלכם', rank_pool_cap:'המניעים לבחירה', rank_drop:'לחצו על מניע מהרשימה',
     generate:'בנו את הפרופיל שלי',
     analyzing:['קוראים את התשובות שלכם...','מזהים דפוסי שפה...','מצליבים מניעים מול תכונות...','מרכיבים את טביעת הקול...'],
     profile_h:'טביעת הקול שלכם',
@@ -535,7 +537,7 @@ const I18N = {
     pic_label:'תמונת הפרופיל שלכם', pic_small:'אופציונלי. מחקרים מראים שבחירת תמונת פרופיל מנבאת תכונות אישיות.',
     pic_btn:'העלאת תמונה (אפשר גם צילומי מסך של פוסטים)',
     about_label:'ה-About שלכם מלינקדאין', about_small:'אופציונלי.',
-    no_li:'אין לי פרופיל לינקדאין',
+    no_li:'אין לי פרופיל לינקדאין / אני לא פעיל/ה בלינקדאין',
     alt_posts_label:'דוגמה לכתיבה שלכם', alt_posts_small:'כל טקסט שכתבתם - אימייל, הודעה, פוסט בכל מקום. זה הכיול הכי חזק של הסגנון.',
     alt_posts_ph:'הדביקו כאן משהו שכתבתם בעצמכם...',
     alt_about_label:'ספרו על עצמכם ועל מה שאתם עושים', alt_about_small:'אופציונלי.',
@@ -586,8 +588,8 @@ const I18N = {
     del_btn:'Delete forever', del_cancel:'Cancel',
     open_note:'Free writing, unedited. At least a few sentences.',
     write_lang_hint:'Write in the language you post in on LinkedIn',
-    rank_note:'Drag 3 motives in order of importance (or click to place). Drag between slots to reorder.',
-    rank_slots_cap:'Your ranking', rank_pool_cap:'Motives to choose from', rank_drop:'Drop here',
+    rank_note:'Tap 3 motives in order of importance. Use ▲▼ to reorder and ✕ to remove.',
+    rank_slots_cap:'Your ranking', rank_pool_cap:'Motives to choose from', rank_drop:'Tap a motive from the list',
     generate:'Build my profile',
     analyzing:['Reading your answers...','Detecting language patterns...','Cross-checking motives vs. traits...','Assembling your voiceprint...'],
     profile_h:'Your Voiceprint',
@@ -612,7 +614,7 @@ const I18N = {
     pic_label:'Your profile picture', pic_small:'Optional. Research shows profile-picture choice predicts personality traits.',
     pic_btn:'Upload image (screenshots of posts work too)',
     about_label:'Your LinkedIn About', about_small:'Optional.',
-    no_li:'I don\'t have a LinkedIn profile',
+    no_li:'I don\'t have a LinkedIn profile / I\'m not active on LinkedIn',
     alt_posts_label:'A sample of your writing', alt_posts_small:'Any text you wrote - an email, a message, a post anywhere. This is the strongest style calibration.',
     alt_posts_ph:'Paste something you wrote yourself...',
     alt_about_label:'Tell us about yourself and what you do', alt_about_small:'Optional.',
@@ -885,7 +887,9 @@ function answered(qid){
   if(q.type==='open') return v && v.trim().length>=30;
   if(q.type==='single') return !!v;
   if(q.type==='rank') return Array.isArray(v) && v.length===q.max;
-  if(q.type==='uploads') return (uploads.posts.trim().length>50)||uploads.images.length>0;
+  /* Q10 is calibration material; if the user has no LinkedIn it's optional
+     (the free-text answers Q1/Q6/Q9 already give writing samples) */
+  if(q.type==='uploads') return uploads.noLinkedIn||(uploads.posts.trim().length>50)||uploads.images.length>0;
   return false;
 }
 
@@ -995,16 +999,22 @@ function questionHTML(q){
       const v=sel[i];
       slots.push(`<div class="rank-slot ${v?'filled':''}" data-slot="${i}">
         <span class="slot-num">${i+1}</span>
-        ${v?`<div class="rank-chip in-slot" draggable="true" data-v="${v}">${label(v)}<span class="chip-x">✕</span></div>`
+        ${v?`<span class="rank-chip in-slot">${label(v)}</span>
+             <span class="rank-ctrls">
+               <button type="button" class="rank-ctrl" data-move="up" data-v="${v}" ${i===0?'disabled':''} aria-label="up">▲</button>
+               <button type="button" class="rank-ctrl" data-move="down" data-v="${v}" ${i===sel.length-1?'disabled':''} aria-label="down">▼</button>
+               <button type="button" class="rank-ctrl" data-rm="${v}" aria-label="remove">✕</button>
+             </span>`
             :`<span class="slot-empty">${t.rank_drop}</span>`}
       </div>`);
     }
     const pool=q.opts.filter(o=>!sel.includes(o.v))
-      .map(o=>`<div class="rank-chip" draggable="true" data-v="${o.v}">${o[lang]}</div>`).join('');
+      .map(o=>`<button type="button" class="rank-chip" data-v="${o.v}">${o[lang]}</button>`).join('');
+    const poolDone = sel.length>=q.max;
     body = `<div class="char-note" style="margin-bottom:14px">${t.rank_note}</div>
       <div class="rank-wrap">
         <div><div class="rank-cap">${t.rank_slots_cap}</div><div class="rank-slots" id="rank-slots">${slots.join('')}</div></div>
-        <div><div class="rank-cap">${t.rank_pool_cap}</div><div class="rank-pool" id="rank-pool">${pool}</div></div>
+        <div><div class="rank-cap">${t.rank_pool_cap}</div><div class="rank-pool ${poolDone?'pool-done':''}" id="rank-pool">${pool||`<span class="slot-empty">—</span>`}</div></div>
       </div>`;
   }
   if(q.type==='uploads'){
@@ -1077,47 +1087,21 @@ function refreshNext(q){
 }
 
 /* ---------- Q3 drag-and-drop ranking ---------- */
+/* tap-to-rank: reliable on touch and desktop alike (HTML5 drag isn't).
+   tap a pool option -> next slot; ▲/▼ reorder; ✕ removes back to the pool */
 function wireRank(q){
-  const slotsEl=document.getElementById('rank-slots');
-  const poolEl=document.getElementById('rank-pool');
   const getSel=()=>answers[q.id]||[];
   const setSel=arr=>{ answers[q.id]=arr; render(); };
-
-  /* place a value at a target slot index; compact array, keep order,
-     bump any displaced value rather than losing it */
-  function place(v, slotIdx){
-    let sel=getSel().slice();
-    sel=sel.filter(x=>x!==v);                 /* remove from wherever it was */
-    if(slotIdx==null || slotIdx>=q.max) slotIdx=Math.min(sel.length,q.max-1);
-    sel.splice(slotIdx,0,v);
-    if(sel.length>q.max) sel=sel.slice(0,q.max);
-    setSel(sel);
-  }
+  function place(v){ const sel=getSel().slice(); if(sel.includes(v)||sel.length>=q.max) return; sel.push(v); setSel(sel); }
   function remove(v){ setSel(getSel().filter(x=>x!==v)); }
-
-  /* click fallback: pool chip -> first empty slot; slot chip -> back to pool */
-  poolEl.querySelectorAll('.rank-chip').forEach(ch=>{
-    ch.addEventListener('click',()=>{ if(getSel().length<q.max) place(ch.dataset.v,null); });
-  });
-  slotsEl.querySelectorAll('.rank-chip.in-slot').forEach(ch=>{
-    ch.addEventListener('click',()=>remove(ch.dataset.v));
-  });
-
-  /* drag and drop */
-  let dragV=null;
-  document.querySelectorAll('.rank-chip').forEach(ch=>{
-    ch.addEventListener('dragstart',e=>{ dragV=ch.dataset.v; ch.classList.add('dragging'); try{e.dataTransfer.setData('text/plain',ch.dataset.v);e.dataTransfer.effectAllowed='move';}catch(_){} });
-    ch.addEventListener('dragend',()=>{ dragV=null; ch.classList.remove('dragging'); });
-  });
-  slotsEl.querySelectorAll('.rank-slot').forEach(slot=>{
-    slot.addEventListener('dragover',e=>{ e.preventDefault(); slot.classList.add('over'); });
-    slot.addEventListener('dragleave',()=>slot.classList.remove('over'));
-    slot.addEventListener('drop',e=>{ e.preventDefault(); slot.classList.remove('over');
-      const v=dragV||e.dataTransfer.getData('text/plain'); if(v) place(v,+slot.dataset.slot); });
-  });
-  poolEl.addEventListener('dragover',e=>{ e.preventDefault(); });
-  poolEl.addEventListener('drop',e=>{ e.preventDefault();
-    const v=dragV||e.dataTransfer.getData('text/plain'); if(v) remove(v); });
+  function move(v,dir){
+    const sel=getSel().slice(); const i=sel.indexOf(v); if(i<0) return;
+    const j=i+(dir==='up'?-1:1); if(j<0||j>=sel.length) return;
+    [sel[i],sel[j]]=[sel[j],sel[i]]; setSel(sel);
+  }
+  document.querySelectorAll('#rank-pool .rank-chip').forEach(b=>b.addEventListener('click',()=>place(b.dataset.v)));
+  document.querySelectorAll('#rank-slots [data-move]').forEach(b=>b.addEventListener('click',()=>move(b.dataset.v,b.dataset.move)));
+  document.querySelectorAll('#rank-slots [data-rm]').forEach(b=>b.addEventListener('click',()=>remove(b.dataset.rm)));
 }
 
 /* =========================================================

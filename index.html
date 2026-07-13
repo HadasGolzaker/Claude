@@ -1169,6 +1169,10 @@ PLAIN LANGUAGE: write for a smart everyday reader ("the average Joe"), not for p
 
 LANGUAGE: write the ENTIRE response in {LANG} only — every field, with no exceptions. Never insert words, phrases, or quotes from another language, not even a single term. If {LANG} is Hebrew, address the reader in gender-neutral Hebrew (plural forms like את/ה, אתם — never a masculine-only conjugation), matching the rest of this app.
 
+GRAMMAR AND FLUENCY (STRICT): every single value must be a complete, grammatically correct, natural-sounding sentence or clause in {LANG} — never a broken fragment, never a construction that only makes sense translated literally from English. If {LANG} is Hebrew: write the way a fluent native Hebrew speaker actually talks, with correct subject-verb agreement and natural word order — do NOT invent awkward metaphors or compressed poetic images (e.g. no "מנוע שקט של רצון", no machinery/engine metaphors) just to sound literary; plain direct Hebrew beats a clever but broken sentence. Before outputting each field, silently check it reads smoothly out loud — if it sounds odd, choppy, or grammatically wrong, rewrite it simpler even if that means using a few more words than the target length.
+
+PUNCTUATION: never use an em dash (—) anywhere, in any field, for any reason. Use a comma, period, or a new sentence instead.
+
 Build the profile from the questionnaire answers using these frameworks:
 
 BIG 5 — score each 1-5 using both closed answers AND language markers in free text (open-vocabulary method, Park et al. 2014):
@@ -1210,12 +1214,12 @@ If profile pictures are provided, use profile-image research: positive emotion +
 
 CROSS-CHECKING: actively look for contradictions between closed answers and free-text style (e.g., claims introvert but writes with high-energy social markers). List them in "gaps".
 
-LENGTH BUDGET (STRICT — the response is time-limited, so a complete, tight profile matters more than a thorough one): keep every evidence line, note, do/dont rule, and list item to ONE short clause (max ~14 words) — enough room to state a real inference, not just compress the answer into fewer words. No sub-clauses, no examples-in-parentheses, no restating the field name. The summary is the only place with full sentences. Total output must stay compact — if in doubt, cut. Depth comes from precision, not length.
+LENGTH BUDGET (STRICT — the response is time-limited, so a complete, tight profile matters more than a thorough one): keep every evidence line, note, do/dont rule, and list item short (max ~16 words) — but it must still be a complete, natural, grammatically whole sentence or clause, never a chopped fragment. No sub-clauses, no examples-in-parentheses, no restating the field name. Total output must stay compact — if in doubt, cut a whole item rather than mangling a sentence to fit. Depth comes from precision, not length.
 
 Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items to short phrases, BUT the "summary" and each "evidence"/"note" must be real inference (see the example above), never a restated or lightly-reworded answer. JSON schema:
 {
  "summary": "A tight 2-3 sentence psychological portrait in {LANG}, second person, warm but insightful — their defining tension and what really drives them. Feel truly seen, not summarized. No quotes, no filler.",
- "big5": {"openness":{"score":1-5,"evidence":"≤14 words: the INFERENCE you drew, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
+ "big5": {"openness":{"score":1-5,"evidence":"a short, complete, natural sentence: the INFERENCE you drew, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
  "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short inference, not the ranking restated"} x3],
  "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
  "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
@@ -1328,11 +1332,28 @@ async function callClaude(content, useSearch, maxTokens, model, onDelta){
   if(data.stop_reason==='pause_turn') throw new Error('That step needed an external lookup that didn\'t finish. Try again, or remove the link.');
   const __sr = data.stop_reason ? ' [stop:'+data.stop_reason+']' : '';
   if(!txt || !txt.trim()) throw new Error('The model returned an empty response'+__sr+'. Please try again.');
-  try{ return extractJSON(txt); }
+  try{ return sanitizeDeep(extractJSON(txt)); }
   catch(_){
     const clip=txt.trim().replace(/\s+/g,' ').slice(0,90);
     throw new Error('Could not read the result'+__sr+' — it began: "'+clip+'…"');
   }
+}
+
+/* hard guarantee (independent of the model following instructions): strip
+   em dashes from every generated string before it ever reaches the screen */
+function stripEmDash(s){
+  if(typeof s!=='string') return s;
+  return s.replace(/\s*—\s*/g,', ').replace(/,\s*,/g,',').replace(/,\s*([.!?])/g,'$1').trim();
+}
+function sanitizeDeep(val){
+  if(typeof val==='string') return stripEmDash(val);
+  if(Array.isArray(val)) return val.map(sanitizeDeep);
+  if(val && typeof val==='object'){
+    const out={};
+    for(const k in val) out[k]=sanitizeDeep(val[k]);
+    return out;
+  }
+  return val;
 }
 
 /* pull the first complete top-level JSON object out of a text blob,
@@ -1774,7 +1795,8 @@ RULES:
 - Match content angle to their profile: systemizer → process/insight framing; empathizer → people/story framing; their top motives shape what the post celebrates.
 - LOCALIZATION: honor the "localization" fields — keep their language_mix, cultural_markers, formality and audience fit so the post reads natively to them and their market. Never translate their voice into neutral corporate English.
 - STORYTELLING: build the post using their "storytelling.structure" and lean on ONE of their "storytelling.templates" where it fits; use their signature_moves naturally (don't force all of them).
-- Sound human. Forbidden: corporate buzzwords, "thrilled/excited to share", "game-changer", generic AI cadence. No em dashes unless their DNA shows them.
+- Sound human. Forbidden: corporate buzzwords, "thrilled/excited to share", "game-changer", generic AI cadence. NEVER use an em dash (—), under any circumstance, even if their writing DNA shows one. Use a comma, period, or a new sentence instead.
+- If writing in Hebrew: every sentence must be complete, grammatically correct, natural spoken Hebrew, not a literal-feeling translation or a broken fragment.
 - End the way THEY end posts (per writing_dna.endings).
 
 RAW MATERIAL (what happened, in their own words):

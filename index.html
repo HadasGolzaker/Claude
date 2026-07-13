@@ -130,7 +130,9 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .loading p{color:var(--ink-soft)}
 
 /* profile view */
-.profile-summary{background:var(--lavender-soft);border-radius:10px;padding:20px 22px;margin-bottom:24px;font-size:1.05rem}
+.profile-summary{background:var(--lavender-soft);border-radius:10px;padding:20px 22px;margin-bottom:24px;font-size:1.05rem;line-height:1.6}
+.profile-summary p{margin:0 0 12px}
+.profile-summary p:last-child{margin-bottom:0}
 .trait-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
 .trait-name{width:170px;font-weight:600;font-size:.92rem;flex-shrink:0}
 .trait-bar{flex:1;height:10px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
@@ -284,7 +286,7 @@ textarea,input[type=text]{
 :root[data-theme="dark"] .error-box{background:var(--danger-soft);color:var(--danger)}
 
 .trait-fill{background:var(--accent)}
-.approved-banner{background:var(--accent);color:#fff}
+.approved-banner{background:var(--accent);color:#000}
 .logo span{color:var(--ink)}
 
 /* brainstorm idea pills — brand palette per category */
@@ -1204,21 +1206,19 @@ If profile pictures are provided, use profile-image research: positive emotion +
 
 CROSS-CHECKING: actively look for contradictions between closed answers and free-text style (e.g., claims introvert but writes with high-energy social markers). List them in "gaps".
 
-LENGTH BUDGET (STRICT — the response is time-limited, so a complete, tight profile matters more than a thorough one): keep every evidence line, note, do/dont rule, and list item to ONE short clause (max ~10 words). No sub-clauses, no examples-in-parentheses, no restating the field name. The summary is the only place with full sentences. Total output must be small — if in doubt, cut. Depth comes from precision, not length.
+OUTPUT SHAPE — IMPORTANT: Use the Big 5, motives, Enneagram, cognitive and cultural analysis above ONLY as internal lenses to WRITE THE "insights" portrait. Do NOT output them as separate fields, scores or lists, and never name a framework in the output. The reader is not from this field — they should read one flowing, human portrait of themselves, not a report.
 
-Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items to short phrases, BUT the "summary" and each "evidence" must be real inference (see below), not restated answers. JSON schema:
+LENGTH BUDGET (STRICT — the response is time-limited): "insights" is the ONE rich field (a few short paragraphs of genuine inference). EVERYTHING ELSE — every writing_dna field, do/dont rule, localization, storytelling and gaps item — must be ONE short clause (max ~10 words): no sub-clauses, no parenthetical examples, no restating the field name. Keep total output tight; depth comes from precision, not length.
+
+Respond with ONLY valid JSON, no markdown fences, no preamble. JSON schema:
 {
- "summary": "A tight 2-3 sentence psychological portrait in {LANG}, second person, warm but insightful — their defining tension and what really drives them. Feel truly seen, not summarized. No quotes, no filler.",
- "big5": {"openness":{"score":1-5,"evidence":"≤10 words: the signal you inferred it from, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
- "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short"} x3],
- "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
- "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
- "writing_dna": {"language":"he|en|mixed","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
+ "insights": "The heart of the profile: a warm, genuinely insightful portrait in {LANG}, written to a smart everyday reader, second person. 4-6 SHORT paragraphs separated by \\n\\n. Weave ALL your analysis into flowing plain language: who they are at their core, what truly drives them beneath the surface, the inner logic and self-image they operate from, how their mind actually works and decides, and how their world and market shape their voice. EVERY sentence is an INFERENCE — what their answers REVEAL about them — never a restatement or quote. No framework names, no clinical terms, no jargon. Make them feel truly seen.",
+ "writing_dna": {"language":"the language(s) they ACTUALLY write in, named plainly (e.g. English, Hebrew, or English mixed with Hebrew) — read it from their real writing samples and open answers, NOT from the language of this response","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
  "localization": {"audience":"short","language_mix":"short","cultural_markers":"short","formality":"short","note":"short"},
  "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
- "gaps": ["...( empty array if none )"]
+ "gaps": ["short contradictions worth checking — empty array if none"]
 }
-All free-text values in {LANG}, in plain everyday language, with no verbatim quotes of the user's answers.`;
+Write every value in {LANG} in plain everyday language, with no verbatim quotes of the user's answers — EXCEPT writing_dna.language and localization.language_mix, which must name the user's REAL writing language even if that differs from {LANG}.`;
 
 function buildUserContent(){
   const qa = QUESTIONS.filter(q=>q.type!=='uploads').map(q=>{
@@ -1406,7 +1406,7 @@ async function translateProfile(target){
   let failed=false, errMsg='';
   try{
     const content=[{type:'text',text:
-      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nTranslate EVERY free-text/descriptive string value into ${target==='he'?'Hebrew':'English'} (summary, evidence, note, core, do/dont rules, signature_phrases, localization and storytelling fields, gaps — everything except the numeric scores and the fixed enum-like values such as writing_dna.language). Keep the exact same JSON schema, field names, array lengths and order, and scores — this is a pure translation, not a re-analysis. Output nothing but the translated JSON object, no markdown fences, no preamble, no trailing commentary.`}];
+      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nTranslate EVERY free-text/descriptive string value into ${target==='he'?'Hebrew':'English'} (insights, writing_dna descriptions, do/dont rules, signature_phrases, localization and storytelling fields, gaps). DO NOT translate writing_dna.language or localization.language_mix — those name the user's real writing language and must stay as-is. Keep the exact same JSON schema, field names, and array lengths and order — this is a pure translation, not a re-analysis. Output nothing but the translated JSON object, no markdown fences, no preamble, no trailing commentary.`}];
     const translated = await callClaude(content, false, 8000);
     translated._lang = target;
     profile = translated;
@@ -1429,24 +1429,6 @@ async function translateProfile(target){
 /* ---------- profile view ---------- */
 function profileHTML(){
   const t=T(), p=profile;
-  const traits=['openness','conscientiousness','extraversion','agreeableness','neuroticism'];
-  const traitGrads=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'];
-  const bars = traits.map((tr,ti)=>{
-    const d=p.big5[tr]||{score:3,evidence:''};
-    return `<div class="trait-row">
-      <span class="trait-name">${t.traits[tr]}</span>
-      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%;background:${traitGrads[ti%traitGrads.length]}"></div></div>
-      <span class="trait-score">${d.score}</span>
-    </div>
-    <div class="char-note" style="margin:-6px 0 12px">${t.ev}: ${d.evidence||''}</div>`;
-  }).join('');
-
-  const motiveGrads=['var(--g-pink)','var(--g-blue)','var(--g-orange)'];
-  const motives=(p.motives||[]).map((m,i)=>
-    `<span class="chip chip-block" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
-
-  const en=p.enneagram||{};
-  const cg=p.cognitive||{};
   const dna=p.writing_dna||{};
   const dnaRows=[
     dna.language,dna.sentence_length,dna.punctuation,dna.emoji,
@@ -1456,35 +1438,16 @@ function profileHTML(){
   const dos=(dna.do||[]).map(x=>`<li>${x}</li>`).join('');
   const donts=(dna.dont||[]).map(x=>`<li>${x}</li>`).join('');
 
-  const loc=p.localization||{};
-  const locRows=[
-    loc.audience,loc.language_mix,loc.cultural_markers,loc.formality
-  ].filter(Boolean).map(v=>`<li>${v}</li>`).join('');
-
-  const st=p.storytelling||{};
-  const stMoves=(st.signature_moves||[]).map(s=>`<span class="chip">${s}</span>`).join('');
-  const stTemplates=(st.templates||[]).map(s=>`<li>${s}</li>`).join('');
-
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
-  const tabs=[
-    {id:'big5', label:t.big5_h, body:bars},
-    {id:'motives', label:t.motives_h, body:motives||'—'},
-    {id:'ennea', label:t.ennea_h, body:`<span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span><div class="char-note">${en.core||''}</div>`},
-    {id:'cog', label:t.cog_h, body:`<span class="chip">${cg.convergent_divergent||''}</span> <span class="chip">${cg.systemizer_empathizer||''}</span><div class="char-note">${cg.note||''}</div>`},
-    {id:'local', label:t.local_h, body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<div class="char-note">${loc.note}</div>`:''}`},
-    {id:'story', label:t.story_h, body:`${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<div class="char-note">${st.note}</div>`:''}`}
-  ];
-  const tabBar=`<div class="tabs" role="tablist">${tabs.map((tb,i)=>`<button class="tab-btn${i===0?' active':''}" data-tab="${tb.id}">${tb.label}</button>`).join('')}</div>`;
-  const tabPanels=tabs.map((tb,i)=>`<div class="tab-panel${i===0?' active':''}" id="tab-${tb.id}">${tb.body}</div>`).join('');
+  /* insights: one flowing plain-language portrait (fall back to legacy .summary) */
+  const insightText=(p.insights||p.summary||'');
+  const insightHTML=insightText.split(/\n\n+/).filter(s=>s.trim()).map(s=>`<p>${escapeHtml(s.trim())}</p>`).join('');
 
   return `<div class="step active">
     <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
-    <div class="profile-summary serif">${p.summary||''}</div>
+    <div class="profile-summary serif">${insightHTML}</div>
     ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
-
-    ${tabBar}
-    ${tabPanels}
 
     <div class="always-open">
       <div class="section-h">${t.dna_h}</div>
@@ -1708,11 +1671,11 @@ function buildPostContent(refineNote){
 ${JSON.stringify(profile)}
 
 RULES:
-- Language: match the writing_dna language (${dnaLang}); but if the raw material below is clearly written in a different language, match the raw material.
+- LANGUAGE (most important): write the post in the SAME LANGUAGE the user wrote the RAW MATERIAL below in. If the raw material is in English, write in English; if in Hebrew, write in Hebrew. This overrides everything — do NOT default to the app's language or the profile's language. (Their usual writing language is ${dnaLang}, but the raw material wins.)
 - Follow every DO and DON'T in writing_dna literally. Mimic their sentence length, punctuation habits, emoji habits, humor and endings. Reuse their signature phrasing style without quoting old posts.
 - First line = a scroll-stopping hook drawn from the most specific, human detail in the material. No clickbait clichés.
 - Short paragraphs with breathing room. One idea per post. Specificity beats generality.
-- Match content angle to their profile: systemizer → process/insight framing; empathizer → people/story framing; their top motives shape what the post celebrates.
+- Match the content angle to who they are, using the "insights" portrait in the profile: lead with process/insight framing for analytical thinkers, people/story framing for relational ones, and celebrate what genuinely drives them.
 - LOCALIZATION: honor the "localization" fields — keep their language_mix, cultural_markers, formality and audience fit so the post reads natively to them and their market. Never translate their voice into neutral corporate English.
 - STORYTELLING: build the post using their "storytelling.structure" and lean on ONE of their "storytelling.templates" where it fits; use their signature_moves naturally (don't force all of them).
 - Sound human. Forbidden: corporate buzzwords, "thrilled/excited to share", "game-changer", generic AI cadence. No em dashes unless their DNA shows them.

@@ -1271,7 +1271,38 @@ async function callClaude(content, useSearch, maxTokens){
   /* read as text first: a timed-out or crashed serverless function returns an
      HTML/plain error page, and response.json() would blow up with a cryptic
      "Unexpected token" instead of a usable message */
-  const __ct=response.headers.get('content-type')||'';const __isStream=!!response.body&&__ct.indexOf('event-stream')>=0;let __streamText='',__stopReason=null,__streamErr=null;if(__isStream){const __NL=String.fromCharCode(10);const __reader=response.body.getReader();const __dec=new TextDecoder();let __buf='';while(true){const{done,value}=await __reader.read();if(done)break;__buf+=__dec.decode(value,{stream:true});const __parts=__buf.split(__NL);__buf=__parts.pop();for(const __line of __parts){const __tt=__line.trim();if(__tt.indexOf('data:')!==0)continue;const __js=__tt.slice(5).trim();if(!__js||__js==='[DONE]')continue;try{const __e=JSON.parse(__js);if(__e.type==='content_block_delta'&&__e.delta&&typeof __e.delta.text==='string')__streamText+=__e.delta.text;else if(__e.type==='message_delta'&&__e.delta&&__e.delta.stop_reason)__stopReason=__e.delta.stop_reason;else if(__e.type==='error'&&__e.error)__streamErr=__e.error;}catch(__ignore){}}}}const raw=__isStream?JSON.stringify({content:[{type:'text',text:__streamText}],stop_reason:__stopReason,error:__streamErr}):await response.text();
+  const __ct=response.headers.get('content-type')||'';
+  const __isStream=!!response.body && __ct.indexOf('event-stream')>=0;
+  let __streamText='', __stopReason=null, __streamErr=null;
+  if(__isStream){
+    const __reader=response.body.getReader();
+    const __dec=new TextDecoder();
+    let __buf='';
+    const __handle=line=>{
+      const s=line.trim();
+      if(s.indexOf('data:')!==0) return;
+      const j=s.slice(5).trim();
+      if(!j||j==='[DONE]') return;
+      try{
+        const e=JSON.parse(j);
+        if(e.type==='content_block_delta'&&e.delta&&typeof e.delta.text==='string') __streamText+=e.delta.text;
+        else if(e.type==='message_delta'&&e.delta&&e.delta.stop_reason) __stopReason=e.delta.stop_reason;
+        else if(e.type==='error'&&e.error) __streamErr=e.error;
+      }catch(_){/* skip partial/keepalive lines */}
+    };
+    while(true){
+      const{done,value}=await __reader.read();
+      if(done) break;
+      __buf+=__dec.decode(value,{stream:true});
+      const parts=__buf.split('\n');
+      __buf=parts.pop();
+      for(const line of parts) __handle(line);
+    }
+    if(__buf) __handle(__buf); /* flush any trailing line without a newline */
+  }
+  const raw=__isStream
+    ? JSON.stringify({content:[{type:'text',text:__streamText}],stop_reason:__stopReason,error:__streamErr})
+    : await response.text();
   let data;
   try{ data = JSON.parse(raw); }
   catch(_){
@@ -1290,7 +1321,13 @@ async function callClaude(content, useSearch, maxTokens){
      continuation this single-shot call doesn't provide. Insight generation uses
      no search, so this only guards the composer's optional link-reading. */
   if(data.stop_reason==='pause_turn') throw new Error('That step needed an external lookup that didn\'t finish. Try again, or remove the link.');
-  return extractJSON(txt);
+  const __sr = data.stop_reason ? ' [stop:'+data.stop_reason+']' : '';
+  if(!txt || !txt.trim()) throw new Error('The model returned an empty response'+__sr+'. Please try again.');
+  try{ return extractJSON(txt); }
+  catch(_){
+    const clip=txt.trim().replace(/\s+/g,' ').slice(0,90);
+    throw new Error('Could not read the result'+__sr+' — it began: "'+clip+'…"');
+  }
 }
 
 /* pull the first complete top-level JSON object out of a text blob,

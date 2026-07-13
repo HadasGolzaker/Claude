@@ -1213,7 +1213,7 @@ LENGTH BUDGET (STRICT — the response is time-limited): "insights" is the ONE r
 
 Respond with ONLY valid JSON, no markdown fences, no preamble. JSON schema:
 {
- "insights": "The heart of the profile: a warm, genuinely insightful portrait in {LANG}, written to a smart everyday reader, second person. 4-6 SHORT paragraphs separated by \\n\\n. Weave ALL your analysis into flowing plain language: who they are at their core, what truly drives them beneath the surface, the inner logic and self-image they operate from, how their mind actually works and decides, and how their world and market shape their voice. EVERY sentence is an INFERENCE — what their answers REVEAL about them — never a restatement or quote. No framework names, no clinical terms, no jargon. Make them feel truly seen.",
+ "insights": "The heart of the profile: a warm, genuinely insightful portrait in {LANG}, written to a smart everyday reader, second person. 3-4 SHORT paragraphs separated by \\n\\n. Weave ALL your analysis into flowing plain language: who they are at their core, what truly drives them beneath the surface, the inner logic and self-image they operate from, how their mind actually works and decides, and how their world and market shape their voice. EVERY sentence is an INFERENCE — what their answers REVEAL about them — never a restatement or quote. No framework names, no clinical terms, no jargon. Make them feel truly seen.",
  "writing_dna": {"language":"the language(s) they ACTUALLY write in, named plainly (e.g. English, Hebrew, or English mixed with Hebrew) — read it from their real writing samples and open answers, NOT from the language of this response","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
  "localization": {"audience":"short","language_mix":"short","cultural_markers":"short","formality":"short","note":"short"},
  "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
@@ -1243,7 +1243,7 @@ function buildUserContent(){
   return content;
 }
 
-async function callClaude(content, useSearch, maxTokens){
+async function callClaude(content, useSearch, maxTokens, model){
   const headers={'Content-Type':'application/json'};
   const token = window.__getToken ? await window.__getToken() : '';
   if(token) headers['Authorization']='Bearer '+token;
@@ -1251,7 +1251,7 @@ async function callClaude(content, useSearch, maxTokens){
     method:'POST',
     headers,
     body:JSON.stringify({
-      model:'claude-sonnet-4-6',
+      model:model||'claude-sonnet-4-6',
       max_tokens:maxTokens||8000,
       /* no pre-answer "thinking" — cuts latency so generation finishes
          well inside the serverless time limit */
@@ -1325,6 +1325,7 @@ async function callClaude(content, useSearch, maxTokens){
 /* pull the first complete top-level JSON object out of a text blob,
    ignoring any commentary the model may have added before/after it */
 function extractJSON(txt){
+  txt = txt.replace(/```(?:json)?/gi,''); /* drop any markdown code fences the model may add */
   const start = txt.indexOf('{');
   if(start===-1) throw new Error('No JSON in response');
   let depth=0, inStr=false, esc=false;
@@ -1371,7 +1372,9 @@ async function runGeneration(refineNote){
     } else {
       content=buildUserContent();
     }
-    profile = await callClaude(content);
+    /* analysis runs on the faster Haiku model so the full profile finishes
+       inside the serverless time limit; posts stay on Sonnet for voice quality */
+    profile = await callClaude(content, false, 8000, 'claude-haiku-4-5-20251001');
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;
@@ -1434,7 +1437,7 @@ async function translateProfile(target){
   try{
     const content=[{type:'text',text:
       `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. DO NOT change writing_dna.language or localization.language_mix — those name the user's real writing language and must stay as-is. Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
-    const translated = await callClaude(content, false, 8000);
+    const translated = await callClaude(content, false, 8000, 'claude-haiku-4-5-20251001');
     translated._lang = target;
     vars[target] = translated;
     applyProfileLang(translated, target);

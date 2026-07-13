@@ -1158,7 +1158,11 @@ function wireRank(q){
 const CODEX = `
 You are an expert personality psychologist profiling a person for a LinkedIn ghostwriting platform. Your job is to READ A PERSON, not to summarize a form.
 
-CRITICAL — INFER, DON'T ECHO: Never restate or lightly paraphrase what the user wrote. Every insight must be an INFERENCE that goes beyond the surface of their answers — read between the lines, connect signals across different questions, name the underlying trait/drive/tension the person may not even see about themselves. If a line could be produced just by rephrasing one answer, it is wrong; replace it with what that answer REVEALS about who they are. Write with the specificity and quiet authority of a psychologist who has just understood someone — concrete, human, occasionally surprising, never generic horoscope language.
+CRITICAL — INFER, DON'T ECHO: Never restate or lightly paraphrase what the user wrote, and NEVER quote their answers back word-for-word. Every insight must be an INFERENCE that goes beyond the surface of their answers — read between the lines, connect signals across different questions, name the underlying trait/drive/tension the person may not even see about themselves. If a line could be produced just by rephrasing one answer, it is wrong; replace it with what that answer REVEALS about who they are.
+
+PLAIN LANGUAGE: write for a smart everyday reader ("the average Joe"), not for psychologists. Explain what you see in warm, clear, jargon-free words. When you draw on a framework (Big 5, Enneagram, Hofstede, etc.), translate it into plain human terms rather than naming clinical constructs — the insight should land, not sound like a textbook.
+
+LANGUAGE: write the ENTIRE response in {LANG} only. Do not output any words, phrases, or quotes in any other language.
 
 Build the profile from the questionnaire answers using these frameworks:
 
@@ -1178,7 +1182,7 @@ COGNITIVE ORIENTATION (mainly from Q6+Q9+posts):
 - systemizer (how systems work: data, frameworks, SOPs) vs empathizer (how people feel: stories, motives, relationships).
 
 WRITING DNA (from Q1, Q6, and pasted posts — the pasted posts are the STRONGEST signal, weight them most):
-- primary language (he/en/mixed), average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature phrases (quote 2-3 verbatim from their text), first/second person habits, how they end posts (question? statement? CTA?).
+- primary language (he/en/mixed), average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature_phrases: 2-3 SHORT descriptions (in {LANG}) of their characteristic phrasing or go-to word choices, IN YOUR OWN WORDS — do NOT copy their sentences verbatim, first/second person habits, how they end posts (question? statement? CTA?).
 - Also produce 3 DO rules and 3 DON'T rules for ghostwriting this person. Make them specific and actionable (not generic advice) — grounded in the actual evidence from their answers and posts.
 
 LOCALIZATION — language & culture fit (from writing language, phrasing, cultural references in Q1/Q6/posts/About):
@@ -1223,7 +1227,7 @@ Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items t
  "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
  "gaps": ["...( empty array if none )"]
 }
-All free-text values in {LANG}.`;
+All free-text values in {LANG}, in plain everyday language, with no verbatim quotes of the user's answers.`;
 
 function buildUserContent(){
   const qa = QUESTIONS.filter(q=>q.type!=='uploads').map(q=>{
@@ -1282,6 +1286,10 @@ async function callClaude(content, useSearch, maxTokens){
   /* a cut-off response (hit the token cap) leaves the JSON unterminated;
      say so plainly instead of the cryptic "No JSON in response" */
   if(data.stop_reason==='max_tokens') throw new Error('The response was cut off (reached the length limit). Try again.');
+  /* pause_turn = Claude paused to run a server tool (web search) and expects a
+     continuation this single-shot call doesn't provide. Insight generation uses
+     no search, so this only guards the composer's optional link-reading. */
+  if(data.stop_reason==='pause_turn') throw new Error('That step needed an external lookup that didn\'t finish. Try again, or remove the link.');
   return extractJSON(txt);
 }
 
@@ -1416,7 +1424,7 @@ function profileHTML(){
     dna.language,dna.sentence_length,dna.punctuation,dna.emoji,
     dna.hook_style,dna.humor,dna.endings
   ].filter(Boolean).map(v=>`<li>${v}</li>`).join('');
-  const sigs=(dna.signature_phrases||[]).map(s=>`<span class="chip">"${s}"</span>`).join('');
+  const sigs=(dna.signature_phrases||[]).map(s=>`<span class="chip">${s}</span>`).join('');
   const dos=(dna.do||[]).map(x=>`<li>${x}</li>`).join('');
   const donts=(dna.dont||[]).map(x=>`<li>${x}</li>`).join('');
 
@@ -1604,12 +1612,11 @@ async function brainstormTopics(){
   let i=0;
   box.innerHTML=`<div class="loading" style="padding:24px 0"><div class="pulse" style="width:40px;height:40px;border-width:3px"></div><p id="ideas-msg">${t.ideas_loading[0]}</p></div>`;
   const timer=setInterval(()=>{i=(i+1)%t.ideas_loading.length;const el=document.getElementById('ideas-msg');if(el)el.textContent=t.ideas_loading[i];},2000);
-  const today=new Date().toISOString().slice(0,10);
   const text=`You help this person decide WHAT to post on LinkedIn when they have nothing specific in mind. Their full profile (personality, motives, writing DNA, localization, storytelling):
 ${JSON.stringify(profile)}
 
-Today is ${today}. Suggest 8 concrete post ideas tailored to THIS person, spread across these categories:
-- "news": something genuinely happening now that fits their field/interests — use web search to ground it in a real, recent item.
+Suggest 8 concrete post ideas tailored to THIS person — drawn from your own knowledge of their field and of evergreen conversations in it, NOT from any live search. Spread them across these categories:
+- "news": an ongoing trend, debate, or recurring theme in their field they could weigh in on (from your knowledge — no need for a specific dated event).
 - "professional": an insight, lesson, or take from their professional world.
 - "personal": something from personal life / values / a small human moment they could share.
 - "hobby": tied to interests or hobbies visible in their profile.
@@ -1617,7 +1624,7 @@ Write each idea in ${lang==='he'?'Hebrew':'English'}, matching their voice and a
 
 Respond with ONLY valid JSON, no fences: {"ideas":[{"category":"news|professional|personal|hobby","title":"...","angle":"..."}]}`;
   try{
-    const res=await callClaude([{type:'text',text}], true);
+    const res=await callClaude([{type:'text',text}]);
     clearInterval(timer);
     renderIdeas(res.ideas||[]);
   }catch(err){

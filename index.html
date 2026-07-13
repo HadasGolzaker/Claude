@@ -498,7 +498,7 @@ const I18N = {
     intro_h:'לפני שנכתוב פוסט אחד - בואו נלמד איך נשמע הקול שלכם.',
     intro_p1:'עשר שאלות. חלקן קצרות, חלקן פתוחות. מהתשובות ייבנה פרופיל בחמש שכבות: אישיות (Big 5), מניעים וערכים, טיפוס אניגרמה, סגנון חשיבה, וה-DNA של הכתיבה שלכם.',
     intro_p2:'טיפ חשוב: על שאלות הכתיבה החופשית, כתבו בשפה שבה אתם מפרסמים בלינקדאין. שאר השאלות - באיזו שפה שנוח לכם.',
-    intro_p3:'אין תשובות נכונות. ככל שהתשובות יהיו אמיתיות יותר - הפרופיל יהיה מדויק יותר.',
+    intro_p3:'מילוי השאלון לוקח כ-10 דקות. אין תשובות נכונות — שווה למלא אותו בתשומת לב וברוגע: ככל שהתשובות אמיתיות ומדויקות יותר, כך הפרופיל שייבנה יהיה מדויק יותר.',
     start:'מתחילים ←',
     name_label:'השם שלכם (זה יהיה שם הפרופיל)',
     name_ph:'למשל: דנה',
@@ -575,7 +575,7 @@ const I18N = {
     intro_h:'Before we write a single post - let\'s learn how you sound.',
     intro_p1:'Ten questions. Some quick, some open. From your answers we\'ll build a five-layer profile: personality (Big 5), motives & values, Enneagram type, thinking style, and your writing DNA.',
     intro_p2:'Important tip: on the free-writing questions, write in the language you post in on LinkedIn. Everything else - whatever feels natural.',
-    intro_p3:'There are no right answers. The more you sound like yourself, the sharper the profile.',
+    intro_p3:'The questionnaire takes about 10 minutes. There are no right answers — it\'s worth filling it out with care and without rushing: the more honest and precise your answers, the sharper and more accurate your profile.',
     start:'Let\'s begin →',
     name_label:'Your name (this will be the profile name)',
     name_ph:'e.g. Dana',
@@ -745,6 +745,7 @@ let step = -1; /* -1 = intro */
 const answers = {};   /* qid -> value */
 let uploads = {posts:'', about:'', images:[], noLinkedIn:false}; /* images: [{media_type,data}] */
 let profile = null;
+let profileVariants = {}; /* lang -> profile object for the current DRAFT, so switching back reverts instead of regenerating */
 let approved = false;
 let apiKey = '';
 let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
@@ -1374,6 +1375,8 @@ async function runGeneration(refineNote){
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;
+    profileVariants = { [lang]: profile }; /* fresh analysis → drop any stale translations */
+    { const e = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null; if(e) e.variants = { [lang]: profile }; }
     clearInterval(loadTimer);
     step=QUESTIONS.length+1; approved=false; render();
   }catch(err){
@@ -1396,23 +1399,45 @@ async function runGeneration(refineNote){
 /* keep the generated profile in sync with the UI language — this only
    re-translates the tool's own analysis text, never the user's answers
    or the ghostwritten post (that stays in the person's real voice) */
+/* per-profile store of already-generated language versions */
+function langVariants(){
+  const entry = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null;
+  if(entry){ entry.variants = entry.variants || {}; return entry.variants; }
+  return profileVariants;
+}
+function applyProfileLang(p,target){
+  p._lang = target;
+  profile = p;
+  const entry = activeProfileId ? profilesStore.profiles.find(x=>x.id===activeProfileId) : null;
+  if(entry){ entry.profile=profile; entry.lang=target; persistProfiles().catch(()=>{}); }
+}
+
 async function translateProfile(target){
   if(!profile) return;
+  const cur = profile._lang || lang;
+  if(cur===target) return;
+  const vars = langVariants();
+  /* remember the version we're leaving so we can come back to it instantly */
+  vars[cur] = profile;
+  /* already have this language? just revert — never regenerate */
+  if(vars[target]){
+    applyProfileLang(vars[target], target);
+    if(step===QUESTIONS.length+1) render();
+    return;
+  }
   const onProfileStep = step===QUESTIONS.length+1;
   const card = document.getElementById('main-card');
   if(onProfileStep && card){
-    card.innerHTML = `<div class="step active loading"><div class="pulse"></div><p>${target==='he'?'מתרגם את הפרופיל...':'Translating your profile...'}</p></div>`;
+    card.innerHTML = `<div class="step active loading"><div class="pulse"></div><p>${target==='he'?'כותב את הפרופיל בעברית...':'Writing your profile in English...'}</p></div>`;
   }
   let failed=false, errMsg='';
   try{
     const content=[{type:'text',text:
-      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nTranslate EVERY free-text/descriptive string value into ${target==='he'?'Hebrew':'English'} (insights, writing_dna descriptions, do/dont rules, signature_phrases, localization and storytelling fields, gaps). DO NOT translate writing_dna.language or localization.language_mix — those name the user's real writing language and must stay as-is. Keep the exact same JSON schema, field names, and array lengths and order — this is a pure translation, not a re-analysis. Output nothing but the translated JSON object, no markdown fences, no preamble, no trailing commentary.`}];
+      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. DO NOT change writing_dna.language or localization.language_mix — those name the user's real writing language and must stay as-is. Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
     const translated = await callClaude(content, false, 8000);
     translated._lang = target;
-    profile = translated;
-    /* keep the stored copy in sync so we don't re-translate on every visit */
-    const entry = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null;
-    if(entry){ entry.profile=profile; entry.lang=target; persistProfiles().catch(()=>{}); }
+    vars[target] = translated;
+    applyProfileLang(translated, target);
   }catch(err){
     console.error('profile translation failed:',err);
     failed=true; errMsg=(err&&err.message)||'';

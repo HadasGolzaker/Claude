@@ -1163,10 +1163,11 @@ const CODEX = `
 You are an expert personality psychologist profiling a person for a LinkedIn ghostwriting platform. Your job is to READ A PERSON, not to summarize a form.
 
 CRITICAL — INFER, DON'T ECHO: Never restate or lightly paraphrase what the user wrote, and NEVER quote their answers back word-for-word. Every insight must be an INFERENCE that goes beyond the surface of their answers — read between the lines, connect signals across different questions, name the underlying trait/drive/tension the person may not even see about themselves. If a line could be produced just by rephrasing one answer, it is wrong; replace it with what that answer REVEALS about who they are.
+Example — if the user answered "I like planning everything in advance": a BAD evidence line is "she likes to plan ahead" (that's just the answer restated). A GOOD evidence line is "needs certainty before she'll commit to anything" (that's what the answer reveals about her).
 
 PLAIN LANGUAGE: write for a smart everyday reader ("the average Joe"), not for psychologists. Explain what you see in warm, clear, jargon-free words. When you draw on a framework (Big 5, Enneagram, Hofstede, etc.), translate it into plain human terms rather than naming clinical constructs — the insight should land, not sound like a textbook.
 
-LANGUAGE: write the ENTIRE response in {LANG} only. Do not output any words, phrases, or quotes in any other language.
+LANGUAGE: write the ENTIRE response in {LANG} only — every field, with no exceptions. Never insert words, phrases, or quotes from another language, not even a single term. If {LANG} is Hebrew, address the reader in gender-neutral Hebrew (plural forms like את/ה, אתם — never a masculine-only conjugation), matching the rest of this app.
 
 Build the profile from the questionnaire answers using these frameworks:
 
@@ -1186,12 +1187,13 @@ COGNITIVE ORIENTATION (mainly from Q6+Q9+posts):
 - systemizer (how systems work: data, frameworks, SOPs) vs empathizer (how people feel: stories, motives, relationships).
 
 WRITING DNA (from Q1, Q6, and pasted posts — the pasted posts are the STRONGEST signal, weight them most):
-- primary language (he/en/mixed), average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature_phrases: 2-3 SHORT descriptions (in {LANG}) of their characteristic phrasing or go-to word choices, IN YOUR OWN WORDS — do NOT copy their sentences verbatim, first/second person habits, how they end posts (question? statement? CTA?).
+- language: the language(s) they ACTUALLY write in, read from their real writing samples and open answers (not from the language of this response) — but name it as a short LABEL written in {LANG} itself (e.g. if {LANG} is Hebrew, write something like "אנגלית" or "אנגלית מעורבת בעברית" — a Hebrew label describing their language, never the literal English word).
+- average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature_phrases: 2-3 SHORT descriptions (in {LANG}) of their characteristic phrasing or go-to word choices, IN YOUR OWN WORDS — do NOT copy their sentences verbatim, first/second person habits, how they end posts (question? statement? CTA?).
 - Also produce 3 DO rules and 3 DON'T rules for ghostwriting this person. Make them specific and actionable (not generic advice) — grounded in the actual evidence from their answers and posts.
 
 LOCALIZATION — language & culture fit (from writing language, phrasing, cultural references in Q1/Q6/posts/About):
 - audience: who they write for and the market/culture they operate in.
-- language_mix: primary language and how they blend he/en (loanwords, code-switching, English terms inside Hebrew, etc.).
+- language_mix: primary language and how they blend languages (loanwords, code-switching, foreign terms inside their main language, etc.) — described as a short LABEL written in {LANG}, same rule as writing_dna.language above: name the languages involved, but write the label itself entirely in {LANG}.
 - cultural_markers: local references, idioms, humor style, sensibilities that fit their audience.
 - formality: how formal/informal and how they address the reader (ata/at, plural, first-name energy).
 - note: one short line on how to keep a post culturally native to them.
@@ -1208,19 +1210,21 @@ If profile pictures are provided, use profile-image research: positive emotion +
 
 CROSS-CHECKING: actively look for contradictions between closed answers and free-text style (e.g., claims introvert but writes with high-energy social markers). List them in "gaps".
 
-OUTPUT SHAPE — IMPORTANT: Use the Big 5, motives, Enneagram, cognitive and cultural analysis above ONLY as internal lenses to WRITE THE "insights" portrait. Do NOT output them as separate fields, scores or lists, and never name a framework in the output. The reader is not from this field — they should read one flowing, human portrait of themselves, not a report.
+LENGTH BUDGET (STRICT — the response is time-limited, so a complete, tight profile matters more than a thorough one): keep every evidence line, note, do/dont rule, and list item to ONE short clause (max ~14 words) — enough room to state a real inference, not just compress the answer into fewer words. No sub-clauses, no examples-in-parentheses, no restating the field name. The summary is the only place with full sentences. Total output must stay compact — if in doubt, cut. Depth comes from precision, not length.
 
-LENGTH BUDGET (STRICT — the response is time-limited): "insights" is the ONE rich field (a few short paragraphs of genuine inference). EVERYTHING ELSE — every writing_dna field, do/dont rule, localization, storytelling and gaps item — must be ONE short clause (max ~10 words): no sub-clauses, no parenthetical examples, no restating the field name. Keep total output tight; depth comes from precision, not length.
-
-Respond with ONLY valid JSON, no markdown fences, no preamble. JSON schema:
+Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items to short phrases, BUT the "summary" and each "evidence"/"note" must be real inference (see the example above), never a restated or lightly-reworded answer. JSON schema:
 {
- "insights": "The heart of the profile: a warm, genuinely insightful portrait in {LANG}, written to a smart everyday reader, second person. 3-4 SHORT paragraphs separated by \\n\\n. Weave ALL your analysis into flowing plain language: who they are at their core, what truly drives them beneath the surface, the inner logic and self-image they operate from, how their mind actually works and decides, and how their world and market shape their voice. EVERY sentence is an INFERENCE — what their answers REVEAL about them — never a restatement or quote. No framework names, no clinical terms, no jargon. Make them feel truly seen.",
- "writing_dna": {"language":"the language(s) they ACTUALLY write in, named plainly (e.g. English, Hebrew, or English mixed with Hebrew) — read it from their real writing samples and open answers, NOT from the language of this response","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
- "localization": {"audience":"short","language_mix":"short","cultural_markers":"short","formality":"short","note":"short"},
+ "summary": "A tight 2-3 sentence psychological portrait in {LANG}, second person, warm but insightful — their defining tension and what really drives them. Feel truly seen, not summarized. No quotes, no filler.",
+ "big5": {"openness":{"score":1-5,"evidence":"≤14 words: the INFERENCE you drew, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
+ "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short inference, not the ranking restated"} x3],
+ "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
+ "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
+ "writing_dna": {"language":"short label in {LANG} — see WRITING DNA rule above","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
+ "localization": {"audience":"short","language_mix":"short label in {LANG} — see LOCALIZATION rule above","cultural_markers":"short","formality":"short","note":"short"},
  "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
- "gaps": ["short contradictions worth checking — empty array if none"]
+ "gaps": ["...( empty array if none )"]
 }
-Write every value in {LANG} in plain everyday language, with no verbatim quotes of the user's answers — EXCEPT writing_dna.language and localization.language_mix, which must name the user's REAL writing language even if that differs from {LANG}.`;
+All free-text values, including writing_dna.language and localization.language_mix, must be written entirely in {LANG} — in plain everyday language, with no verbatim quotes of the user's answers and no words borrowed from another language.`;
 
 function buildUserContent(){
   const qa = QUESTIONS.filter(q=>q.type!=='uploads').map(q=>{
@@ -1363,10 +1367,10 @@ function generateHTML(){
   </div>`;
 }
 
-/* pull out the growing "insights" string from a streaming, still-incomplete
+/* pull out the growing "summary" string from a streaming, still-incomplete
    JSON blob so the loading screen can show the profile being written live */
 function partialInsightPreview(raw){
-  const m = raw.match(/"insights"\s*:\s*"((?:[^"\\]|\\.)*)/);
+  const m = raw.match(/"summary"\s*:\s*"((?:[^"\\]|\\.)*)/);
   if(!m) return '';
   let s = m[1];
   if(s.endsWith('\\')) s = s.slice(0,-1);
@@ -1392,8 +1396,6 @@ async function runGeneration(refineNote){
     } else {
       content=buildUserContent();
     }
-    /* analysis runs on the faster Haiku model so the full profile finishes
-       inside the serverless time limit; posts stay on Sonnet for voice quality */
     const onDelta = raw=>{
       const preview = partialInsightPreview(raw);
       if(!preview) return;
@@ -1403,7 +1405,7 @@ async function runGeneration(refineNote){
       const prevEl=document.getElementById('loading-preview');
       if(prevEl) prevEl.textContent=preview;
     };
-    profile = await callClaude(content, false, 8000, 'claude-haiku-4-5-20251001', onDelta);
+    profile = await callClaude(content, false, 8000, 'claude-sonnet-4-6', onDelta);
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;
@@ -1465,8 +1467,8 @@ async function translateProfile(target){
   let failed=false, errMsg='';
   try{
     const content=[{type:'text',text:
-      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. DO NOT change writing_dna.language or localization.language_mix — those name the user's real writing language and must stay as-is. Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
-    const translated = await callClaude(content, false, 8000, 'claude-haiku-4-5-20251001');
+      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. EVERY field including writing_dna.language and localization.language_mix must be written entirely in ${target==='he'?'Hebrew':'English'} too (they are short labels naming the user's real writing language, phrased in ${target==='he'?'Hebrew':'English'} words — never leave them in the other language). ${target==='he'?'If Hebrew, address the reader in gender-neutral plural forms (את/ה, אתם), never masculine-only.':''} Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
+    const translated = await callClaude(content, false, 8000, 'claude-sonnet-4-6');
     translated._lang = target;
     vars[target] = translated;
     applyProfileLang(translated, target);
@@ -1486,6 +1488,24 @@ async function translateProfile(target){
 /* ---------- profile view ---------- */
 function profileHTML(){
   const t=T(), p=profile;
+  const traits=['openness','conscientiousness','extraversion','agreeableness','neuroticism'];
+  const traitGrads=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'];
+  const bars = traits.map((tr,ti)=>{
+    const d=p.big5[tr]||{score:3,evidence:''};
+    return `<div class="trait-row">
+      <span class="trait-name">${t.traits[tr]}</span>
+      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%;background:${traitGrads[ti%traitGrads.length]}"></div></div>
+      <span class="trait-score">${d.score}</span>
+    </div>
+    <div class="char-note" style="margin:-6px 0 12px">${t.ev}: ${d.evidence||''}</div>`;
+  }).join('');
+
+  const motiveGrads=['var(--g-pink)','var(--g-blue)','var(--g-orange)'];
+  const motives=(p.motives||[]).map((m,i)=>
+    `<span class="chip chip-block" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
+
+  const en=p.enneagram||{};
+  const cg=p.cognitive||{};
   const dna=p.writing_dna||{};
   const dnaRows=[
     dna.language,dna.sentence_length,dna.punctuation,dna.emoji,
@@ -1495,16 +1515,35 @@ function profileHTML(){
   const dos=(dna.do||[]).map(x=>`<li>${x}</li>`).join('');
   const donts=(dna.dont||[]).map(x=>`<li>${x}</li>`).join('');
 
+  const loc=p.localization||{};
+  const locRows=[
+    loc.audience,loc.language_mix,loc.cultural_markers,loc.formality
+  ].filter(Boolean).map(v=>`<li>${v}</li>`).join('');
+
+  const st=p.storytelling||{};
+  const stMoves=(st.signature_moves||[]).map(s=>`<span class="chip">${s}</span>`).join('');
+  const stTemplates=(st.templates||[]).map(s=>`<li>${s}</li>`).join('');
+
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
-  /* insights: one flowing plain-language portrait (fall back to legacy .summary) */
-  const insightText=(p.insights||p.summary||'');
-  const insightHTML=insightText.split(/\n\n+/).filter(s=>s.trim()).map(s=>`<p>${escapeHtml(s.trim())}</p>`).join('');
+  const tabs=[
+    {id:'big5', label:t.big5_h, body:bars},
+    {id:'motives', label:t.motives_h, body:motives||'—'},
+    {id:'ennea', label:t.ennea_h, body:`<span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span><div class="char-note">${en.core||''}</div>`},
+    {id:'cog', label:t.cog_h, body:`<span class="chip">${cg.convergent_divergent||''}</span> <span class="chip">${cg.systemizer_empathizer||''}</span><div class="char-note">${cg.note||''}</div>`},
+    {id:'local', label:t.local_h, body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<div class="char-note">${loc.note}</div>`:''}`},
+    {id:'story', label:t.story_h, body:`${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<div class="char-note">${st.note}</div>`:''}`}
+  ];
+  const tabBar=`<div class="tabs" role="tablist">${tabs.map((tb,i)=>`<button class="tab-btn${i===0?' active':''}" data-tab="${tb.id}">${tb.label}</button>`).join('')}</div>`;
+  const tabPanels=tabs.map((tb,i)=>`<div class="tab-panel${i===0?' active':''}" id="tab-${tb.id}">${tb.body}</div>`).join('');
 
   return `<div class="step active">
     <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
-    <div class="profile-summary serif">${insightHTML}</div>
+    <div class="profile-summary serif">${p.summary||''}</div>
     ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
+
+    ${tabBar}
+    ${tabPanels}
 
     <div class="always-open">
       <div class="section-h">${t.dna_h}</div>
@@ -1732,7 +1771,7 @@ RULES:
 - Follow every DO and DON'T in writing_dna literally. Mimic their sentence length, punctuation habits, emoji habits, humor and endings. Reuse their signature phrasing style without quoting old posts.
 - First line = a scroll-stopping hook drawn from the most specific, human detail in the material. No clickbait clichés.
 - Short paragraphs with breathing room. One idea per post. Specificity beats generality.
-- Match the content angle to who they are, using the "insights" portrait in the profile: lead with process/insight framing for analytical thinkers, people/story framing for relational ones, and celebrate what genuinely drives them.
+- Match content angle to their profile: systemizer → process/insight framing; empathizer → people/story framing; their top motives shape what the post celebrates.
 - LOCALIZATION: honor the "localization" fields — keep their language_mix, cultural_markers, formality and audience fit so the post reads natively to them and their market. Never translate their voice into neutral corporate English.
 - STORYTELLING: build the post using their "storytelling.structure" and lean on ONE of their "storytelling.templates" where it fits; use their signature_moves naturally (don't force all of them).
 - Sound human. Forbidden: corporate buzzwords, "thrilled/excited to share", "game-changer", generic AI cadence. No em dashes unless their DNA shows them.

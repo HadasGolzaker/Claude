@@ -5,7 +5,7 @@
  * Streams the response so long generations don't hit the 60s timeout.
  */
 
-export const config = { runtime: 'nodejs', maxDuration: 60 };
+export const config = { runtime: 'nodejs', maxDuration: 120 };
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

@@ -130,10 +130,40 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading p{color:var(--ink-soft)}
 
-/* profile view */
-.profile-summary{background:var(--lavender-soft);border-radius:10px;padding:20px 22px;margin-bottom:24px;font-size:1.05rem;line-height:1.6}
-.profile-summary p{margin:0 0 12px}
-.profile-summary p:last-child{margin-bottom:0}
+/* profile view — persona hero (photo · quick facts · summary) */
+.persona-hero{display:grid;grid-template-columns:1fr 1.3fr 1.3fr;gap:16px;margin-bottom:26px;align-items:stretch}
+@media(max-width:820px){.persona-hero{grid-template-columns:1fr}}
+.persona-photo,.persona-layers{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.persona-photo{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;justify-content:center}
+.avatar-placeholder{width:104px;height:104px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.avatar-placeholder img{width:100%;height:100%;object-fit:cover}
+.avatar-initials{font-family:var(--font-serif);font-weight:700;font-size:2rem;color:var(--ink)}
+.avatar-placeholder svg{width:52px;height:52px;color:var(--ink)}
+.avatar-caption{font-size:.9rem;color:var(--ink-soft);line-height:1.5}
+.avatar-caption b{display:block;margin-bottom:4px;color:var(--ink);font-weight:600}
+.persona-layers .section-h{margin-top:0}
+.persona-summary{background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;justify-content:center}
+.persona-summary .section-h{color:var(--bg);border-bottom-color:rgba(128,128,128,.35);margin-top:0}
+.persona-summary-text{font-size:1.08rem;line-height:1.6}
+
+/* horizontal-scroll model-layer cards */
+.layer-scroll{display:flex;gap:14px;overflow-x:auto;padding:6px 0 14px;margin-bottom:12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.layer-card{flex:0 0 auto;width:78%;max-width:300px;border-radius:var(--radius);padding:18px 20px;scroll-snap-align:start;color:#000}
+.layer-card .section-h{margin:0 0 12px;border:0;padding:0;color:#000}
+.layer-card .trait-name{width:88px;font-size:.82rem}
+.layer-card .trait-score{width:22px;font-size:.82rem}
+.layer-card .char-note{color:#000;opacity:.72}
+.layer-card .chip,.layer-card .chip-block{background:rgba(255,255,255,.55);border-color:rgba(0,0,0,.15)}
+.layer-card .dna-list li{border-bottom-color:rgba(0,0,0,.18)}
+@media(min-width:600px){.layer-card{width:280px}}
+
+/* writing DNA + writing rules, two columns */
+.dna-rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:8px}
+@media(max-width:700px){.dna-rules-grid{grid-template-columns:1fr;gap:6px}}
+.rules-list li{border-inline-start:3px solid var(--line);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
+.rules-list li.rule-do{border-inline-start-color:var(--olive)}
+.rules-list li.rule-dont{border-inline-start-color:var(--ink)}
+
 .trait-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
 .trait-name{width:170px;font-weight:600;font-size:.92rem;flex-shrink:0}
 .trait-bar{flex:1;height:10px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
@@ -270,10 +300,6 @@ textarea,input[type=text]{
 .btn-ghost:hover{background:var(--hover-fill)}
 .btn-accent{background:var(--accent);color:#000}
 .btn-accent:hover{filter:brightness(1.06)}
-.profile-summary{
-  background:var(--lavender-soft);
-  border:1px solid var(--line);
-}
 .chip{
   background:var(--paper);
   border:1.5px solid var(--line);
@@ -300,8 +326,6 @@ textarea,input[type=text]{
 .idea-pill.open .idea-body{max-height:260px;padding:16px 18px}
 .idea-angle{margin-bottom:14px;color:var(--ink)}
 .idea-use{padding:8px 18px;font-size:.88rem}
-.do-list li{border-inline-start:3px solid var(--olive);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
-.dont-list li{border-inline-start:3px solid var(--ink);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
 @keyframes ideaIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.idea-pill{animation:none}}
 
@@ -310,15 +334,6 @@ textarea,input[type=text]{
 #profile-picker{display:none;font:inherit;font-weight:600;font-size:.9rem;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;background:transparent;color:var(--ink);cursor:pointer;max-width:170px}
 @media(max-width:600px){#profile-picker{max-width:120px}}
 #profile-del{display:none}
-/* collapsed full-profile accordion */
-/* profile category tabs */
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
-.tab-btn{font:inherit;font-weight:600;font-size:.9rem;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
-.tab-btn:hover{background:var(--hover-fill)}
-.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#000}
-.tab-panel{display:none;padding-top:6px}
-.tab-panel.active{display:block}
-.always-open{margin-top:8px}
 /* delete-profile confirmation */
 .btn-danger{background:var(--danger);color:#fff}
 .btn-danger:disabled{opacity:.35;cursor:not-allowed}
@@ -404,9 +419,6 @@ textarea,input[type=text]{
   .btn{padding:11px 20px}
   .progress-label{order:3;flex:1 1 100%;text-align:center;margin-top:2px}
 
-  /* profile category tabs scroll sideways instead of stacking tall */
-  .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-  .tab-btn{flex:0 0 auto;white-space:nowrap}
   .trait-name{width:120px;font-size:.86rem}
 
   /* login overlay */
@@ -532,7 +544,8 @@ const I18N = {
     big5_h:'חמשת הממדים', motives_h:'מה מניע אתכם', ennea_h:'טיפוס אניגרמה',
     cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלכם', gaps_h:'פערים ששווה לבדוק',
     local_h:'לוקאליזציה - שפה ותרבות', story_h:'סיפוריות',
-    dos_h:'כן - כללי הכתיבה שלכם', donts_h:'לא - מה להימנע ממנו',
+    rules_h:'כללי הכתיבה',
+    layers_h:'שכבות הפרופיל', summary_h:'הסיכום שלכם', avatar_caption_lead:'כך אנחנו מדמיינות אותך:',
     story_struct:'מבנה', story_moves:'מהלכים אופייניים', story_templates:'תבניות סיפור',
     ev:'על סמך',
     posts_label:'3-5 פוסטים שכתבתם בעצמכם', posts_small:'הדביקו אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
@@ -609,7 +622,8 @@ const I18N = {
     big5_h:'The five dimensions', motives_h:'What drives you', ennea_h:'Enneagram type',
     cog_h:'Thinking style', dna_h:'Your writing DNA', gaps_h:'Gaps worth checking',
     local_h:'Localization - language & culture', story_h:'Storytelling',
-    dos_h:'Do - your writing rules', donts_h:'Don\'t - what to avoid',
+    rules_h:'Writing rules',
+    layers_h:'Profile layers', summary_h:'Your summary', avatar_caption_lead:'Here\'s how we picture you:',
     story_struct:'Structure', story_moves:'Signature moves', story_templates:'Story templates',
     ev:'based on',
     posts_label:'3-5 posts you wrote yourself', posts_small:'Paste them here, separated by an empty line. This is the strongest style calibration.',
@@ -1219,6 +1233,7 @@ LENGTH BUDGET (STRICT — the response is time-limited, so a complete, tight pro
 Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items to short phrases, BUT the "summary" and each "evidence"/"note" must be real inference (see the example above), never a restated or lightly-reworded answer. JSON schema:
 {
  "summary": "A tight 2-3 sentence psychological portrait in {LANG}, second person, warm but insightful — their defining tension and what really drives them. Feel truly seen, not summarized. No quotes, no filler.",
+ "visual_impression": "One short vivid sentence in {LANG} (max ~16 words), third person, describing how you picture this person physically/in a scene based on their profile (e.g. posture, expression, a small telling habit) — an impression, not a literal photo description. Plain language, no clichés, no framework talk.",
  "big5": {"openness":{"score":1-5,"evidence":"a short, complete, natural sentence: the INFERENCE you drew, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
  "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short inference, not the ranking restated"} x3],
  "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
@@ -1507,6 +1522,8 @@ async function translateProfile(target){
 }
 
 /* ---------- profile view ---------- */
+const AVATAR_FALLBACK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>`;
+
 function profileHTML(){
   const t=T(), p=profile;
   const traits=['openness','conscientiousness','extraversion','agreeableness','neuroticism'];
@@ -1533,8 +1550,6 @@ function profileHTML(){
     dna.hook_style,dna.humor,dna.endings
   ].filter(Boolean).map(v=>`<li>${v}</li>`).join('');
   const sigs=(dna.signature_phrases||[]).map(s=>`<span class="chip">${s}</span>`).join('');
-  const dos=(dna.do||[]).map(x=>`<li>${x}</li>`).join('');
-  const donts=(dna.dont||[]).map(x=>`<li>${x}</li>`).join('');
 
   const loc=p.localization||{};
   const locRows=[
@@ -1547,34 +1562,75 @@ function profileHTML(){
 
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
-  const tabs=[
-    {id:'big5', label:t.big5_h, body:bars},
-    {id:'motives', label:t.motives_h, body:motives||'—'},
-    {id:'ennea', label:t.ennea_h, body:`<span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span><div class="char-note">${en.core||''}</div>`},
-    {id:'cog', label:t.cog_h, body:`<span class="chip">${cg.convergent_divergent||''}</span> <span class="chip">${cg.systemizer_empathizer||''}</span><div class="char-note">${cg.note||''}</div>`},
-    {id:'local', label:t.local_h, body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<div class="char-note">${loc.note}</div>`:''}`},
-    {id:'story', label:t.story_h, body:`${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<div class="char-note">${st.note}</div>`:''}`}
+  /* merged writing rules — do + dont together, no separate headers, just a subtle
+     colored marker per item so it's still easy to tell them apart at a glance */
+  const rules=[
+    ...(dna.do||[]).map(x=>({text:x,kind:'do'})),
+    ...(dna.dont||[]).map(x=>({text:x,kind:'dont'}))
+  ].map(r=>`<li class="rule-${r.kind}">${r.text}</li>`).join('');
+
+  /* six colored, horizontally-scrollable model cards */
+  const layerColors=['var(--g-blue)','var(--g-pink)','var(--g-green)','var(--g-lime)','var(--g-orange)','var(--g-blue)'];
+  const layers=[
+    {label:t.big5_h, body:bars},
+    {label:t.motives_h, body:motives||'—'},
+    {label:t.ennea_h, body:`<span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span><div class="char-note">${en.core||''}</div>`},
+    {label:t.cog_h, body:`<span class="chip">${cg.convergent_divergent||''}</span> <span class="chip">${cg.systemizer_empathizer||''}</span><div class="char-note">${cg.note||''}</div>`},
+    {label:t.local_h, body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<div class="char-note">${loc.note}</div>`:''}`},
+    {label:t.story_h, body:`${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<div class="char-note">${st.note}</div>`:''}`}
   ];
-  const tabBar=`<div class="tabs" role="tablist">${tabs.map((tb,i)=>`<button class="tab-btn${i===0?' active':''}" data-tab="${tb.id}">${tb.label}</button>`).join('')}</div>`;
-  const tabPanels=tabs.map((tb,i)=>`<div class="tab-panel${i===0?' active':''}" id="tab-${tb.id}">${tb.body}</div>`).join('');
+  const layerScroll=`<div class="layer-scroll">${layers.map((l,i)=>`<div class="layer-card" style="background:${layerColors[i%layerColors.length]}"><div class="section-h">${l.label}</div>${l.body}</div>`).join('')}</div>`;
+
+  /* quick-facts snapshot for the hero's middle card, computed from data we already have */
+  const big5TopIdx = traits.reduce((best,tr,i)=>((p.big5[tr]&&p.big5[tr].score)||0) > ((p.big5[traits[best]]&&p.big5[traits[best]].score)||0) ? i : best, 0);
+  const topMotive = (p.motives&&p.motives[0]) ? (lang==='he'?(p.motives[0].label_he||p.motives[0].id):(p.motives[0].label_en||p.motives[0].id)) : '';
+  const layerFacts=[
+    {label:t.big5_h, value:t.traits[traits[big5TopIdx]]},
+    {label:t.motives_h, value:topMotive},
+    {label:t.ennea_h, value:lang==='he'?(en.name_he||''):(en.name_en||'')},
+    {label:t.cog_h, value:[cg.convergent_divergent,cg.systemizer_empathizer].filter(Boolean).join(' · ')},
+    {label:t.local_h, value:loc.audience||''},
+    {label:t.story_h, value:st.structure||''}
+  ].filter(f=>f.value);
+
+  /* avatar: never a real photo (none is stored after analysis) — initials in a
+     placeholder circle, plus a short caption of how the model pictures this person */
+  const initials=(profileName||'').trim().split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+  const avatarInner = initials ? `<span class="avatar-initials">${escapeHtml(initials)}</span>` : AVATAR_FALLBACK_SVG;
 
   return `<div class="step active">
     <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
-    <div class="profile-summary serif">${p.summary||''}</div>
     ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
 
-    ${tabBar}
-    ${tabPanels}
-
-    <div class="always-open">
-      <div class="section-h">${t.dna_h}</div>
-      <ul class="dna-list">${dnaRows}</ul>
-      <div style="margin-top:10px">${sigs}</div>
-      <div class="section-h">${t.dos_h}</div>
-      <ul class="dna-list do-list">${dos}</ul>
-      <div class="section-h">${t.donts_h}</div>
-      <ul class="dna-list dont-list">${donts}</ul>
+    <div class="persona-hero">
+      <div class="persona-summary">
+        <div class="section-h">${t.summary_h}</div>
+        <div class="serif persona-summary-text">${p.summary||''}</div>
+      </div>
+      <div class="persona-layers">
+        <div class="section-h">${t.layers_h}</div>
+        <ul class="dna-list">${layerFacts.map(f=>`<li><b>${f.label}:</b> ${f.value}</li>`).join('')}</ul>
+      </div>
+      <div class="persona-photo">
+        <div class="avatar-placeholder">${avatarInner}</div>
+        ${p.visual_impression?`<div class="avatar-caption"><b>${t.avatar_caption_lead}</b>${escapeHtml(p.visual_impression)}</div>`:''}
+      </div>
     </div>
+
+    ${layerScroll}
+
+    <div class="dna-rules-grid">
+      <div>
+        <div class="section-h">${t.dna_h}</div>
+        <ul class="dna-list">${dnaRows}</ul>
+        <div style="margin-top:10px">${sigs}</div>
+      </div>
+      <div>
+        <div class="section-h">${t.rules_h}</div>
+        <ul class="dna-list rules-list">${rules}</ul>
+      </div>
+    </div>
+
     ${gaps}
 
     ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:#000;margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
@@ -1588,11 +1644,6 @@ function profileHTML(){
 }
 
 function wireRefine(){
-  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
-    const id=btn.dataset.tab;
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+id));
-  }));
   const rb=document.getElementById('refine-btn');
   const ab=document.getElementById('approve-btn');
   if(rb) rb.addEventListener('click',()=>{

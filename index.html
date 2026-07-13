@@ -33,8 +33,10 @@ body{
 .serif{font-family:var(--font-serif)}
 
 /* ---------- layout ---------- */
-.app{max-width:1060px;margin:0 auto;padding:28px 20px 80px;display:grid;grid-template-columns:1fr 230px;gap:36px}
+.app{max-width:1500px;margin:0 auto;padding:28px 20px 80px;display:grid;grid-template-columns:1fr 230px;gap:36px}
 [dir="ltr"] .app{grid-template-columns:1fr 230px}
+.app.no-aside,[dir="ltr"] .app.no-aside{grid-template-columns:1fr}
+.app.no-aside aside{display:none}
 main{min-width:0}
 @media(max-width:820px){
   .app,[dir="ltr"] .app{grid-template-columns:1fr;gap:18px}
@@ -914,6 +916,12 @@ function answered(qid){
 /* ---------- render ---------- */
 function render(){
   const card = document.getElementById('main-card');
+  /* the layers progress sidebar only makes sense while answering questions —
+     it just shows stale, fully-filled dots everywhere else and eats width
+     that the results/composer screens want for themselves */
+  const appEl = document.querySelector('.app');
+  const showAside = step>=0 && step<QUESTIONS.length;
+  if(appEl) appEl.classList.toggle('no-aside', !showAside);
   if(step===-1){ card.innerHTML = introHTML(); wireIntro(); return; }
   if(step===QUESTIONS.length){ card.innerHTML = generateHTML(); return; }
   if(step===QUESTIONS.length+1){ card.innerHTML = profileHTML(); wireRefine(); return; }

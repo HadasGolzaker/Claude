@@ -1317,9 +1317,11 @@ async function callClaude(content, useSearch, maxTokens, model, onDelta){
     body:JSON.stringify({
       model:model||'claude-sonnet-5',
       max_tokens:maxTokens||8000,
-      /* no pre-answer "thinking" — cuts latency so generation finishes
-         well inside the serverless time limit */
-      thinking:{type:'disabled'},
+      /* adaptive thinking — Sonnet 5's near-Opus quality on nuanced language/
+         reasoning tasks depends on this; disabling it (as before) was actively
+         working against profile accuracy. Streaming already keeps us well
+         inside the serverless time limit regardless of thinking. */
+      thinking:{type:'adaptive'},
       messages:[{role:'user',content}],
       ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
     })
@@ -1475,7 +1477,7 @@ async function runGeneration(refineNote){
       const prevEl=document.getElementById('loading-preview');
       if(prevEl) prevEl.textContent=preview;
     };
-    profile = await callClaude(content, false, 8000, 'claude-sonnet-5', onDelta);
+    profile = await callClaude(content, false, 16000, 'claude-sonnet-5', onDelta);
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;
@@ -1577,7 +1579,7 @@ async function translateProfile(target){
   try{
     const content=[{type:'text',text:
       `Here is an existing personality/writing profile JSON:\n${JSON.stringify({...profile, photo:undefined})}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. EVERY field including writing_dna.language and localization.language_mix must be written entirely in ${target==='he'?'Hebrew':'English'} too (they are short labels naming the user's real writing language, phrased in ${target==='he'?'Hebrew':'English'} words — never leave them in the other language). EXCEPT writing_dna.primary_lang_code — that is a strict "he" or "en" code, not text to translate; copy it through completely unchanged. ${target==='he'?'If Hebrew, address the reader in gender-neutral plural forms (את/ה, אתם), never masculine-only.':''} Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
-    const translated = await callClaude(content, false, 8000, 'claude-sonnet-5');
+    const translated = await callClaude(content, false, 16000, 'claude-sonnet-5');
     translated._lang = target;
     translated.photo = profile.photo; /* translation never touches the photo */
     vars[target] = translated;
@@ -1799,7 +1801,7 @@ async function rewritePostLang(targetLang, prevLang){
   try{
     const content=[{type:'text',text:
       `Here is an existing LinkedIn post with alternative hooks:\n${JSON.stringify(currentPost)}\n\nRe-express this SAME post NATIVELY in ${targetLang==='he'?'Hebrew':'English'} — as if it had been written in ${targetLang==='he'?'Hebrew':'English'} from the start, with real slang, idiom and rhythm a native speaker actually uses. Do NOT do a literal, stiff translation. Keep the exact same message, structure, hook and tone. NEVER use an em dash (—). Same JSON shape: {"post":"...","hooks":["...","..."]}. Output nothing but the JSON, no fences, no preamble.`}];
-    currentPost = await callClaude(content, false, 8000);
+    currentPost = await callClaude(content, false, 12000);
     savePostHistory();
     render();
   }catch(err){
@@ -1993,7 +1995,7 @@ async function startPostGen(refineNote){
   clearInterval(loadTimer);
   loadTimer=setInterval(()=>{i=(i+1)%t.writing.length;const el=document.getElementById('loading-msg');if(el)el.textContent=t.writing[i];},2200);
   try{
-    currentPost=await callClaude(buildPostContent(refineNote), !!postLink.trim());
+    currentPost=await callClaude(buildPostContent(refineNote), !!postLink.trim(), 12000);
     clearInterval(loadTimer);
     savePostHistory();
     step=STEP_RESULT; render();

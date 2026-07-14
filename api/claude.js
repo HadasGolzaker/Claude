@@ -57,7 +57,14 @@ export default async function handler(req, res) {
 
     if (!upstream.ok || !upstream.body) {
       const errText = await upstream.text();
-      res.status(upstream.status || 500).json({ error: { message: errText || 'Claude request failed' } });
+      // Anthropic's error body is itself JSON ({"type":"error","error":{"type":...,"message":...}}).
+      // Extract the human-readable message instead of dumping the raw envelope to the UI.
+      let message = errText || 'Claude request failed';
+      try {
+        const parsed = JSON.parse(errText);
+        if (parsed && parsed.error && parsed.error.message) message = parsed.error.message;
+      } catch (_) { /* not JSON, use as-is */ }
+      res.status(upstream.status || 500).json({ error: { message } });
       return;
     }
 

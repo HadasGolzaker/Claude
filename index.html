@@ -543,6 +543,7 @@ const I18N = {
     saved_local:'הפרופיל נשמר בהצלחה.',
     save_warn:'לא הצלחתי לשמור לאחסון קבוע - הפרופיל זמין בסשן הנוכחי בלבד.',
     err_api:'משהו השתבש בניתוח. נסו שוב.',
+    err_usage_limit:'הגעתם למכסת השימוש החודשית. המכסה מתאפסת בתחילת החודש הבא.',
     retry:'נסו שוב',
     big5_h:'חמשת הממדים', motives_h:'מה מניע אתכם', ennea_h:'טיפוס אניגרמה',
     cog_h:'סגנון חשיבה', dna_h:'DNA הכתיבה שלכם', gaps_h:'פערים ששווה לבדוק',
@@ -623,6 +624,7 @@ const I18N = {
     saved_local:'Profile saved successfully.',
     save_warn:'Couldn\'t reach persistent storage - profile is available for this session only.',
     err_api:'Something went wrong during analysis. Try again.',
+    err_usage_limit:'You\'ve reached your monthly usage limit. It resets at the start of next month.',
     retry:'Try again',
     big5_h:'The five dimensions', motives_h:'What drives you', ennea_h:'Enneagram type',
     cog_h:'Thinking style', dna_h:'Your writing DNA', gaps_h:'Gaps worth checking',
@@ -1370,6 +1372,7 @@ async function callClaude(content, useSearch, maxTokens, model, onDelta){
       throw new Error('The server took too long and timed out. Please try again.');
     throw new Error('Server error (HTTP '+response.status+'): '+(snippet||'no details'));
   }
+  if(data.error && data.error.type==='usage_limit_reached') throw new Error(T().err_usage_limit);
   if(data.error) throw new Error(data.error.message||'API error');
   if(!response.ok) throw new Error('Server error (HTTP '+response.status+')');
   const txt = (data.content||[]).filter(i=>i.type==='text').map(i=>i.text).join('\n');

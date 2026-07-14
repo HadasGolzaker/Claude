@@ -776,6 +776,21 @@ let profilesStore={activeId:null,profiles:[]}; /* persisted under 'voiceprint_pr
 let activeProfileId=null; /* null while composing a brand-new profile */
 const genId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 async function persistProfiles(){ if(window.storage) await window.storage.set('voiceprint_profiles', JSON.stringify(profilesStore)); }
+
+/* ---------- questionnaire-in-progress draft (survives closing the tab / logging out) ---------- */
+let draftSaveTimer=null;
+function scheduleDraftSave(){ clearTimeout(draftSaveTimer); draftSaveTimer=setTimeout(saveDraft, 800); }
+async function saveDraft(){
+  if(!window.storage) return;
+  try{
+    const payload={answers, uploads:{posts:uploads.posts,about:uploads.about,noLinkedIn:uploads.noLinkedIn}, profileName, profileCountry, step};
+    await window.storage.set('voiceprint_draft', JSON.stringify(payload));
+  }catch(e){ console.warn('draft save failed',e); }
+}
+async function clearDraft(){
+  if(!window.storage) return;
+  try{ await window.storage.set('voiceprint_draft',''); }catch(e){/* best effort */}
+}
 const COUNTRY_CODES=('AF,AL,DZ,AD,AO,AG,AR,AM,AU,AT,AZ,BS,BH,BD,BB,BY,BE,BZ,BJ,BT,BO,BA,BW,BR,BN,BG,BF,BI,KH,CM,CA,CV,CF,TD,CL,CN,CO,KM,CG,CD,CR,CI,HR,CU,CY,CZ,DK,DJ,DM,DO,EC,EG,SV,GQ,ER,EE,SZ,ET,FJ,FI,FR,GA,GM,GE,DE,GH,GR,GD,GT,GN,GW,GY,HT,HN,HK,HU,IS,IN,ID,IR,IQ,IE,IL,IT,JM,JP,JO,KZ,KE,KI,KW,KG,LA,LV,LB,LS,LR,LY,LI,LT,LU,MG,MW,MY,MV,ML,MT,MH,MR,MU,MX,FM,MD,MC,MN,ME,MA,MZ,MM,NA,NR,NP,NL,NZ,NI,NE,NG,KP,MK,NO,OM,PK,PW,PA,PG,PY,PE,PH,PL,PT,QA,RO,RU,RW,KN,LC,VC,WS,SM,ST,SA,SN,RS,SC,SL,SG,SK,SI,SB,SO,ZA,KR,SS,ES,LK,SD,SR,SE,CH,SY,TW,TJ,TZ,TH,TL,TG,TO,TT,TN,TR,TM,TV,UG,UA,AE,GB,US,UY,UZ,VU,VA,VE,VN,YE,ZM,ZW').split(',');
 function countryName(code,inLang){ if(!code) return ''; try{ return new Intl.DisplayNames([inLang||'en'],{type:'region'}).of(code)||code; }catch(e){ return code; } }
 
@@ -874,6 +889,7 @@ function startNewProfile(){
   profileName=''; profileCountry='';
   currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
   step=-1;
+  clearDraft(); /* deliberately starting fresh — don't resurrect an old draft later */
   renderProfilePicker(); renderLayers(); render();
 }
 
@@ -951,7 +967,7 @@ function introHTML(){
       </div>
     </div>
     <div class="start-row">
-      <button class="btn btn-primary" id="start-btn" onclick="step=0;render()" disabled>${t.start}</button>
+      <button class="btn btn-primary" id="start-btn" onclick="goStep(1)" disabled>${t.start}</button>
     </div>
   </div>`;
 }
@@ -970,7 +986,7 @@ function wireIntro(){
   items.sort((a,b2)=>a.label.localeCompare(b2.label,loc));
 
   let activeIdx=-1, filtered=items;
-  const setName=()=>{ profileName=n.value.trim(); b.disabled=!profileName; };
+  const setName=()=>{ profileName=n.value.trim(); b.disabled=!profileName; scheduleDraftSave(); };
   n.addEventListener('input',setName);
 
   /* show the current country's name in the field (not the code) */
@@ -989,7 +1005,7 @@ function wireIntro(){
   }
   function pick(code){
     const it=items.find(i=>i.code===code); if(!it) return;
-    profileCountry=code; c.value=it.label; close();
+    profileCountry=code; c.value=it.label; close(); scheduleDraftSave();
   }
 
   c.addEventListener('focus',()=>{ filtered=items; open(); });
@@ -1066,30 +1082,31 @@ function questionHTML(q){
     ${L.s?`<p class="q-sub">${L.s}</p>`:''}
     ${body}
     <div class="nav">
-      <button class="btn btn-ghost" onclick="step--;render()">${t.back}</button>
+      <button class="btn btn-ghost" onclick="goStep(-1)">${t.back}</button>
       <span class="progress-label">${step+1} ${t.of} ${QUESTIONS.length}</span>
       <button class="btn btn-primary" id="next-btn" ${answered(q.id)?'':'disabled'}
-        onclick="step++;render()">${isLast?t.generate:t.next}</button>
+        onclick="goStep(1)">${isLast?t.generate:t.next}</button>
     </div>
   </div>`;
 }
+function goStep(delta){ step+=delta; saveDraft(); render(); }
 
 function wireQuestion(q){
   if(q.type==='open'){
     const ta=document.getElementById('ta');
-    ta.addEventListener('input',()=>{answers[q.id]=ta.value;refreshNext(q);renderLayers();});
+    ta.addEventListener('input',()=>{answers[q.id]=ta.value;refreshNext(q);renderLayers();scheduleDraftSave();});
   }
   if(q.type==='single'){
     document.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>{
-      answers[q.id]=b.dataset.v; render();
+      answers[q.id]=b.dataset.v; scheduleDraftSave(); render();
     }));
   }
   if(q.type==='rank'){ wireRank(q); }
   if(q.type==='uploads'){
     const pt=document.getElementById('posts-ta'), ab=document.getElementById('about-ta');
-    document.getElementById('no-li').addEventListener('change',e=>{ uploads.noLinkedIn=e.target.checked; render(); });
-    pt.addEventListener('input',()=>{uploads.posts=pt.value;refreshNext(q);renderLayers();});
-    ab.addEventListener('input',()=>{uploads.about=ab.value;});
+    document.getElementById('no-li').addEventListener('change',e=>{ uploads.noLinkedIn=e.target.checked; scheduleDraftSave(); render(); });
+    pt.addEventListener('input',()=>{uploads.posts=pt.value;refreshNext(q);renderLayers();scheduleDraftSave();});
+    ab.addEventListener('input',()=>{uploads.about=ab.value;scheduleDraftSave();});
     document.getElementById('img-input').addEventListener('change',async e=>{
       for(const f of Array.from(e.target.files).slice(0,4-uploads.images.length)){
         const data = await new Promise((res,rej)=>{
@@ -1118,7 +1135,7 @@ function wireRank(q){
   const slotsEl=document.getElementById('rank-slots');
   const poolEl=document.getElementById('rank-pool');
   const getSel=()=>answers[q.id]||[];
-  const setSel=arr=>{ answers[q.id]=arr; render(); };
+  const setSel=arr=>{ answers[q.id]=arr; scheduleDraftSave(); render(); };
   function placeAt(v, slotIdx){
     let sel=getSel().filter(x=>x!==v);
     if(slotIdx==null||slotIdx<0) slotIdx=sel.length;
@@ -1738,6 +1755,7 @@ async function saveProfile(){
     card.insertAdjacentHTML('beforeend',`<div class="gap-note">${t.save_warn}</div>`);
     return;
   }
+  clearDraft(); /* the questionnaire's answers now live safely inside the saved profile */
   render(); renderProfilePicker();
 }
 
@@ -2033,6 +2051,23 @@ async function savePostHistory(){
       }
     }
   }catch(e){/* no saved profile — fresh start */}
+  /* no saved profile yet — resume an in-progress questionnaire draft, if any,
+     so answers already typed survive closing the tab or logging out */
+  try{
+    if(window.storage){
+      const d=await window.storage.get('voiceprint_draft');
+      if(d&&d.value){
+        const draft=JSON.parse(d.value);
+        Object.assign(answers, draft.answers||{});
+        uploads.posts=(draft.uploads&&draft.uploads.posts)||'';
+        uploads.about=(draft.uploads&&draft.uploads.about)||'';
+        uploads.noLinkedIn=!!(draft.uploads&&draft.uploads.noLinkedIn);
+        profileName=draft.profileName||'';
+        profileCountry=draft.profileCountry||'';
+        if(typeof draft.step==='number' && draft.step>=-1 && draft.step<QUESTIONS.length) step=draft.step;
+      }
+    }
+  }catch(e){/* no draft — fresh start */}
   render();
 })();
 </script>

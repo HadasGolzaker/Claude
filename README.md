@@ -48,8 +48,23 @@
    | `ANTHROPIC_API_KEY` | מפתח ה-Claude שלך (`sk-ant-...`) |
    | `SUPABASE_URL` | ה-Project URL מ-Supabase |
    | `SUPABASE_ANON_KEY` | ה-anon public key מ-Supabase |
+   | `GEMINI_API_KEY` | מפתח Google Gemini שלך (ליצירת תמונת הפרופיל - ראו שלב 3.5) |
 
 3. לחצי **Deploy**. אחרי כדקה תקבלי כתובת אתר (משהו כמו `https://voiceprint.vercel.app`).
+
+---
+
+## שלב 3.5 — מפתח Google Gemini (ליצירת תמונת הפרופיל)
+
+כשלא מעלים תמונה בשאלון, האפליקציה מייצרת דמות ויזואלית באמצעות Gemini 2.5 Flash Image (המכונה גם "Nano Banana"). זו עלות זעירה לכל תמונה (כמה סנטים), ודורשת מפתח נפרד מ-Claude:
+
+1. היכנסי ל-[aistudio.google.com/apikey](https://aistudio.google.com/apikey) והתחברי עם חשבון Google.
+2. לחצי **Create API key**, ואם מתבקש - צרי/בחרי פרויקט Google Cloud (חינמי).
+3. העתיקי את המפתח שנוצר (מתחיל ב-`AIza...`).
+4. ב-Vercel: **Settings → Environment Variables**, הוסיפי משתנה בשם `GEMINI_API_KEY` עם הערך שהעתקת.
+5. **Deployments → ⋯ → Redeploy** כדי שהשינוי ייכנס לתוקף.
+
+אם המפתח לא מוגדר, תמונת הפרופיל פשוט תישאר עם ראשי התיבות - שאר האפליקציה תמשיך לעבוד רגיל.
 
 ---
 

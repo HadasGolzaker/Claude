@@ -548,6 +548,7 @@ const I18N = {
     local_h:'לוקאליזציה - שפה ותרבות', story_h:'סיפוריות',
     rules_h:'כללי הכתיבה',
     layers_h:'שכבות הפרופיל', summary_h:'הסיכום שלכם', avatar_caption_lead:'כך אנחנו מדמיינות אותך:',
+    avatar_photo_caption:'כך אתם נראים לפי הפרופיל.',
     story_struct:'מבנה', story_moves:'מהלכים אופייניים', story_templates:'תבניות סיפור',
     ev:'על סמך',
     posts_label:'3-5 פוסטים שכתבתם בעצמכם', posts_small:'הדביקו אותם כאן, מופרדים בשורה ריקה. זה הכיול הכי חזק של הסגנון.',
@@ -626,6 +627,7 @@ const I18N = {
     local_h:'Localization - language & culture', story_h:'Storytelling',
     rules_h:'Writing rules',
     layers_h:'Profile layers', summary_h:'Your summary', avatar_caption_lead:'Here\'s how we picture you:',
+    avatar_photo_caption:'This is how you look, based on the profile.',
     story_struct:'Structure', story_moves:'Signature moves', story_templates:'Story templates',
     ev:'based on',
     posts_label:'3-5 posts you wrote yourself', posts_small:'Paste them here, separated by an empty line. This is the strongest style calibration.',
@@ -1433,10 +1435,11 @@ async function runGeneration(refineNote){
   },2200);
 
   try{
-    let content;
+    let content, existingPhoto;
     if(refineNote && profile){
+      existingPhoto = profile.photo;
       content=[{type:'text',text:
-        `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nThe user corrected it: "${refineNote}"\n\nApply the correction thoughtfully (adjust related fields too, e.g. if they say "I never use emojis" fix writing_dna.emoji and the do/dont rules). Respond with ONLY the full updated JSON, same schema, no fences. Free-text values in ${lang==='he'?'Hebrew':'English'}.`}];
+        `Here is an existing personality/writing profile JSON:\n${JSON.stringify({...profile, photo:undefined})}\n\nThe user corrected it: "${refineNote}"\n\nApply the correction thoughtfully (adjust related fields too, e.g. if they say "I never use emojis" fix writing_dna.emoji and the do/dont rules). Respond with ONLY the full updated JSON, same schema, no fences. Free-text values in ${lang==='he'?'Hebrew':'English'}.`}];
     } else {
       content=buildUserContent();
     }
@@ -1453,10 +1456,18 @@ async function runGeneration(refineNote){
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;
+    if(refineNote){
+      profile.photo = existingPhoto; /* a correction doesn't change how they look */
+    } else if(uploads.images.length){
+      profile.photo = { media_type: uploads.images[0].media_type, data: uploads.images[0].data, source:'upload' };
+    }
     profileVariants = { [lang]: profile }; /* fresh analysis → drop any stale translations */
     { const e = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null; if(e) e.variants = { [lang]: profile }; }
     clearInterval(loadTimer);
     step=QUESTIONS.length+1; approved=false; render();
+    /* no uploaded photo → generate one in the background; the results page
+       already shows the initials placeholder + text impression while this runs */
+    if(!refineNote && !uploads.images.length) generateAvatarImage(profile);
   }catch(err){
     clearInterval(loadTimer);
     console.error('Claude API error:',err);
@@ -1471,6 +1482,37 @@ async function runGeneration(refineNote){
       </div>`:''}
       <div class="nav"><button class="btn btn-ghost" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
       <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
+  }
+}
+
+function avatarPrompt(p){
+  const country = countryName(profileCountry,'en')||'';
+  return `Realistic professional portrait photo of a person, based on this impression: ${p.visual_impression||p.summary||''}. `+
+    (country?`They are based in ${country}. `:'')+
+    `Natural lighting, plain neutral background, shoulders-up framing, photorealistic, no text, no watermark, no logo.`;
+}
+
+/* runs in the background after a fresh (non-refine) generation when no photo
+   was uploaded; a failure here is silent — the initials placeholder stays and
+   the rest of the profile is unaffected */
+async function generateAvatarImage(forProfile){
+  try{
+    const headers={'Content-Type':'application/json'};
+    const token = window.__getToken ? await window.__getToken() : '';
+    if(token) headers['Authorization']='Bearer '+token;
+    const response = await fetch('/api/image',{
+      method:'POST', headers,
+      body:JSON.stringify({prompt:avatarPrompt(forProfile)})
+    });
+    const data = await response.json();
+    if(!response.ok || data.error) throw new Error((data.error&&data.error.message)||'Image generation failed');
+    if(profile!==forProfile) return; /* user moved on (new/refined/switched profile) before this resolved */
+    profile.photo = { media_type: data.media_type, data: data.data, source:'generated' };
+    const entry = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null;
+    if(entry){ entry.profile = profile; persistProfiles().catch(()=>{}); }
+    if(step===QUESTIONS.length+1) render();
+  }catch(err){
+    console.error('avatar image generation failed:', err);
   }
 }
 
@@ -1511,9 +1553,10 @@ async function translateProfile(target){
   let failed=false, errMsg='';
   try{
     const content=[{type:'text',text:
-      `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. EVERY field including writing_dna.language and localization.language_mix must be written entirely in ${target==='he'?'Hebrew':'English'} too (they are short labels naming the user's real writing language, phrased in ${target==='he'?'Hebrew':'English'} words — never leave them in the other language). ${target==='he'?'If Hebrew, address the reader in gender-neutral plural forms (את/ה, אתם), never masculine-only.':''} Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
+      `Here is an existing personality/writing profile JSON:\n${JSON.stringify({...profile, photo:undefined})}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. EVERY field including writing_dna.language and localization.language_mix must be written entirely in ${target==='he'?'Hebrew':'English'} too (they are short labels naming the user's real writing language, phrased in ${target==='he'?'Hebrew':'English'} words — never leave them in the other language). ${target==='he'?'If Hebrew, address the reader in gender-neutral plural forms (את/ה, אתם), never masculine-only.':''} Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
     const translated = await callClaude(content, false, 8000, 'claude-sonnet-4-6');
     translated._lang = target;
+    translated.photo = profile.photo; /* translation never touches the photo */
     vars[target] = translated;
     applyProfileLang(translated, target);
   }catch(err){
@@ -1601,10 +1644,17 @@ function profileHTML(){
     {label:t.story_h, value:st.structure||''}
   ].filter(f=>f.value);
 
-  /* avatar: never a real photo (none is stored after analysis) — initials in a
-     placeholder circle, plus a short caption of how the model pictures this person */
-  const initials=(profileName||'').trim().split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
-  const avatarInner = initials ? `<span class="avatar-initials">${escapeHtml(initials)}</span>` : AVATAR_FALLBACK_SVG;
+  /* avatar: a real uploaded photo wins; otherwise a generated portrait once
+     it's ready; until then, initials + a text impression as the meantime state */
+  let avatarInner, avatarCaptionHTML;
+  if(p.photo && p.photo.data){
+    avatarInner = `<img src="data:${p.photo.media_type};base64,${p.photo.data}" alt="">`;
+    avatarCaptionHTML = p.photo.source==='generated' ? `<div class="avatar-caption"><b>${t.avatar_photo_caption}</b></div>` : '';
+  } else {
+    const initials=(profileName||'').trim().split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+    avatarInner = initials ? `<span class="avatar-initials">${escapeHtml(initials)}</span>` : AVATAR_FALLBACK_SVG;
+    avatarCaptionHTML = p.visual_impression ? `<div class="avatar-caption"><b>${t.avatar_caption_lead}</b>${escapeHtml(p.visual_impression)}</div>` : '';
+  }
 
   return `<div class="step active">
     <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
@@ -1621,7 +1671,7 @@ function profileHTML(){
       </div>
       <div class="persona-photo">
         <div class="avatar-placeholder">${avatarInner}</div>
-        ${p.visual_impression?`<div class="avatar-caption"><b>${t.avatar_caption_lead}</b>${escapeHtml(p.visual_impression)}</div>`:''}
+        ${avatarCaptionHTML}
       </div>
     </div>
 
@@ -1844,7 +1894,7 @@ function useIdea(idea){
 function buildPostContent(refineNote){
   const dnaLang=(profile&&profile.writing_dna&&profile.writing_dna.language)||'mixed';
   let text=`You are ghostwriting ONE LinkedIn post AS this person. Their full profile (personality + writing DNA):
-${JSON.stringify(profile)}
+${JSON.stringify({...profile, photo:undefined})}
 
 RULES:
 - LANGUAGE (most important): write the post in the SAME LANGUAGE the user wrote the RAW MATERIAL below in. If the raw material is in English, write in English; if in Hebrew, write in Hebrew. This overrides everything — do NOT default to the app's language or the profile's language. (Their usual writing language is ${dnaLang}, but the raw material wins.)

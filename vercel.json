@@ -2,6 +2,9 @@
   "functions": {
     "api/claude.js": {
       "maxDuration": 120
+    },
+    "api/image.js": {
+      "maxDuration": 45
     }
   },
   "headers": [

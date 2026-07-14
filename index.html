@@ -54,6 +54,7 @@ header .logo,header .header-controls{direction:ltr}
 .lang-toggle{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
 .lang-toggle button{border:0;background:transparent;padding:6px 16px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
 .lang-toggle button.active{background:var(--ink);color:var(--paper)}
+.post-lang-toggle{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 
 /* ---------- layers sidebar (signature) ---------- */
 aside{position:sticky;top:24px;align-self:start}
@@ -565,6 +566,7 @@ const I18N = {
     to_composer:'למסך כתיבת הפוסטים ←',
     composer_h:'מה קרה היום?',
     composer_sub:'ספרו חופשי - אירוע, שיחה, מחשבה, תסכול, ניצחון קטן. הקלדה או הקלטה. אני אדאג שזה יישמע כמוכם.',
+    post_lang_label:'כתבו את הפוסט ב:',
     input_ph:'היום קרה משהו ש...',
     rec_start:'הקלטה', rec_stop:'עצירה', rec_unsupported:'הקלטה עובדת רק בכרום',
     link_label:'לינק רלוונטי', link_small:'אופציונלי. אקרא אותו ואשלב מהתוכן.',
@@ -644,6 +646,7 @@ const I18N = {
     to_composer:'To the post-writing screen →',
     composer_h:'What happened today?',
     composer_sub:'Tell it freely - an event, a conversation, a thought, a frustration, a small win. Type or record. I\'ll make it sound like you.',
+    post_lang_label:'Write the post in:',
     input_ph:'Today something happened that...',
     rec_start:'Record', rec_stop:'Stop', rec_unsupported:'Recording works in Chrome only',
     link_label:'Relevant link', link_small:'Optional. I\'ll read it and weave it in.',
@@ -768,6 +771,9 @@ let profileVariants = {}; /* lang -> profile object for the current DRAFT, so sw
 let approved = false;
 let apiKey = '';
 let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
+let postLang=null; /* null = follow the profile's own language; 'he'|'en' = explicit override for this post */
+function defaultPostLang(){ return (profile&&profile.writing_dna&&profile.writing_dna.primary_lang_code)||'he'; }
+function effectivePostLang(){ return postLang||defaultPostLang(); }
 const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3;
 
 /* ---------- multi-profile state ---------- */
@@ -875,7 +881,7 @@ function switchProfile(id){
   profile=entry.profile; profileName=entry.name; profileCountry=entry.country||'';
   if(profile && !profile._lang) profile._lang=entry.lang||lang;
   approved=true;
-  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null;
   step=QUESTIONS.length+1;
   renderProfilePicker(); renderLayers(); render();
   if(profile && profile._lang!==lang) translateProfile(lang);
@@ -887,7 +893,7 @@ function startNewProfile(){
   Object.keys(answers).forEach(k=>delete answers[k]);
   uploads={posts:'',about:'',images:[],noLinkedIn:false};
   profileName=''; profileCountry='';
-  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null;
   step=-1;
   clearDraft(); /* deliberately starting fresh — don't resurrect an old draft later */
   renderProfilePicker(); renderLayers(); render();
@@ -1265,7 +1271,7 @@ Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items t
  "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short inference, not the ranking restated"} x3],
  "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
  "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
- "writing_dna": {"language":"short label in {LANG} — see WRITING DNA rule above","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
+ "writing_dna": {"language":"short label in {LANG} — see WRITING DNA rule above","primary_lang_code":"he|en — the ONE dominant language they actually write in, as a strict code (pick whichever is more dominant even if they mix)","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
  "localization": {"audience":"short","language_mix":"short label in {LANG} — see LOCALIZATION rule above","cultural_markers":"short","formality":"short","note":"short"},
  "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
  "gaps": ["...( empty array if none )"]
@@ -1309,7 +1315,7 @@ async function callClaude(content, useSearch, maxTokens, model, onDelta){
     method:'POST',
     headers,
     body:JSON.stringify({
-      model:model||'claude-sonnet-4-6',
+      model:model||'claude-sonnet-5',
       max_tokens:maxTokens||8000,
       /* no pre-answer "thinking" — cuts latency so generation finishes
          well inside the serverless time limit */
@@ -1469,7 +1475,7 @@ async function runGeneration(refineNote){
       const prevEl=document.getElementById('loading-preview');
       if(prevEl) prevEl.textContent=preview;
     };
-    profile = await callClaude(content, false, 8000, 'claude-sonnet-4-6', onDelta);
+    profile = await callClaude(content, false, 8000, 'claude-sonnet-5', onDelta);
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;
@@ -1504,9 +1510,9 @@ async function runGeneration(refineNote){
 
 function avatarPrompt(p){
   const country = countryName(profileCountry,'en')||'';
-  return `Realistic professional portrait photo of a person, based on this impression: ${p.visual_impression||p.summary||''}. `+
+  return `Realistic professional headshot photo of a person, based on this impression: ${p.visual_impression||p.summary||''}. `+
     (country?`They are based in ${country}. `:'')+
-    `Natural lighting, plain neutral background, shoulders-up framing, photorealistic, no text, no watermark, no logo.`;
+    `Extreme close-up crop: face and shoulders fill the ENTIRE frame edge-to-edge, like a tightly-cropped LinkedIn profile picture or passport photo — no empty space, margin, or background border visible around the subject. Square 1:1 aspect ratio. Natural lighting, simple background directly behind the subject (not visible around the edges), photorealistic, no text, no watermark, no logo.`;
 }
 
 /* runs in the background after a fresh (non-refine) generation when no photo
@@ -1570,8 +1576,8 @@ async function translateProfile(target){
   let failed=false, errMsg='';
   try{
     const content=[{type:'text',text:
-      `Here is an existing personality/writing profile JSON:\n${JSON.stringify({...profile, photo:undefined})}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. EVERY field including writing_dna.language and localization.language_mix must be written entirely in ${target==='he'?'Hebrew':'English'} too (they are short labels naming the user's real writing language, phrased in ${target==='he'?'Hebrew':'English'} words — never leave them in the other language). ${target==='he'?'If Hebrew, address the reader in gender-neutral plural forms (את/ה, אתם), never masculine-only.':''} Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
-    const translated = await callClaude(content, false, 8000, 'claude-sonnet-4-6');
+      `Here is an existing personality/writing profile JSON:\n${JSON.stringify({...profile, photo:undefined})}\n\nRe-express this SAME profile in ${target==='he'?'Hebrew':'English'}, written NATIVELY — as if it had been authored in ${target==='he'?'Hebrew':'English'} from the start. Do NOT do a stiff word-for-word translation: use natural phrasing, idiom and rhythm of ${target==='he'?'Hebrew':'English'} so it reads like an original, while keeping the exact same meaning, insights and judgments. Keep the exact same JSON schema, field names, and array lengths and order — same analysis, new language. EVERY field including writing_dna.language and localization.language_mix must be written entirely in ${target==='he'?'Hebrew':'English'} too (they are short labels naming the user's real writing language, phrased in ${target==='he'?'Hebrew':'English'} words — never leave them in the other language). EXCEPT writing_dna.primary_lang_code — that is a strict "he" or "en" code, not text to translate; copy it through completely unchanged. ${target==='he'?'If Hebrew, address the reader in gender-neutral plural forms (את/ה, אתם), never masculine-only.':''} Output nothing but the JSON object, no markdown fences, no preamble, no trailing commentary.`}];
+    const translated = await callClaude(content, false, 8000, 'claude-sonnet-5');
     translated._lang = target;
     translated.photo = profile.photo; /* translation never touches the photo */
     vars[target] = translated;
@@ -1765,12 +1771,53 @@ async function saveProfile(){
 
 function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+function postLangToggleHTML(){
+  const t=T(), cur=effectivePostLang();
+  return `<div class="post-lang-toggle">
+    <span class="field-label" style="margin:0">${t.post_lang_label}</span>
+    <div class="lang-toggle">
+      <button class="${cur==='he'?'active':''}" onclick="setPostLang('he')">עברית</button>
+      <button class="${cur==='en'?'active':''}" onclick="setPostLang('en')">English</button>
+    </div>
+  </div>`;
+}
+
+function setPostLang(l){
+  if(effectivePostLang()===l) return;
+  const prev=postLang;
+  postLang=l;
+  if(currentPost) rewritePostLang(l, prev);
+  else render();
+}
+
+/* re-express an already-generated post natively in the new language —
+   not a literal translation, same message/hook/structure, native phrasing */
+async function rewritePostLang(targetLang, prevLang){
+  const t=T();
+  const card=document.getElementById('main-card');
+  card.innerHTML=`<div class="step active loading"><div class="pulse"></div><p>${targetLang==='he'?'כותבים את הפוסט מחדש בעברית...':'Rewriting the post in English...'}</p></div>`;
+  try{
+    const content=[{type:'text',text:
+      `Here is an existing LinkedIn post with alternative hooks:\n${JSON.stringify(currentPost)}\n\nRe-express this SAME post NATIVELY in ${targetLang==='he'?'Hebrew':'English'} — as if it had been written in ${targetLang==='he'?'Hebrew':'English'} from the start, with real slang, idiom and rhythm a native speaker actually uses. Do NOT do a literal, stiff translation. Keep the exact same message, structure, hook and tone. NEVER use an em dash (—). Same JSON shape: {"post":"...","hooks":["...","..."]}. Output nothing but the JSON, no fences, no preamble.`}];
+    currentPost = await callClaude(content, false, 8000);
+    savePostHistory();
+    render();
+  }catch(err){
+    console.error('post language rewrite failed:',err);
+    postLang=prevLang;
+    render();
+    document.getElementById('main-card').insertAdjacentHTML('beforeend',
+      `<div class="gap-note">${t.err_api}<br><small style="opacity:.7">${escapeHtml((err&&err.message)||'')}</small></div>`);
+  }
+}
+
 function composerHTML(){
   const t=T();
   return `<div class="step active">
     <div class="eyebrow">Voiceprint</div>
     <h2 class="q-title">${t.composer_h}</h2>
     <p class="q-sub">${t.composer_sub}</p>
+    ${postLangToggleHTML()}
     <textarea id="post-input" style="min-height:180px" placeholder="${t.input_ph}">${escapeHtml(postInput)}</textarea>
     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-ghost" id="rec-btn">${recog?t.rec_stop:t.rec_start}</button>
@@ -1910,12 +1957,12 @@ function useIdea(idea){
 }
 
 function buildPostContent(refineNote){
-  const dnaLang=(profile&&profile.writing_dna&&profile.writing_dna.language)||'mixed';
+  const targetLang = effectivePostLang()==='he' ? 'Hebrew' : 'English';
   let text=`You are ghostwriting ONE LinkedIn post AS this person. Their full profile (personality + writing DNA):
 ${JSON.stringify({...profile, photo:undefined})}
 
 RULES:
-- LANGUAGE (most important): write the post in the SAME LANGUAGE the user wrote the RAW MATERIAL below in. If the raw material is in English, write in English; if in Hebrew, write in Hebrew. This overrides everything — do NOT default to the app's language or the profile's language. (Their usual writing language is ${dnaLang}, but the raw material wins.)
+- LANGUAGE (most important): write the ENTIRE post in ${targetLang}, natively — real slang, idiom and rhythm a native ${targetLang} speaker actually uses, not a stiff or literal-feeling translation. This is fixed regardless of what language the raw material below happens to be written in: if the raw material is in a different language, translate the MEANING and the STORY into fully natural ${targetLang}, never word-for-word.
 - Follow every DO and DON'T in writing_dna literally. Mimic their sentence length, punctuation habits, emoji habits, humor and endings. Reuse their signature phrasing style without quoting old posts.
 - First line = a scroll-stopping hook drawn from the most specific, human detail in the material. No clickbait clichés.
 - Short paragraphs with breathing room. One idea per post. Specificity beats generality.
@@ -1968,6 +2015,7 @@ function resultHTML(){
   const hooks=(p.hooks||[]).map(h=>`<span class="chip">${escapeHtml(h)}</span>`).join('');
   return `<div class="step active">
     <div class="eyebrow">${t.result_h}</div>
+    ${postLangToggleHTML()}
     <div style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:22px;white-space:pre-wrap;font-size:1.02rem">${escapeHtml(p.post)}</div>
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-accent" id="copy-btn" onclick="copyPost()">${t.copy}</button>

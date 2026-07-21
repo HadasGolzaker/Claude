@@ -1155,7 +1155,10 @@ function wireRank(q){
    PROFILE ENGINE — Claude API
    ========================================================= */
 
-const CODEX = `
+/* ---------- profile generation prompt, split into 3 groups that run as
+   parallel Claude calls (see runGeneration) so a slower/deeper model still
+   returns fast: each call only has to write ~1/3 of the profile. ---------- */
+const PROFILE_HEADER = `
 You are an expert personality psychologist profiling a person for a LinkedIn ghostwriting platform. Your job is to READ A PERSON, not to summarize a form.
 
 CRITICAL — INFER, DON'T ECHO: Never restate or lightly paraphrase what the user wrote, and NEVER quote their answers back word-for-word. Every insight must be an INFERENCE that goes beyond the surface of their answers — read between the lines, connect signals across different questions, name the underlying trait/drive/tension the person may not even see about themselves. If a line could be produced just by rephrasing one answer, it is wrong; replace it with what that answer REVEALS about who they are.
@@ -1163,28 +1166,38 @@ CRITICAL — INFER, DON'T ECHO: Never restate or lightly paraphrase what the use
 PLAIN LANGUAGE: write for a smart everyday reader ("the average Joe"), not for psychologists. Explain what you see in warm, clear, jargon-free words. When you draw on a framework (Big 5, Enneagram, Hofstede, etc.), translate it into plain human terms rather than naming clinical constructs — the insight should land, not sound like a textbook.
 
 LANGUAGE: write the ENTIRE response in {LANG} only. Do not output any words, phrases, or quotes in any other language.
+`;
 
-Build the profile from the questionnaire answers using these frameworks:
-
+const FRAMEWORK_BIG5 = `
 BIG 5 — score each 1-5 using both closed answers AND language markers in free text (open-vocabulary method, Park et al. 2014):
 - Extraversion: social words, exclamation marks, emojis, short energetic sentences, calls to action vs. reflective first-person, longer sentences, ellipses.
 - Openness: metaphors, abstract/idea words, original syntax, varied topics vs. concrete, practical, routine language.
 - Conscientiousness: planning words, structured syntax, standard punctuation vs. "we'll see", topic-jumping, casual flow.
 - Agreeableness: warm words (thanks, together, appreciate), soft phrasing, hearts vs. sharp, competitive, blunt language.
 - Neuroticism: stress words, multiple !!/..., dramatic phrasing vs. calm, solution-focused, proportionate language.
+`;
 
+const FRAMEWORK_MOTIVES = `
 MOTIVES (score the user's top 3 from their ranking Q3 + free text evidence): achievement, power/influence, recognition, security, belonging/acceptance, meaning/spiritual, thrill/risk, pleasure/hedonism, altruism, material. Motives answer WHY the person acts; traits answer HOW. Flag any contradiction between declared ranking and language evidence.
+`;
 
+const FRAMEWORK_ENNEAGRAM = `
 ENNEAGRAM (from Q2 worldview + corroborating evidence): e1=Perfectionist, e2=Helper, e3=Performer, e4=Individualist, e5=Investigator, e6=Loyalist, e7=Enthusiast, e8=Challenger, e9=Peacemaker. Give type number, name, and the core inner motivation.
+`;
 
+const FRAMEWORK_COGNITIVE = `
 COGNITIVE ORIENTATION (mainly from Q6+Q9+posts):
 - convergent (one precise solution, data, process) vs divergent (many possibilities, connections, "what if").
 - systemizer (how systems work: data, frameworks, SOPs) vs empathizer (how people feel: stories, motives, relationships).
+`;
 
+const FRAMEWORK_WRITING_DNA = `
 WRITING DNA (from Q1, Q6, and pasted posts — the pasted posts are the STRONGEST signal, weight them most):
 - primary language (he/en/mixed), average sentence length, punctuation habits (exclamations? ellipses? dashes?), emoji usage (which/none), hook style, humor type, signature_phrases: 2-3 SHORT descriptions (in {LANG}) of their characteristic phrasing or go-to word choices, IN YOUR OWN WORDS — do NOT copy their sentences verbatim, first/second person habits, how they end posts (question? statement? CTA?).
 - Also produce 3 DO rules and 3 DON'T rules for ghostwriting this person. Make them specific and actionable (not generic advice) — grounded in the actual evidence from their answers and posts.
+`;
 
+const FRAMEWORK_LOCALIZATION = `
 LOCALIZATION — language & culture fit (from writing language, phrasing, cultural references in Q1/Q6/posts/About):
 - audience: who they write for and the market/culture they operate in.
 - language_mix: primary language and how they blend he/en (loanwords, code-switching, English terms inside Hebrew, etc.).
@@ -1192,44 +1205,94 @@ LOCALIZATION — language & culture fit (from writing language, phrasing, cultur
 - formality: how formal/informal and how they address the reader (ata/at, plural, first-name energy).
 - note: one short line on how to keep a post culturally native to them.
 Anchor on the declared country/market (USER CONTEXT) combined with the language evidence, not country stereotypes. Use Hofstede's 6 cultural dimensions as a qualitative lens (power distance, individualism/collectivism, masculinity/femininity, uncertainty avoidance, long/short-term, indulgence/restraint) only where actually visible in their writing.
+`;
 
+const FRAMEWORK_STORYTELLING = `
 STORYTELLING — how they narrate (from Q1, Q6, Q9 and posts):
 - structure: how they build a post (e.g. hook → tension → turn → lesson → close), described from their real patterns.
 - signature_moves: 2 narrative devices they actually use (each ≤6 words).
 - templates: 2 short reusable story skeletons that fit them (each one short line).
 - note: one short line on what makes their storytelling land.
 Name the closest battle-tested shape in "structure" (Three-Act, PAS, AIDA, BAB, Hero's Journey, StoryBrand, or In Medias Res) rather than inventing vocabulary — whichever actually fits; build "templates" as short skeletons of that shape from their real material.
+`;
 
+const FRAMEWORK_IMAGES = `
 If profile pictures are provided, use profile-image research: positive emotion + single frontal face → conscientiousness/agreeableness/extraversion signals; aesthetic/unconventional composition → openness; no face/low emotion → openness or neuroticism direction. Treat as weak supporting evidence only.
+`;
 
+const CROSS_CHECK = `
 CROSS-CHECKING: actively look for contradictions between closed answers and free-text style (e.g., claims introvert but writes with high-energy social markers). List them in "gaps".
+`;
 
-LENGTH BUDGET (STRICT — the response is time-limited, so a complete, tight profile matters more than a thorough one): keep every evidence line, note, do/dont rule, and list item to ONE short clause (max ~10 words). No sub-clauses, no examples-in-parentheses, no restating the field name. The summary is the only place with full sentences. Total output must be small — if in doubt, cut. Depth comes from precision, not length.
+/* relaxed vs. the old single-call budget: each call now only writes ~1/3 of
+   the profile, so there's room for a real clause instead of a fragment */
+const LENGTH_BUDGET = `
+LENGTH BUDGET: keep every evidence line, note, and list item to one clear, specific clause (roughly 12-20 words) — no padding, no restating the field name, no examples-in-parentheses. The "summary" is the only place with full sentences (2-3). Depth comes from precision, not length — don't stretch a thin observation, but don't cut a real insight just to hit a word count.
+`;
 
-Respond with ONLY valid JSON, no markdown fences, no preamble. Keep list items to short phrases, BUT the "summary" and each "evidence" must be real inference (see below), not restated answers. JSON schema:
-{
- "summary": "A tight 2-3 sentence psychological portrait in {LANG}, second person, warm but insightful — their defining tension and what really drives them. Feel truly seen, not summarized. No quotes, no filler.",
- "big5": {"openness":{"score":1-5,"evidence":"≤10 words: the signal you inferred it from, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
- "motives": [{"id":"...","label_he":"...","label_en":"...","note":"short"} x3],
- "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"short"},
- "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"short"},
- "writing_dna": {"language":"he|en|mixed","sentence_length":"short","punctuation":"short","emoji":"short","hook_style":"short","humor":"short","signature_phrases":["...","..."],"endings":"short","do":["...","...","..."],"dont":["...","...","..."]},
- "localization": {"audience":"short","language_mix":"short","cultural_markers":"short","formality":"short","note":"short"},
- "storytelling": {"structure":"short","signature_moves":["...","..."],"templates":["...","..."],"note":"short"},
- "gaps": ["...( empty array if none )"]
+function groupPrompt(fw, schema){
+  return PROFILE_HEADER + fw + LENGTH_BUDGET +
+    `\nRespond with ONLY valid JSON, no markdown fences, no preamble. Every "evidence"/"note" must be real inference (see above), not a restated answer. JSON schema:\n${schema}\nAll free-text values in {LANG}, in plain everyday language, with no verbatim quotes of the user's answers.`;
 }
-All free-text values in {LANG}, in plain everyday language, with no verbatim quotes of the user's answers.`;
 
-function buildUserContent(){
-  const qa = QUESTIONS.filter(q=>q.type!=='uploads').map(q=>{
+const GROUP_PROMPTS = {
+  core: groupPrompt(FRAMEWORK_BIG5 + FRAMEWORK_MOTIVES + FRAMEWORK_ENNEAGRAM + FRAMEWORK_IMAGES, `{
+ "summary": "A tight 2-3 sentence psychological portrait in {LANG}, second person, warm but insightful — their defining tension and what really drives them. Feel truly seen, not summarized. No quotes, no filler.",
+ "big5": {"openness":{"score":1-5,"evidence":"the signal you inferred it from, not a restated answer"},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
+ "motives": [{"id":"...","label_he":"...","label_en":"...","note":"..."} x3],
+ "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"..."}
+}`),
+  voice: groupPrompt(FRAMEWORK_COGNITIVE + FRAMEWORK_WRITING_DNA, `{
+ "cognitive": {"convergent_divergent":"convergent|divergent|balanced","systemizer_empathizer":"systemizer|empathizer|balanced","note":"..."},
+ "writing_dna": {"language":"he|en|mixed","sentence_length":"...","punctuation":"...","emoji":"...","hook_style":"...","humor":"...","signature_phrases":["...","..."],"endings":"...","do":["...","...","..."],"dont":["...","...","..."]}
+}`),
+  context: groupPrompt(FRAMEWORK_LOCALIZATION + FRAMEWORK_STORYTELLING + CROSS_CHECK, `{
+ "localization": {"audience":"...","language_mix":"...","cultural_markers":"...","formality":"...","note":"..."},
+ "storytelling": {"structure":"...","signature_moves":["...","..."],"templates":["...","..."],"note":"..."},
+ "gaps": ["...( empty array if none )"]
+}`),
+};
+
+const FULL_PROFILE_SCHEMA = `{
+ "summary": "...", "big5": {"openness":{"score":1-5,"evidence":"..."},"conscientiousness":{...},"extraversion":{...},"agreeableness":{...},"neuroticism":{...}},
+ "motives": [{"id":"...","label_he":"...","label_en":"...","note":"..."} x3],
+ "enneagram": {"type":N,"name_he":"...","name_en":"...","core":"..."},
+ "cognitive": {"convergent_divergent":"...","systemizer_empathizer":"...","note":"..."},
+ "writing_dna": {"language":"...","sentence_length":"...","punctuation":"...","emoji":"...","hook_style":"...","humor":"...","signature_phrases":["...","..."],"endings":"...","do":["...","...","..."],"dont":["...","...","..."]},
+ "localization": {"audience":"...","language_mix":"...","cultural_markers":"...","formality":"...","note":"..."},
+ "storytelling": {"structure":"...","signature_moves":["...","..."],"templates":["...","..."],"note":"..."},
+ "gaps": ["..."]
+}`;
+
+/* second pass: the 3 group calls above run in parallel and never see each
+   other's output, so this pass re-reads the merged draft as a whole to
+   catch cross-section contradictions and any line that's really just a
+   restated answer rather than a genuine inference */
+const CRITIQUE_PROMPT = `
+You wrote a personality/writing profile for a LinkedIn ghostwriting platform, generated as three parallel drafts (personality core, cognitive/voice, localization/storytelling) that could not see each other. Review the MERGED draft below as a whole and fix it.
+
+For every "evidence"/"note"/list item, check:
+1. Is it a genuine INFERENCE, or does it just restate/paraphrase an answer? Replace any restatement with what the answer actually reveals about the person.
+2. Is it consistent with the rest of the profile? (e.g. a low extraversion score next to a writing_dna.hook_style built on big energetic calls-to-action is a contradiction — resolve it using the actual evidence below, and if it's a real tension worth surfacing rather than an error, add a short line to "gaps".)
+
+Keep the same length discipline as the draft: each evidence/note/list item ~12-20 words, "summary" 2-3 full sentences. Respond with ONLY the corrected full JSON, same schema, no markdown fences, no preamble. All free-text values in {LANG}, with no verbatim quotes of the user's answers. Schema:
+${FULL_PROFILE_SCHEMA}
+`;
+
+function buildQAText(){
+  return QUESTIONS.filter(q=>q.type!=='uploads').map(q=>{
     let a = answers[q.id];
     if(q.type==='single'){const o=q.opts.find(x=>x.v===a);a = a+' — '+(o?o.en:'');}
     if(q.type==='rank'){a = (a||[]).map((v,i)=>`${i+1}. ${v}`).join(' | ');}
     return `Q ${q.id} (${q.en.t}):\n${a}`;
   }).join('\n\n');
+}
+
+function buildUserContent(group){
+  const qa = buildQAText();
 
   const noLi=uploads.noLinkedIn;
-  let text = CODEX.replaceAll('{LANG}', lang==='he'?'Hebrew':'English')
+  let text = GROUP_PROMPTS[group].replaceAll('{LANG}', lang==='he'?'Hebrew':'English')
     + '\n\n=== USER CONTEXT ===\nName: ' + (profileName||'-')
     + '\nCountry/market: ' + (countryName(profileCountry,'en')||'not specified')
     + (noLi?'\nNote: this person does NOT have a LinkedIn profile — the writing sample below is general (not LinkedIn posts), so weight it as their natural voice and infer the LinkedIn fit rather than assuming existing LinkedIn habits.':'')
@@ -1238,7 +1301,9 @@ function buildUserContent(){
   if(uploads.about.trim()) text += (noLi?'\n\n=== ABOUT THE USER (self-described) ===\n':'\n\n=== LINKEDIN ABOUT ===\n')+uploads.about.trim();
 
   const content=[{type:'text',text}];
-  uploads.images.forEach(im=>content.push({type:'image',source:{type:'base64',media_type:im.media_type,data:im.data}}));
+  /* profile pictures only inform Big 5 / motives / enneagram (the "core"
+     group) — no point re-sending image bytes to the other parallel calls */
+  if(group==='core') uploads.images.forEach(im=>content.push({type:'image',source:{type:'base64',media_type:im.media_type,data:im.data}}));
   return content;
 }
 
@@ -1250,11 +1315,14 @@ async function callClaude(content, useSearch, maxTokens){
     method:'POST',
     headers,
     body:JSON.stringify({
-      model:'claude-sonnet-4-6',
-      max_tokens:maxTokens||8000,
-      /* no pre-answer "thinking" — cuts latency so generation finishes
-         well inside the serverless time limit */
-      thinking:{type:'disabled'},
+      model:'claude-opus-4-8',
+      max_tokens:maxTokens||12000,
+      /* adaptive thinking (must be set explicitly on Opus 4.8 — a request
+         with no "thinking" field runs without it) lets the model reason
+         before it commits to an inference, instead of jumping straight
+         to a surface-level answer */
+      thinking:{type:'adaptive'},
+      output_config:{effort:'high'},
       messages:[{role:'user',content}],
       ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
     })
@@ -1363,14 +1431,33 @@ async function runGeneration(refineNote){
   },2200);
 
   try{
-    let content;
     if(refineNote && profile){
-      content=[{type:'text',text:
+      const content=[{type:'text',text:
         `Here is an existing personality/writing profile JSON:\n${JSON.stringify(profile)}\n\nThe user corrected it: "${refineNote}"\n\nApply the correction thoughtfully (adjust related fields too, e.g. if they say "I never use emojis" fix writing_dna.emoji and the do/dont rules). Respond with ONLY the full updated JSON, same schema, no fences. Free-text values in ${lang==='he'?'Hebrew':'English'}.`}];
+      profile = await callClaude(content);
     } else {
-      content=buildUserContent();
+      /* 3 independent calls in parallel, each writing a disjoint slice of
+         the profile — cuts wall-clock time vs. one call writing everything
+         in sequence, which is what makes Opus + adaptive thinking affordable
+         here. A 4th, cheaper pass then reviews the merged result as a whole
+         (see CRITIQUE_PROMPT) since the 3 calls never saw each other's output. */
+      const [core, voice, context] = await Promise.all([
+        callClaude(buildUserContent('core')),
+        callClaude(buildUserContent('voice')),
+        callClaude(buildUserContent('context')),
+      ]);
+      const draft = Object.assign({}, core, voice, context);
+      try{
+        const critiqueContent=[{type:'text',text:
+          CRITIQUE_PROMPT.replaceAll('{LANG}', lang==='he'?'Hebrew':'English')
+          + '\n\n=== QUESTIONNAIRE ANSWERS ===\n' + buildQAText()
+          + '\n\n=== MERGED DRAFT PROFILE ===\n' + JSON.stringify(draft)}];
+        profile = await callClaude(critiqueContent);
+      }catch(critiqueErr){
+        console.warn('profile critique pass failed, using merged draft as-is', critiqueErr);
+        profile = draft;
+      }
     }
-    profile = await callClaude(content);
     profile._lang = lang;
     profile._name = profileName;
     profile._country = profileCountry;

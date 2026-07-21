@@ -360,6 +360,13 @@ textarea,input[type=text]{
 /* Q10 no-LinkedIn toggle */
 .no-li-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.95rem;cursor:pointer;margin-bottom:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
 .no-li-toggle input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+/* brainstorm setup panel */
+.ideas-setup{border:1.5px solid var(--line);border-radius:14px;padding:16px;margin-top:10px;background:var(--paper)}
+.cat-checks{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 4px}
+.cat-check{display:flex;align-items:center;gap:6px;font-weight:600;font-size:.9rem;cursor:pointer}
+.cat-check input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.idea-personal{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.idea-personal textarea{margin-top:6px}
 .theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
 .theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}
@@ -555,7 +562,18 @@ const I18N = {
     ideas_h:'רעיונות לפוסט - בחרו אחד וזה יכנס למעלה',
     ideas_loading:['סורקים מה קורה היום...','מצליבים מול הפרופיל שלכם...','מרכיבים רעיונות בקול שלכם...'],
     ideas_cats:{news:'מהחדשות',professional:'מקצועי',personal:'אישי',hobby:'תחביבים'},
-    ideas_use:'כתבו על זה ←', ideas_err:'לא הצלחתי להביא רעיונות. נסו שוב.',
+    ideas_err:'לא הצלחתי להביא רעיונות. נסו שוב.',
+    ideas_setup_h:'על מה נעשה בריינסטורמינג?',
+    ideas_mode_profile:'רעיונות לפי הפרופיל שלי',
+    ideas_mode_topic:'רעיונות על נושא שאני אתן',
+    ideas_topic_ph:'לדוגמה: מונדיאל, בינה מלאכותית, עונת גיוסים...',
+    ideas_cats_h:'אילו קטגוריות לכלול?',
+    ideas_generate_btn:'צרו רעיונות',
+    ideas_personal_label:'רוצים להוסיף פן אישי? (אופציונלי)',
+    ideas_personal_ph:'לדוגמה: חוויה שהייתה לי, לקוח שעבדתי איתו, סיפור אמיתי...',
+    ideas_use_plain:'השתמשו ברעיון כמו שהוא',
+    ideas_use_personal:'שלבו את הפן האישי',
+    ideas_personalizing:'משלבים...',
     writing:['קוראים את מה שסיפרתם...','טובלים את זה בקול שלכם...','מחדדים את הפתיחה...','עוד שנייה...'],
     result_h:'הפוסט שלכם',
     copy:'העתקת הפוסט', copied:'הועתק',
@@ -632,7 +650,18 @@ const I18N = {
     ideas_h:'Post ideas - pick one and it drops into the box above',
     ideas_loading:['Scanning what\'s happening today...','Cross-checking with your profile...','Shaping ideas in your voice...'],
     ideas_cats:{news:'In the news',professional:'Professional',personal:'Personal',hobby:'Hobbies'},
-    ideas_use:'Write about this →', ideas_err:'Couldn\'t fetch ideas. Try again.',
+    ideas_err:'Couldn\'t fetch ideas. Try again.',
+    ideas_setup_h:'What should we brainstorm?',
+    ideas_mode_profile:'Ideas based on my profile',
+    ideas_mode_topic:'Ideas about a topic I give',
+    ideas_topic_ph:'e.g. World Cup, AI, hiring season...',
+    ideas_cats_h:'Which categories to include?',
+    ideas_generate_btn:'Generate ideas',
+    ideas_personal_label:'Want to add a personal angle? (optional)',
+    ideas_personal_ph:'e.g. something that happened to me, a client I worked with, a real story...',
+    ideas_use_plain:'Use as-is',
+    ideas_use_personal:'Blend in my personal angle',
+    ideas_personalizing:'Blending...',
     writing:['Reading what you told me...','Dipping it in your voice...','Sharpening the hook...','One more second...'],
     result_h:'Your post',
     copy:'Copy post', copied:'Copied',
@@ -746,6 +775,7 @@ let profile = null;
 let approved = false;
 let apiKey = '';
 let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
+let ideasMode='profile', ideasTopic='', ideasCats={news:true,professional:true,personal:true,hobby:true};
 const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3;
 
 /* ---------- multi-profile state ---------- */
@@ -1678,7 +1708,7 @@ function wireComposer(){
   ta.addEventListener('input',()=>{postInput=ta.value;
     const b=document.getElementById('gen-btn'); if(b) b.disabled=postInput.trim().length<20;});
   const ib=document.getElementById('ideas-btn');
-  if(ib) ib.addEventListener('click',brainstormTopics);
+  if(ib) ib.addEventListener('click',showIdeasSetup);
   const lk=document.getElementById('post-link');
   lk.addEventListener('input',()=>postLink=lk.value);
   document.getElementById('post-img').addEventListener('change',async e=>{
@@ -1720,24 +1750,95 @@ function wireComposer(){
 }
 
 /* ---------- topic brainstormer ---------- */
+function ideasGenDisabled(){
+  if(!Object.values(ideasCats).some(Boolean)) return true;
+  if(ideasMode==='topic' && !ideasTopic.trim()) return true;
+  return false;
+}
+
+function ideasSetupHTML(){
+  const t=T();
+  const cats=t.ideas_cats;
+  const catRow=Object.keys(cats).map(k=>`
+    <label class="cat-check"><input type="checkbox" data-cat="${k}" ${ideasCats[k]?'checked':''}> ${cats[k]}</label>`).join('');
+  return `<div class="ideas-setup">
+    <div class="section-h">${t.ideas_setup_h}</div>
+    <button type="button" class="opt ${ideasMode==='profile'?'selected':''}" data-mode="profile">${t.ideas_mode_profile}</button>
+    <button type="button" class="opt ${ideasMode==='topic'?'selected':''}" data-mode="topic">${t.ideas_mode_topic}</button>
+    <div id="ideas-topic-wrap" style="${ideasMode==='topic'?'':'display:none'}">
+      <input type="text" id="ideas-topic-input" style="min-height:auto" placeholder="${t.ideas_topic_ph}" value="${escapeHtml(ideasTopic)}">
+    </div>
+    <label class="field-label" style="margin-top:12px">${t.ideas_cats_h}</label>
+    <div class="cat-checks">${catRow}</div>
+    <button class="btn btn-primary" id="ideas-generate-btn" ${ideasGenDisabled()?'disabled':''}>${t.ideas_generate_btn}</button>
+  </div>`;
+}
+
+function showIdeasSetup(){
+  const box=document.getElementById('ideas-box');
+  if(!box) return;
+  box.innerHTML=ideasSetupHTML();
+  wireIdeasSetup();
+}
+
+function wireIdeasSetup(){
+  const box=document.getElementById('ideas-box');
+  if(!box) return;
+  box.querySelectorAll('.ideas-setup .opt[data-mode]').forEach(b=>b.addEventListener('click',()=>{
+    ideasMode=b.dataset.mode;
+    box.innerHTML=ideasSetupHTML();
+    wireIdeasSetup();
+  }));
+  const ti=document.getElementById('ideas-topic-input');
+  if(ti) ti.addEventListener('input',()=>{
+    ideasTopic=ti.value;
+    const btn=document.getElementById('ideas-generate-btn'); if(btn) btn.disabled=ideasGenDisabled();
+  });
+  box.querySelectorAll('.cat-check input[type=checkbox]').forEach(cb=>cb.addEventListener('change',()=>{
+    ideasCats[cb.dataset.cat]=cb.checked;
+    const btn=document.getElementById('ideas-generate-btn'); if(btn) btn.disabled=ideasGenDisabled();
+  }));
+  const gb=document.getElementById('ideas-generate-btn');
+  if(gb) gb.addEventListener('click',brainstormTopics);
+}
+
 async function brainstormTopics(){
   const t=T();
   const box=document.getElementById('ideas-box');
   if(!box) return;
+  const selectedCats=Object.keys(ideasCats).filter(k=>ideasCats[k]);
+  if(!selectedCats.length) return;
   let i=0;
   box.innerHTML=`<div class="loading" style="padding:24px 0"><div class="pulse" style="width:40px;height:40px;border-width:3px"></div><p id="ideas-msg">${t.ideas_loading[0]}</p></div>`;
   const timer=setInterval(()=>{i=(i+1)%t.ideas_loading.length;const el=document.getElementById('ideas-msg');if(el)el.textContent=t.ideas_loading[i];},2000);
-  const text=`You help this person decide WHAT to post on LinkedIn when they have nothing specific in mind. Their full profile (personality, motives, writing DNA, localization, storytelling):
+
+  const langName=lang==='he'?'Hebrew':'English';
+  const catList=selectedCats.map(k=>`"${k}"`).join(', ');
+  const catDefs=`- "news": an ongoing trend, debate, or recurring theme they could weigh in on (from your knowledge — no need for a specific dated event).
+- "professional": an insight, lesson, or take from their professional world.
+- "personal": a value, belief, or general reflection touching personal life — do NOT invent a specific personal anecdote, past client, or story about them; keep it general. They'll get a chance to add their own real personal detail after picking an idea.
+- "hobby": tied to interests or hobbies visible in their profile.`;
+
+  const text = ideasMode==='topic'
+    ? `You help this person brainstorm LinkedIn post ideas about a SPECIFIC topic they gave you, tailored to their voice and worldview. Their full profile (personality, motives, writing DNA, localization, storytelling):
 ${JSON.stringify(profile)}
 
-Suggest 8 concrete post ideas tailored to THIS person — drawn from your own knowledge of their field and of evergreen conversations in it, NOT from any live search. Spread them across these categories:
-- "news": an ongoing trend, debate, or recurring theme in their field they could weigh in on (from your knowledge — no need for a specific dated event).
-- "professional": an insight, lesson, or take from their professional world.
-- "personal": something from personal life / values / a small human moment they could share.
-- "hobby": tied to interests or hobbies visible in their profile.
-Write each idea in ${lang==='he'?'Hebrew':'English'}, matching their voice and audience (localization). "title" = a short scroll-stopping idea; "angle" = one line on what the post would actually say. Make them specific to this person, not generic.
+The topic to brainstorm about: "${ideasTopic.trim()}"
 
-Respond with ONLY valid JSON, no fences: {"ideas":[{"category":"news|professional|personal|hobby","title":"...","angle":"..."}]}`;
+Suggest 8 concrete post ideas — each a DIFFERENT angle on this exact topic — using ONLY these categories of angle: ${catList}.
+${catDefs}
+Write each idea in ${langName}, matching their voice and audience (localization). "title" = a short scroll-stopping idea; "angle" = one line on what the post would actually say. Every idea must clearly be about "${ideasTopic.trim()}" — do not drift to unrelated topics.
+
+Respond with ONLY valid JSON, no fences: {"ideas":[{"category":"...","title":"...","angle":"..."}]}`
+    : `You help this person decide WHAT to post on LinkedIn when they have nothing specific in mind. Their full profile (personality, motives, writing DNA, localization, storytelling):
+${JSON.stringify(profile)}
+
+Suggest 8 concrete post ideas tailored to THIS person — drawn from your own knowledge of their field and of evergreen conversations in it, NOT from any live search. Use ONLY these categories: ${catList}.
+${catDefs}
+Write each idea in ${langName}, matching their voice and audience (localization). "title" = a short scroll-stopping idea; "angle" = one line on what the post would actually say. Make them specific to this person, not generic.
+
+Respond with ONLY valid JSON, no fences: {"ideas":[{"category":"...","title":"...","angle":"..."}]}`;
+
   try{
     const res=await callClaude([{type:'text',text}]);
     clearInterval(timer);
@@ -1765,7 +1866,14 @@ function renderIdeas(ideas){
       </button>
       <div class="idea-body">
         <div class="idea-angle">${escapeHtml(idea.angle||'')}</div>
-        <button class="btn btn-primary idea-use" data-use="${idx}">${t.ideas_use}</button>
+        <div class="idea-personal">
+          <label class="field-label">${t.ideas_personal_label}</label>
+          <textarea class="idea-personal-input" data-idx="${idx}" style="min-height:60px" placeholder="${t.ideas_personal_ph}"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button class="btn btn-ghost idea-use-plain" data-use="${idx}">${t.ideas_use_plain}</button>
+            <button class="btn btn-primary idea-use-personal" data-use="${idx}">${t.ideas_use_personal}</button>
+          </div>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1776,7 +1884,38 @@ function renderIdeas(ideas){
     box.querySelectorAll('.idea-pill.open').forEach(p=>p.classList.remove('open'));
     if(!wasOpen){ pill.classList.add('open'); pill.scrollIntoView({block:'nearest',behavior:'smooth'}); }
   }));
-  box.querySelectorAll('.idea-use').forEach(b=>b.addEventListener('click',()=>useIdea(ideas[+b.dataset.use])));
+  box.querySelectorAll('.idea-use-plain').forEach(b=>b.addEventListener('click',()=>useIdea(ideas[+b.dataset.use])));
+  box.querySelectorAll('.idea-use-personal').forEach(b=>b.addEventListener('click',async ()=>{
+    const idx=+b.dataset.use;
+    const ta=box.querySelector(`.idea-personal-input[data-idx="${idx}"]`);
+    const note=(ta&&ta.value||'').trim();
+    if(!note){ useIdea(ideas[idx]); return; }
+    const orig=b.textContent; b.disabled=true; b.textContent=t.ideas_personalizing;
+    try{
+      const merged=await personalizeIdea(ideas[idx],note);
+      useIdea(merged);
+    }catch(e){
+      console.warn('personalize failed, using idea as-is',e);
+      useIdea(ideas[idx]);
+    }finally{
+      b.disabled=false; b.textContent=orig;
+    }
+  }));
+}
+
+async function personalizeIdea(idea,note){
+  const langName=lang==='he'?'Hebrew':'English';
+  const text=`Blend a real personal detail into a LinkedIn post idea, in this person's voice. Writing DNA + storytelling (for voice only):
+${JSON.stringify({writing_dna:profile.writing_dna,storytelling:profile.storytelling})}
+
+Original idea:
+Title: ${idea.title||''}
+Angle: ${idea.angle||''}
+
+Personal detail to weave in (real, from the user — use it as given, don't invent anything beyond it): "${note}"
+
+Rewrite as one short idea seed in ${langName} that opens the post from this real personal detail and connects it to the original angle. Respond with ONLY valid JSON, no fences: {"title":"...","angle":"..."}`;
+  return await callClaude([{type:'text',text}]);
 }
 
 function useIdea(idea){

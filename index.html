@@ -294,9 +294,10 @@ textarea,input[type=text]{
 .idea-cat{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.66}
 .idea-title{font-weight:600;font-size:1.02rem;line-height:1.25}
 .idea-body{max-height:0;overflow:hidden;background:var(--card);transition:max-height .35s ease,padding .35s ease;padding:0 18px}
-.idea-pill.open .idea-body{max-height:260px;padding:16px 18px}
+/* generous enough for angle + personal-angle textarea + both action buttons —
+   a fixed max-height just needs to clear the tallest real content, not match it */
+.idea-pill.open .idea-body{max-height:560px;padding:16px 18px}
 .idea-angle{margin-bottom:14px;color:var(--ink)}
-.idea-use{padding:8px 18px;font-size:.88rem}
 .do-list li{border-inline-start:3px solid var(--olive);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
 .dont-list li{border-inline-start:3px solid var(--ink);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
 @keyframes ideaIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
@@ -366,7 +367,7 @@ textarea,input[type=text]{
 .cat-check{display:flex;align-items:center;gap:6px;font-weight:600;font-size:.9rem;cursor:pointer}
 .cat-check input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
 .idea-personal{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
-.idea-personal textarea{margin-top:6px}
+.idea-personal textarea{margin-top:6px;max-height:140px}
 .theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
 .theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}

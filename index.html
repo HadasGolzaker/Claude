@@ -1915,11 +1915,21 @@ Angle: ${idea.angle||''}
 Personal detail to weave in (real, from the user — use it as given, don't invent anything beyond it): "${note}"
 
 Rewrite as one short idea seed in ${langName} that opens the post from this real personal detail and connects it to the original angle. Respond with ONLY valid JSON, no fences: {"title":"...","angle":"..."}`;
-  return await callClaude([{type:'text',text}]);
+  const merged=await callClaude([{type:'text',text}]);
+  /* a call can technically return valid JSON that doesn't match the
+     requested {title,angle} shape (wrong keys, empty strings) — treat
+     that the same as a network failure so the caller falls back to the
+     original idea instead of silently handing useIdea an empty seed */
+  if(!merged || !((merged.title||'').trim() || (merged.angle||'').trim())) throw new Error('personalize response missing title/angle');
+  return merged;
 }
 
 function useIdea(idea){
-  const seed=(idea.title||'')+(idea.angle?' — '+idea.angle:'');
+  const seed=((idea.title||'')+(idea.angle?' — '+idea.angle:'')).trim();
+  /* a malformed idea (no title/angle) would otherwise silently blank the
+     textarea and leave the "generate post" button disabled with no clue
+     why — bail out instead of applying an empty seed */
+  if(!seed) return;
   postInput=seed;
   const ta=document.getElementById('post-input');
   if(ta){ ta.value=seed; ta.focus(); }

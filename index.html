@@ -351,6 +351,11 @@ textarea,input[type=text]{
 .user-menu-item:hover{background:var(--hover-fill)}
 .user-menu-item.active{font-weight:700}
 .user-menu-item.danger{color:var(--danger)}
+.profile-row{display:flex;align-items:center;gap:2px}
+.profile-row .user-menu-item{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-del-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;background:transparent;color:var(--ink-soft);border-radius:8px;cursor:pointer}
+.profile-del-btn:hover{background:var(--hover-fill);color:var(--danger)}
+.profile-del-btn svg{width:16px;height:16px}
 .user-menu-divider{height:1px;background:var(--line);margin:6px 4px}
 .user-menu-segment{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;margin:0 4px 8px}
 .user-menu-segment button{flex:1;border:0;background:transparent;padding:7px 10px;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;color:var(--ink)}
@@ -610,7 +615,7 @@ const I18N = {
     ideas_personalizing:'משלבים...',
     menu_history:'היסטוריית פוסטים',
     menu_profiles_label:'פרופילים',
-    menu_delete_profile:'מחיקת הפרופיל הנוכחי',
+    menu_delete_profile:'מחיקת הפרופיל',
     menu_logout:'יציאה מהחשבון',
     menu_language_label:'שפה',
     menu_theme_label:'תצוגה',
@@ -712,7 +717,7 @@ const I18N = {
     ideas_personalizing:'Blending...',
     menu_history:'Post history',
     menu_profiles_label:'Profiles',
-    menu_delete_profile:'Delete current profile',
+    menu_delete_profile:'Delete profile',
     menu_logout:'Log out',
     menu_language_label:'Language',
     menu_theme_label:'Appearance',
@@ -834,6 +839,7 @@ let profileVariants = {}; /* lang -> profile object for the current DRAFT, so sw
 let approved = false;
 let apiKey = '';
 let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
+let currentHistoryId=null; /* the history entry this post session is saved into — refining/toggling language updates it in place instead of piling up new rows */
 let postLang=null; /* null = follow the profile's own language; 'he'|'en' = explicit override for this post */
 function defaultPostLang(){ return (profile&&profile.writing_dna&&profile.writing_dna.primary_lang_code)||'he'; }
 function effectivePostLang(){ return postLang||defaultPostLang(); }
@@ -884,7 +890,12 @@ function renderProfilePicker(){
   const t=T();
   const list=profilesStore.profiles;
   const profileRows=list.map(p=>
-    `<button type="button" class="user-menu-item profile-row${p.id===activeProfileId?' active':''}" data-action="switch" data-id="${p.id}">${escapeHtml(p.name)}</button>`
+    `<div class="profile-row">
+      <button type="button" class="user-menu-item${p.id===activeProfileId?' active':''}" data-action="switch" data-id="${p.id}">${escapeHtml(p.name)}</button>
+      <button type="button" class="profile-del-btn" data-action="delete-profile" data-id="${p.id}" aria-label="${t.menu_delete_profile}" title="${t.menu_delete_profile}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M10 11v6M14 11v6"/></svg>
+      </button>
+    </div>`
   ).join('') + `<button type="button" class="user-menu-item" data-action="new-profile">${t.add_profile}</button>`;
   const curTheme = document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light';
   panel.innerHTML = `
@@ -903,7 +914,6 @@ function renderProfilePicker(){
       <button type="button" class="${curTheme==='light'?'active':''}" data-action="set-theme" data-mode="light">${t.menu_theme_light}</button>
       <button type="button" class="${curTheme==='dark'?'active':''}" data-action="set-theme" data-mode="dark">${t.menu_theme_dark}</button>
     </div>
-    ${activeProfileId?`<div class="user-menu-divider"></div><button type="button" class="user-menu-item danger" data-action="delete-profile">${t.menu_delete_profile}</button>`:''}
     <div class="user-menu-divider"></div>
     <button type="button" class="user-menu-item" data-action="logout">${t.menu_logout}</button>
   `;
@@ -936,7 +946,7 @@ function wireUserMenu(){
       case 'history': preMenuStep=step; step=STEP_HISTORY; render(); break;
       case 'switch': switchProfile(item.dataset.id); break;
       case 'new-profile': startNewProfile(); break;
-      case 'delete-profile': openDeleteModal(); break;
+      case 'delete-profile': openDeleteModal(item.dataset.id); break;
       case 'set-lang': setLang(item.dataset.lang); break;
       case 'set-theme': setTheme(item.dataset.mode); break;
       case 'logout': { const b=document.getElementById('vp-logout'); if(b) b.click(); break; }
@@ -948,9 +958,9 @@ function wireUserMenu(){
 }
 
 /* ---------- delete profile (bin icon -> type-DELETE confirmation) ---------- */
-function openDeleteModal(){
+function openDeleteModal(id){
   const t=T();
-  const entry=profilesStore.profiles.find(p=>p.id===activeProfileId);
+  const entry=profilesStore.profiles.find(p=>p.id===id);
   if(!entry) return;
   const ov=document.createElement('div');
   ov.id='vp-del';
@@ -972,15 +982,22 @@ function openDeleteModal(){
   confirm.addEventListener('click',async()=>{
     if(inp.value!=='DELETE') return;
     ov.remove();
-    await deleteActiveProfile();
+    await deleteProfile(entry.id);
   });
   inp.focus();
 }
 
-async function deleteActiveProfile(){
-  const id=activeProfileId;
+async function deleteProfile(id){
   if(!id) return;
+  const wasActive = id===activeProfileId;
   profilesStore.profiles=profilesStore.profiles.filter(p=>p.id!==id);
+  if(!wasActive){
+    /* deleting a profile you're not currently viewing — just drop it from
+       the list, nothing about the current screen changes */
+    try{ await persistProfiles(); }catch(e){ console.warn('storage failed',e); }
+    renderProfilePicker();
+    return;
+  }
   const next=profilesStore.profiles[0];
   if(next){
     switchProfile(next.id); /* persists the new activeId */
@@ -999,7 +1016,7 @@ function switchProfile(id){
   profile=entry.profile; profileName=entry.name; profileCountry=entry.country||'';
   if(profile && !profile._lang) profile._lang=entry.lang||lang;
   approved=true;
-  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null;
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null; currentHistoryId=null;
   step=QUESTIONS.length+1;
   renderProfilePicker(); renderLayers(); render();
   if(profile && profile._lang!==lang) translateProfile(lang);
@@ -1011,7 +1028,7 @@ function startNewProfile(){
   Object.keys(answers).forEach(k=>delete answers[k]);
   uploads={posts:'',about:'',images:[],noLinkedIn:false};
   profileName=''; profileCountry='';
-  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null;
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null; currentHistoryId=null;
   step=-1;
   clearDraft(); /* deliberately starting fresh — don't resurrect an old draft later */
   renderProfilePicker(); renderLayers(); render();
@@ -2344,7 +2361,7 @@ function resultHTML(){
     <div class="section-h">${t.refine_post_label}</div>
     <textarea id="post-refine" style="min-height:80px" placeholder="${t.refine_post_ph}"></textarea>
     <div class="nav">
-      <button class="btn btn-ghost" onclick="postInput='';postLink='';postImages=[];currentPost=null;step=STEP_COMPOSER;render()">${t.new_post}</button>
+      <button class="btn btn-ghost" onclick="postInput='';postLink='';postImages=[];currentPost=null;currentHistoryId=null;step=STEP_COMPOSER;render()">${t.new_post}</button>
       <button class="btn btn-primary" onclick="const n=document.getElementById('post-refine').value.trim();if(n)startPostGen(n)">${t.regen}</button>
     </div>
   </div>`;
@@ -2377,7 +2394,15 @@ async function savePostHistory(){
       const saved=await window.storage.get('voiceprint_posts');
       if(saved&&saved.value) hist=JSON.parse(saved.value);
     }catch(e){/* first post */}
-    hist.push({date:new Date().toISOString(),input:postInput.slice(0,300),post:currentPost.post});
+    /* refining or toggling language on the same post updates its existing
+       entry in place, instead of piling up a near-duplicate row per edit */
+    const existingIdx = currentHistoryId ? hist.findIndex(h=>h.id===currentHistoryId) : -1;
+    if(existingIdx>=0){
+      hist[existingIdx] = {...hist[existingIdx], input:postInput.slice(0,300), post:currentPost.post};
+    }else{
+      currentHistoryId = genId();
+      hist.push({id:currentHistoryId, date:new Date().toISOString(), input:postInput.slice(0,300), post:currentPost.post});
+    }
     if(hist.length>20) hist=hist.slice(-20);
     await window.storage.set('voiceprint_posts', JSON.stringify(hist));
   }catch(e){console.warn('post history save failed',e);}

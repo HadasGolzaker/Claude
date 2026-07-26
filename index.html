@@ -340,6 +340,16 @@ textarea,input[type=text]{
 .idea-personal{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .idea-personal textarea{margin-top:6px;max-height:140px}
 
+/* post refine: rewrite-whole-post vs select-a-snippet-to-edit */
+.refine-option{margin-top:12px;padding:14px 16px;border:1.5px dashed var(--line);border-radius:12px}
+.refine-option .field-label{margin:0 0 4px}
+#post-display{cursor:text}
+#sel-popup{position:fixed;z-index:60;width:280px;max-width:calc(100vw - 24px);background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:12px}
+#sel-popup[hidden]{display:none}
+#sel-popup .sel-popup-quote{font-size:.82rem;color:var(--ink-soft);border-inline-start:3px solid var(--accent);padding-inline-start:10px;margin-bottom:8px;max-height:80px;overflow:auto}
+#sel-popup textarea{min-height:60px;margin-bottom:8px}
+#sel-popup .sel-popup-actions{display:flex;gap:8px;justify-content:flex-end}
+
 /* header controls + theme toggle */
 .header-controls{display:flex;gap:12px;align-items:center;flex-shrink:0}
 /* user menu (history / profiles / delete / logout / language / theme) */
@@ -628,9 +638,15 @@ const I18N = {
     copy:'העתקת הפוסט', copied:'הועתק',
     li_open:'העתיקו ופתחו לינקדאין', li_toast:'הועתק - הדביקו בלינקדאין',
     alt_hooks:'פתיחות חלופיות (אם ההוק לא יושב)',
+    refine_h:'רוצים לשנות משהו?',
+    refine_rewrite_label:'אפשרות 1: כתבו את כל הפוסט מחדש, בצורה אחרת',
     refine_post_label:'רוצה לשנות משהו?',
     refine_post_ph:'למשל: קצרו בחצי, תורידו את האימוג׳ים, תסיימו בשאלה',
-    regen:'עדכנו את הפוסט',
+    regen:'כתבו מחדש',
+    refine_select_label:'אפשרות 2: סמנו קטע בפוסט למעלה כדי לערוך רק אותו',
+    select_edit_ph:'מה לשנות בקטע המסומן?',
+    select_edit_btn:'עדכנו רק את זה',
+    cancel:'ביטול',
     approve_post:'אשרו את הפוסט',
     edit_again:'ערכו שוב',
     new_post:'+ פוסט חדש',
@@ -740,9 +756,15 @@ const I18N = {
     copy:'Copy post', copied:'Copied',
     li_open:'Copy & open LinkedIn', li_toast:'Copied - paste it in LinkedIn',
     alt_hooks:'Alternative hooks (if the opener doesn\'t sit right)',
+    refine_h:'Want to change something?',
+    refine_rewrite_label:'Option 1: Rewrite the whole post, differently',
     refine_post_label:'Want to change something?',
     refine_post_ph:'e.g. cut it in half, drop the emojis, end with a question',
-    regen:'Update the post',
+    regen:'Rewrite it',
+    refine_select_label:'Option 2: Select part of the post above to edit only that',
+    select_edit_ph:'What should change in the selected part?',
+    select_edit_btn:'Update just this',
+    cancel:'Cancel',
     approve_post:'Approve post',
     edit_again:'Edit again',
     new_post:'+ New post',
@@ -1105,7 +1127,7 @@ function render(){
   if(step===QUESTIONS.length){ card.innerHTML = generateHTML(); return; }
   if(step===QUESTIONS.length+1){ card.innerHTML = profileHTML(); wireRefine(); return; }
   if(step===STEP_COMPOSER){ card.innerHTML = composerHTML(); wireComposer(); return; }
-  if(step===STEP_RESULT){ card.innerHTML = resultHTML(); return; }
+  if(step===STEP_RESULT){ card.innerHTML = resultHTML(); wireResult(); return; }
   if(step===STEP_HISTORY){ card.innerHTML = historyHTML(); wireHistory(); return; }
   card.innerHTML = questionHTML(QUESTIONS[step]);
   wireQuestion(QUESTIONS[step]);
@@ -2374,17 +2396,23 @@ async function startPostGen(refineNote){
 function resultHTML(){
   const t=T(), p=currentPost||{post:'',hooks:[]};
   const hooks=(p.hooks||[]).map(h=>`<span class="chip">${escapeHtml(h)}</span>`).join('');
-  const postBlock=`<div style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:22px;white-space:pre-wrap;font-size:1.02rem">${escapeHtml(p.post)}</div>`;
+  const postBlock=`<div id="post-display" style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:22px;white-space:pre-wrap;font-size:1.02rem">${escapeHtml(p.post)}</div>`;
   if(!postApproved){
     return `<div class="step active">
       <div class="eyebrow">${t.result_h}</div>
       ${postLangToggleHTML()}
       ${postBlock}
       ${hooks?`<div class="section-h">${t.alt_hooks}</div>${hooks}`:''}
-      <div class="section-h">${t.refine_post_label}</div>
-      <textarea id="post-refine" style="min-height:80px" placeholder="${t.refine_post_ph}"></textarea>
+      <div class="section-h">${t.refine_h}</div>
+      <div class="refine-option">
+        <div class="field-label">${t.refine_rewrite_label}</div>
+        <textarea id="post-refine" style="min-height:80px;margin-top:6px" placeholder="${t.refine_post_ph}"></textarea>
+        <button class="btn btn-ghost" style="margin-top:10px" onclick="const n=document.getElementById('post-refine').value.trim();if(n)startPostGen(n)">${t.regen}</button>
+      </div>
+      <div class="refine-option">
+        <div class="field-label">${t.refine_select_label}</div>
+      </div>
       <div class="nav">
-        <button class="btn btn-ghost" onclick="const n=document.getElementById('post-refine').value.trim();if(n)startPostGen(n)">${t.regen}</button>
         <button class="btn btn-primary" onclick="approvePost()">${t.approve_post}</button>
       </div>
     </div>`;
@@ -2413,11 +2441,110 @@ function startNewPost(){
   step=STEP_COMPOSER; render();
 }
 
+/* ---------- select-a-snippet-to-edit (option 2 of post refine) ---------- */
+let selRange=null; /* {start,end,text} — plain-text offsets of the current selection within currentPost.post */
+
+function wireResult(){
+  wireSelectionEdit();
+  if(postApproved && comments) wireComments();
+}
+
+let selectionPopupGloballyWired=false;
+function wireSelectionEdit(){
+  const disp=document.getElementById('post-display');
+  if(!disp || postApproved) return; /* selection-edit only applies pre-approval */
+  disp.addEventListener('mouseup', handlePostSelection);
+  disp.addEventListener('touchend', handlePostSelection);
+  if(!selectionPopupGloballyWired){
+    selectionPopupGloballyWired=true;
+    document.addEventListener('click', maybeCloseSelectionPopup);
+    window.addEventListener('scroll', closeSelectionPopup, true);
+  }
+}
+
+function textOffsetOf(container, node, offset){
+  const r=document.createRange();
+  r.selectNodeContents(container);
+  r.setEnd(node, offset);
+  return r.toString().length;
+}
+
+function handlePostSelection(){
+  const disp=document.getElementById('post-display');
+  const sel=window.getSelection();
+  if(!disp || !sel || sel.isCollapsed || sel.rangeCount===0) return;
+  const range=sel.getRangeAt(0);
+  if(!disp.contains(range.startContainer) || !disp.contains(range.endContainer)) return;
+  const text=range.toString();
+  if(!text.trim()) return;
+  const start=textOffsetOf(disp, range.startContainer, range.startOffset);
+  selRange={start, end:start+text.length, text};
+  showSelectionPopup(range);
+}
+
+function maybeCloseSelectionPopup(e){
+  const pop=document.getElementById('sel-popup');
+  if(!pop || pop.hidden) return;
+  if(e.target.closest('#sel-popup') || e.target.closest('#post-display')) return;
+  closeSelectionPopup();
+}
+
+function showSelectionPopup(range){
+  const t=T();
+  let pop=document.getElementById('sel-popup');
+  if(!pop){ pop=document.createElement('div'); pop.id='sel-popup'; document.body.appendChild(pop); }
+  pop.innerHTML=`
+    <div class="sel-popup-quote">${escapeHtml(selRange.text)}</div>
+    <textarea id="sel-popup-input" placeholder="${t.select_edit_ph}"></textarea>
+    <div class="sel-popup-actions">
+      <button class="btn btn-ghost" id="sel-popup-cancel">${t.cancel}</button>
+      <button class="btn btn-primary" id="sel-popup-submit">${t.select_edit_btn}</button>
+    </div>`;
+  const rect=range.getBoundingClientRect();
+  pop.hidden=false;
+  const popW=280;
+  pop.style.top=Math.min(rect.bottom+8, window.innerHeight-260)+'px';
+  pop.style.left=Math.max(12, Math.min(rect.left, window.innerWidth-popW-12))+'px';
+  document.getElementById('sel-popup-cancel').addEventListener('click', closeSelectionPopup);
+  document.getElementById('sel-popup-submit').addEventListener('click', submitSelectionEdit);
+  document.getElementById('sel-popup-input').focus();
+}
+
+function closeSelectionPopup(){
+  const pop=document.getElementById('sel-popup');
+  if(pop) pop.hidden=true;
+  selRange=null;
+}
+
+async function submitSelectionEdit(){
+  if(!selRange) return;
+  const input=document.getElementById('sel-popup-input');
+  const note=(input&&input.value||'').trim();
+  if(!note) return;
+  const btn=document.getElementById('sel-popup-submit');
+  const orig=btn.textContent; btn.disabled=true; btn.textContent='...';
+  try{
+    const langName=effectivePostLang()==='he'?'Hebrew':'English';
+    const text=`Here is a LinkedIn post:\n${currentPost.post}\n\nHere is one specific excerpt from it, to change:\n"${selRange.text}"\n\nRewrite ONLY this excerpt per this instruction: "${note}". It must still fit naturally, grammatically, into the sentence/paragraph around it — do not add surrounding quotes or restate the rest of the post. Write in ${langName}.\n\nRespond with ONLY valid JSON, no fences: {"replacement":"..."}`;
+    const res=await callClaude([{type:'text',text}]);
+    const replacement=(res&&res.replacement)||'';
+    if(replacement.trim()){
+      currentPost.post=currentPost.post.slice(0,selRange.start)+replacement+currentPost.post.slice(selRange.end);
+      postApproved=false; comments=null;
+      closeSelectionPopup();
+      render();
+    }
+  }catch(e){
+    console.warn('selection edit failed',e);
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent=orig; }
+  }
+}
+
 function approvePost(){
   postApproved=true;
   savePostHistory();
   render();
-  wireComments();
 }
 
 function renderCommentsHTML(){

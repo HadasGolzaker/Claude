@@ -646,6 +646,8 @@ const I18N = {
     refine_select_label:'אפשרות 2: סמנו קטע בפוסט למעלה כדי לערוך רק אותו',
     select_edit_ph:'מה לשנות בקטע המסומן?',
     select_edit_btn:'עדכנו רק את זה',
+    sel_lost:'הסימון אבד. סמנו שוב את הקטע בפוסט.',
+    sel_need_note:'כתבו מה לשנות בקטע המסומן.',
     cancel:'ביטול',
     approve_post:'אשרו את הפוסט',
     edit_again:'ערכו שוב',
@@ -764,6 +766,8 @@ const I18N = {
     refine_select_label:'Option 2: Select part of the post above to edit only that',
     select_edit_ph:'What should change in the selected part?',
     select_edit_btn:'Update just this',
+    sel_lost:'The selection was lost. Please select the text again.',
+    sel_need_note:'Write what should change in the selected text.',
     cancel:'Cancel',
     approve_post:'Approve post',
     edit_again:'Edit again',
@@ -2458,7 +2462,10 @@ function wireSelectionEdit(){
   if(!selectionPopupGloballyWired){
     selectionPopupGloballyWired=true;
     document.addEventListener('click', maybeCloseSelectionPopup);
-    window.addEventListener('scroll', closeSelectionPopup, true);
+    /* deliberately NOT closing on scroll: a capture-phase scroll listener also
+       fires for scrolls *inside* the popup's own textarea, which silently threw
+       away the pending selection mid-typing. The popup is position:fixed, so
+       leaving it open during a scroll is harmless. */
   }
 }
 
@@ -2516,12 +2523,26 @@ function closeSelectionPopup(){
   selRange=null;
 }
 
+function selPopupError(msg){
+  const pop=document.getElementById('sel-popup');
+  if(!pop) return;
+  const oldErr=pop.querySelector('.sel-popup-err');
+  if(oldErr) oldErr.remove();
+  const div=document.createElement('div');
+  div.className='sel-popup-err gap-note';
+  div.style.cssText='margin-top:8px;font-size:.82rem';
+  div.textContent=msg;
+  pop.insertBefore(div, pop.querySelector('.sel-popup-actions'));
+}
+
 async function submitSelectionEdit(){
-  if(!selRange) return;
   const pop=document.getElementById('sel-popup');
   const input=document.getElementById('sel-popup-input');
   const note=(input&&input.value||'').trim();
-  if(!note) return;
+  /* these two used to `return` silently, which is indistinguishable from a
+     dead button — always say why nothing happened */
+  if(!selRange){ selPopupError(T().sel_lost); return; }
+  if(!note){ selPopupError(T().sel_need_note); return; }
   const oldErr=pop.querySelector('.sel-popup-err');
   if(oldErr) oldErr.remove();
   const btn=document.getElementById('sel-popup-submit');
@@ -2538,11 +2559,7 @@ async function submitSelectionEdit(){
     render();
   }catch(e){
     console.warn('selection edit failed',e);
-    const div=document.createElement('div');
-    div.className='sel-popup-err gap-note';
-    div.style.cssText='margin-top:8px;font-size:.82rem';
-    div.textContent=(e&&e.message)||String(e);
-    pop.insertBefore(div, pop.querySelector('.sel-popup-actions'));
+    selPopupError((e&&e.message)||String(e));
   }finally{
     if(btn){ btn.disabled=false; btn.textContent=orig; }
   }

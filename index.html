@@ -2518,9 +2518,12 @@ function closeSelectionPopup(){
 
 async function submitSelectionEdit(){
   if(!selRange) return;
+  const pop=document.getElementById('sel-popup');
   const input=document.getElementById('sel-popup-input');
   const note=(input&&input.value||'').trim();
   if(!note) return;
+  const oldErr=pop.querySelector('.sel-popup-err');
+  if(oldErr) oldErr.remove();
   const btn=document.getElementById('sel-popup-submit');
   const orig=btn.textContent; btn.disabled=true; btn.textContent='...';
   try{
@@ -2528,14 +2531,18 @@ async function submitSelectionEdit(){
     const text=`Here is a LinkedIn post:\n${currentPost.post}\n\nHere is one specific excerpt from it, to change:\n"${selRange.text}"\n\nRewrite ONLY this excerpt per this instruction: "${note}". It must still fit naturally, grammatically, into the sentence/paragraph around it — do not add surrounding quotes or restate the rest of the post. Write in ${langName}.\n\nRespond with ONLY valid JSON, no fences: {"replacement":"..."}`;
     const res=await callClaude([{type:'text',text}]);
     const replacement=(res&&res.replacement)||'';
-    if(replacement.trim()){
-      currentPost.post=currentPost.post.slice(0,selRange.start)+replacement+currentPost.post.slice(selRange.end);
-      postApproved=false; comments=null;
-      closeSelectionPopup();
-      render();
-    }
+    if(!replacement.trim()) throw new Error('No usable reply came back. Try rephrasing.');
+    currentPost.post=currentPost.post.slice(0,selRange.start)+replacement+currentPost.post.slice(selRange.end);
+    postApproved=false; comments=null;
+    closeSelectionPopup();
+    render();
   }catch(e){
     console.warn('selection edit failed',e);
+    const div=document.createElement('div');
+    div.className='sel-popup-err gap-note';
+    div.style.cssText='margin-top:8px;font-size:.82rem';
+    div.textContent=(e&&e.message)||String(e);
+    pop.insertBefore(div, pop.querySelector('.sel-popup-actions'));
   }finally{
     if(btn){ btn.disabled=false; btn.textContent=orig; }
   }

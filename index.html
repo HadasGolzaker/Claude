@@ -921,6 +921,7 @@ function renderProfilePicker(){
   ).join('') + `<button type="button" class="user-menu-item" data-action="new-profile">${t.add_profile}</button>`;
   const curTheme = document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light';
   panel.innerHTML = `
+    ${profile&&approved?`<button type="button" class="user-menu-item" data-action="new-post">${t.new_post}</button>`:''}
     <button type="button" class="user-menu-item" data-action="history">${t.menu_history}</button>
     <div class="user-menu-divider"></div>
     <div class="user-menu-label">${t.menu_profiles_label}</div>
@@ -965,6 +966,7 @@ function wireUserMenu(){
     if(!item) return;
     closeUserMenu();
     switch(item.dataset.action){
+      case 'new-post': startNewPost(); break;
       case 'history': preMenuStep=step; step=STEP_HISTORY; render(); break;
       case 'switch': switchProfile(item.dataset.id); break;
       case 'new-profile': startNewProfile(); break;
@@ -2401,9 +2403,14 @@ function resultHTML(){
     <div id="comments-box">${comments?renderCommentsHTML():`<button class="btn btn-ghost" id="gen-comments-btn" onclick="startCommentsGen()">${t.gen_comments_btn}</button>`}</div>
     <div class="nav">
       <button class="btn btn-ghost" onclick="postApproved=false;render()">${t.edit_again}</button>
-      <button class="btn btn-ghost" onclick="postInput='';postLink='';postImages=[];currentPost=null;currentHistoryId=null;postApproved=false;comments=null;step=STEP_COMPOSER;render()">${t.new_post}</button>
+      <button class="btn btn-ghost" onclick="startNewPost()">${t.new_post}</button>
     </div>
   </div>`;
+}
+
+function startNewPost(){
+  postInput=''; postLink=''; postImages=[]; currentPost=null; currentHistoryId=null; postApproved=false; comments=null;
+  step=STEP_COMPOSER; render();
 }
 
 function approvePost(){

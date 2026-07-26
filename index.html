@@ -648,6 +648,19 @@ const I18N = {
     select_edit_btn:'עדכנו רק את זה',
     sel_lost:'הסימון אבד. סמנו שוב את הקטע בפוסט.',
     sel_need_note:'כתבו מה לשנות בקטע המסומן.',
+    menu_reply:'הגיבו לפוסט של מישהו אחר',
+    reply_h:'הגיבו לפוסט',
+    reply_sub:'הדביקו פוסט שראיתם, ואכתוב לכם כמה אפשרויות לתגובה בקול שלכם.',
+    reply_source_label:'הפוסט שאתם רוצים להגיב לו',
+    reply_source_ph:'הדביקו כאן את הפוסט...',
+    reply_note_label:'משהו מסוים שתרצו להגיד?',
+    reply_note_small:'אופציונלי',
+    reply_note_ph:'למשל: להסכים ולהוסיף דוגמה משלי, לחלוק בעדינות, לשאול שאלה',
+    reply_gen_btn:'צרו אפשרויות לתגובה',
+    reply_loading:['קוראים את הפוסט...','חושבים מה יש לכם להגיד על זה...','מנסחים בקול שלכם...'],
+    reply_err:'לא הצלחנו ליצור תגובות. נסו שוב.',
+    reply_results_h:'אפשרויות לתגובה',
+    reply_copy:'העתקת התגובה',
     cancel:'ביטול',
     approve_post:'אשרו את הפוסט',
     edit_again:'ערכו שוב',
@@ -768,6 +781,19 @@ const I18N = {
     select_edit_btn:'Update just this',
     sel_lost:'The selection was lost. Please select the text again.',
     sel_need_note:'Write what should change in the selected text.',
+    menu_reply:'Reply to someone\'s post',
+    reply_h:'Reply to a post',
+    reply_sub:'Paste a post you saw, and I\'ll write a few ways you could reply, in your voice.',
+    reply_source_label:'The post you want to reply to',
+    reply_source_ph:'Paste the post here...',
+    reply_note_label:'Anything specific you want to say?',
+    reply_note_small:'optional',
+    reply_note_ph:'e.g. agree and add my own example, push back gently, ask a question',
+    reply_gen_btn:'Generate reply options',
+    reply_loading:['Reading the post...','Working out what you\'d say about it...','Putting it in your voice...'],
+    reply_err:'Couldn\'t generate replies. Try again.',
+    reply_results_h:'Reply options',
+    reply_copy:'Copy reply',
     cancel:'Cancel',
     approve_post:'Approve post',
     edit_again:'Edit again',
@@ -888,11 +914,15 @@ let postInput='', postLink='', postImages=[], currentPost=null, recog=null, last
 let currentHistoryId=null; /* the history entry this post session is saved into — refining/toggling language updates it in place instead of piling up new rows */
 let postApproved=false; /* gates Copy/LinkedIn/comment-generation behind an explicit approve step, matching the designed flow */
 let comments=null; /* the 5 generated "comments to share" suggestions for the current approved post */
+/* replying to SOMEONE ELSE's post: the pasted source post, an optional angle,
+   and the generated reply options. Kept separate from `comments`, which is the
+   opposite direction (what others would say on the user's own post). */
+let replySource='', replyNote='', replies=null;
 let postLang=null; /* null = follow the profile's own language; 'he'|'en' = explicit override for this post */
 function defaultPostLang(){ return (profile&&profile.writing_dna&&profile.writing_dna.primary_lang_code)||'he'; }
 function effectivePostLang(){ return postLang||defaultPostLang(); }
 let ideasMode='profile', ideasTopic='', ideasCats={news:true,professional:true,personal:true,hobby:true};
-const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3, STEP_HISTORY = QUESTIONS.length+4;
+const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3, STEP_HISTORY = QUESTIONS.length+4, STEP_REPLY = QUESTIONS.length+5;
 let preMenuStep = null; /* step to return to when leaving the history screen */
 
 /* ---------- multi-profile state ---------- */
@@ -948,6 +978,7 @@ function renderProfilePicker(){
   const curTheme = document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light';
   panel.innerHTML = `
     ${profile&&approved?`<button type="button" class="user-menu-item" data-action="new-post">${t.new_post}</button>`:''}
+    ${profile&&approved?`<button type="button" class="user-menu-item" data-action="reply-post">${t.menu_reply}</button>`:''}
     <button type="button" class="user-menu-item" data-action="history">${t.menu_history}</button>
     <div class="user-menu-divider"></div>
     <div class="user-menu-label">${t.menu_profiles_label}</div>
@@ -993,6 +1024,7 @@ function wireUserMenu(){
     closeUserMenu();
     switch(item.dataset.action){
       case 'new-post': startNewPost(); break;
+      case 'reply-post': preMenuStep=step; step=STEP_REPLY; render(); break;
       case 'history': preMenuStep=step; step=STEP_HISTORY; render(); break;
       case 'switch': switchProfile(item.dataset.id); break;
       case 'new-profile': startNewProfile(); break;
@@ -1067,6 +1099,7 @@ function switchProfile(id){
   if(profile && !profile._lang) profile._lang=entry.lang||lang;
   approved=true;
   currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null; currentHistoryId=null; postApproved=false; comments=null;
+  replySource=''; replyNote=''; replies=null;
   step=QUESTIONS.length+1;
   renderProfilePicker(); renderLayers(); render();
   if(profile && profile._lang!==lang) translateProfile(lang);
@@ -1079,6 +1112,7 @@ function startNewProfile(){
   uploads={posts:'',about:'',images:[],noLinkedIn:false};
   profileName=''; profileCountry='';
   currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null; postLang=null; currentHistoryId=null; postApproved=false; comments=null;
+  replySource=''; replyNote=''; replies=null;
   step=-1;
   clearDraft(); /* deliberately starting fresh — don't resurrect an old draft later */
   renderProfilePicker(); renderLayers(); render();
@@ -1133,6 +1167,7 @@ function render(){
   if(step===STEP_COMPOSER){ card.innerHTML = composerHTML(); wireComposer(); return; }
   if(step===STEP_RESULT){ card.innerHTML = resultHTML(); wireResult(); return; }
   if(step===STEP_HISTORY){ card.innerHTML = historyHTML(); wireHistory(); return; }
+  if(step===STEP_REPLY){ card.innerHTML = replyHTML(); wireReply(); return; }
   card.innerHTML = questionHTML(QUESTIONS[step]);
   wireQuestion(QUESTIONS[step]);
   renderLayers();
@@ -2633,6 +2668,139 @@ function wireComments(){
       const res=await callClaude([{type:'text',text}]);
       if(res&&(res.comment||'').trim()){ comments[idx]=res.comment.trim(); box.innerHTML=renderCommentsHTML(); wireComments(); }
     }catch(e){ console.warn('comment tweak failed',e); }
+    finally{ b.disabled=false; b.textContent=orig; }
+  }));
+}
+
+/* =========================================================
+   REPLY TO SOMEONE ELSE'S POST
+   Paste a post you saw, get several ways to reply in your
+   own voice. The generation logic takes the source post as
+   plain text, so a browser extension could later feed it
+   straight from the page instead of a paste.
+   ========================================================= */
+function replyHTML(){
+  const t=T();
+  return `<div class="step active">
+    <div class="eyebrow">Voiceprint</div>
+    <h2 class="q-title">${t.reply_h}</h2>
+    <p class="q-sub">${t.reply_sub}</p>
+
+    <label class="field-label">${t.reply_source_label}</label>
+    <textarea id="reply-source" style="min-height:150px" placeholder="${t.reply_source_ph}">${escapeHtml(replySource)}</textarea>
+
+    <label class="field-label">${t.reply_note_label} <small>· ${t.reply_note_small}</small></label>
+    <textarea id="reply-note" style="min-height:60px" placeholder="${t.reply_note_ph}">${escapeHtml(replyNote)}</textarea>
+
+    <div style="margin-top:12px">
+      <button class="btn btn-primary" id="reply-gen-btn" ${replySource.trim().length>=20?'':'disabled'}>${t.reply_gen_btn}</button>
+    </div>
+
+    <div id="replies-box">${replies?renderRepliesHTML():''}</div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="step=(preMenuStep??STEP_COMPOSER);preMenuStep=null;render()">${t.back}</button>
+    </div>
+  </div>`;
+}
+
+function wireReply(){
+  const src=document.getElementById('reply-source');
+  const note=document.getElementById('reply-note');
+  const btn=document.getElementById('reply-gen-btn');
+  if(src) src.addEventListener('input',()=>{
+    replySource=src.value;
+    if(btn) btn.disabled = replySource.trim().length<20;
+  });
+  if(note) note.addEventListener('input',()=>{ replyNote=note.value; });
+  if(btn) btn.addEventListener('click', startRepliesGen);
+  if(replies) wireReplies();
+}
+
+function renderRepliesHTML(){
+  const t=T();
+  if(!replies||!replies.length) return `<div class="gap-note">${t.reply_err}</div>`;
+  const grads=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)'];
+  return `<div class="section-h">${t.reply_results_h}</div><div class="idea-pills">`+replies.map((r,idx)=>`
+    <div class="idea-pill open" style="--pg:${grads[idx%grads.length]}">
+      ${r.angle?`<div class="idea-head" style="cursor:default"><span class="idea-cat">${escapeHtml(r.angle)}</span></div>`:''}
+      <div class="idea-body" style="max-height:none;padding:16px 18px">
+        <div class="idea-angle">${escapeHtml(r.text||'')}</div>
+        <div class="idea-personal">
+          <textarea class="reply-tweak-input" data-idx="${idx}" style="min-height:50px" placeholder="${t.comment_tweak_ph}"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button class="btn btn-ghost reply-tweak-btn" data-idx="${idx}">${t.comment_tweak_btn}</button>
+            <button class="btn btn-primary reply-copy-btn" data-idx="${idx}">${t.reply_copy}</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('')+`</div>`;
+}
+
+async function startRepliesGen(){
+  const t=T();
+  const box=document.getElementById('replies-box');
+  if(!box || replySource.trim().length<20) return;
+  let i=0;
+  box.innerHTML=`<div class="loading" style="padding:24px 0"><div class="pulse" style="width:40px;height:40px;border-width:3px"></div><p id="replies-msg">${t.reply_loading[0]}</p></div>`;
+  const timer=setInterval(()=>{i=(i+1)%t.reply_loading.length;const el=document.getElementById('replies-msg');if(el)el.textContent=t.reply_loading[i];},2000);
+  try{
+    const res=await callClaude([{type:'text',text:buildReplyPrompt()}]);
+    clearInterval(timer);
+    replies=(res.replies||[]).filter(r=>r&&(r.text||'').trim());
+    if(!replies.length) throw new Error('empty');
+    box.innerHTML=renderRepliesHTML();
+    wireReplies();
+  }catch(err){
+    clearInterval(timer);
+    replies=null;
+    box.innerHTML=`<div class="gap-note">${t.reply_err}<br><small style="opacity:.6">${escapeHtml((err&&err.message)||'')}</small></div>`;
+  }
+}
+
+function buildReplyPrompt(){
+  const langName=effectivePostLang()==='he'?'Hebrew':'English';
+  const voice=JSON.stringify({...profile, photo:undefined});
+  return `Someone else wrote this LinkedIn post:\n"""\n${replySource.trim()}\n"""\n\nYou are writing AS the person whose full profile follows (personality, motives, expertise, writing DNA, localization, storytelling):\n${voice}\n\nWrite 4 different comments THIS person could leave on that post. Each must take a genuinely different approach, for example: agreeing and adding a concrete point from their own expertise, offering a different angle or respectful pushback, asking a sharp question that opens conversation, or sharing a short relevant observation.\n${replyNote.trim()?`\nThe person specifically wants to say something along these lines, honor it in every option: "${replyNote.trim()}"\n`:''}
+RULES:
+- Write in ${langName}, natively, with the rhythm and idiom a native speaker actually uses.
+- Sound like THIS person: follow their writing_dna, their humor, their sentence length, their emoji habits. A reader who knows them should recognize the voice.
+- Be a real commenter, not a fan. Forbidden: "Great post!", "So true!", "Thanks for sharing", empty praise, corporate buzzwords, generic AI cadence.
+- React to something SPECIFIC in the post, not to its general topic.
+- Keep each comment 1 to 3 sentences. LinkedIn comments are short.
+- Never use an em dash.
+- "angle" is a 2 to 4 word label in ${langName} describing the approach (for example "מסכימה ומוסיפה" or "שואלת שאלה").
+
+Respond with ONLY valid JSON, no fences: {"replies":[{"angle":"...","text":"..."}]}`;
+}
+
+function wireReplies(){
+  const box=document.getElementById('replies-box');
+  if(!box) return;
+  box.querySelectorAll('.reply-copy-btn').forEach(b=>b.addEventListener('click',()=>{
+    const idx=+b.dataset.idx;
+    navigator.clipboard.writeText((replies[idx]&&replies[idx].text)||'').then(()=>{
+      const orig=b.textContent; b.textContent=T().copied;
+      setTimeout(()=>{ b.textContent=orig; },2000);
+    });
+  }));
+  box.querySelectorAll('.reply-tweak-btn').forEach(b=>b.addEventListener('click',async()=>{
+    const idx=+b.dataset.idx;
+    const ta=box.querySelector(`.reply-tweak-input[data-idx="${idx}"]`);
+    const note=(ta&&ta.value||'').trim();
+    if(!note) return;
+    const orig=b.textContent; b.disabled=true; b.textContent='...';
+    try{
+      const langName=effectivePostLang()==='he'?'Hebrew':'English';
+      const voice=JSON.stringify({writing_dna:profile&&profile.writing_dna, storytelling:profile&&profile.storytelling});
+      const text=`Someone else wrote this LinkedIn post:\n"""\n${replySource.trim()}\n"""\n\nHere is a draft comment replying to it: "${replies[idx].text}"\n\nThe author's writing DNA, so it keeps sounding like them:\n${voice}\n\nRewrite that comment according to this feedback: "${note}". Keep it 1 to 3 sentences, still a natural reaction to something specific in the post, in ${langName}. Never use an em dash. Return the comment only, no quotes around it.\n\nRespond with ONLY valid JSON, no fences: {"text":"..."}`;
+      const res=await callClaude([{type:'text',text}]);
+      if(res&&(res.text||'').trim()){
+        replies[idx]={...replies[idx], text:res.text.trim()};
+        box.innerHTML=renderRepliesHTML();
+        wireReplies();
+      }
+    }catch(e){ console.warn('reply tweak failed',e); }
     finally{ b.disabled=false; b.textContent=orig; }
   }));
 }

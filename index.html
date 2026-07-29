@@ -3121,39 +3121,98 @@ async function wireHistory(){
    ========================================================= */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-/* ---- login screen styles (kept minimal, matches the app look) ---- */
+/* ---- login screen, ported from the Claude Design "Voiceprint Login" ui_kit ---- */
 const css = document.createElement('style');
 css.textContent = `
-#vp-auth{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000}
-#vp-auth .box{max-width:420px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:var(--shadow)}
-#vp-auth h2{font-family:var(--font-serif);font-weight:600;letter-spacing:normal;font-size:2rem;margin-bottom:8px}
-#vp-auth p{color:var(--ink-soft);margin-bottom:20px;font-size:1rem}
-#vp-auth input{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;background:var(--paper);color:var(--ink);margin-bottom:12px;min-height:auto}
-#vp-auth input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
-#vp-send{width:100%;border:0;font:inherit;font-weight:600;border-radius:999px;padding:13px;cursor:pointer;background:var(--ink);color:var(--bg)}
-#vp-send:disabled{opacity:.5;cursor:not-allowed}
-#vp-auth .msg{margin-top:14px;font-size:.9rem;color:var(--ink);font-weight:600}
-#vp-auth .msg.err{color:var(--danger)}
-#vp-auth-controls{position:fixed;top:24px;right:24px;display:flex;align-items:center;gap:12px;direction:ltr;z-index:1001}
-#vp-logout{border:1.5px solid var(--line);background:transparent;color:var(--ink-soft);font:inherit;font-weight:600;font-size:.82rem;border-radius:999px;padding:6px 14px;cursor:pointer;margin-inline-start:10px}
+#vp-auth{position:fixed;inset:0;background:var(--surface-canvas);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1000;overflow:hidden}
+#vp-auth-controls{position:fixed;top:24px;inset-inline-end:24px;display:flex;align-items:center;gap:12px;direction:ltr;z-index:1001}
+#vp-logout{border:2px solid var(--border-hairline);background:transparent;color:var(--text-muted);font:inherit;font-weight:700;font-size:.82rem;border-radius:var(--radius-pill);padding:7px 16px;cursor:pointer;margin-inline-start:10px;transition:background var(--duration-fast) var(--ease-out)}
+#vp-logout:hover{background:var(--hover-fill)}
+
+/* decorative shapes — the ui_kit references static SVG assets we don't have, so these
+   are CSS/inline-SVG equivalents built on the same design-system tokens; that also
+   means, unlike the source assets, they re-theme automatically with dark/light */
+.vp-auth-deco{position:absolute;inset:0;pointer-events:none;z-index:0}
+.vp-auth-sunburst{position:absolute;top:-60px;inset-inline-start:-100px;width:320px;height:320px;background:repeating-conic-gradient(from -30deg at 0% 0%, var(--orange-500) 0deg 7deg, transparent 7deg 14deg);opacity:.85}
+.vp-auth-blob{position:absolute;bottom:-40px;inset-inline-start:6%;width:230px;height:180px;background:var(--orange-600);opacity:.3;border-radius:60% 40% 30% 70% / 55% 35% 65% 45%}
+.vp-auth-ring{position:absolute;top:38%;inset-inline-end:-90px;width:190px;height:190px;border:26px solid var(--magenta-500);border-radius:var(--radius-pill);opacity:.85}
+.vp-auth-squiggle{position:absolute;top:18%;inset-inline-end:8%;width:150px;height:auto;opacity:.9}
+.vp-auth-squiggle path{fill:none;stroke:var(--teal-400);stroke-width:6;stroke-linecap:round}
+@media(max-width:940px){.vp-auth-deco{display:none}}
+
+.vp-auth-card{position:relative;z-index:1;width:100%;max-width:480px;background:var(--surface-card);border:var(--border-thick);border-radius:var(--radius-lg);box-shadow:var(--shadow-hard-md);padding:46px 44px 40px;text-align:center}
+.vp-auth-star{position:absolute;top:-18px;inset-inline-end:-14px;width:52px;height:52px;z-index:2}
+.vp-auth-star path{fill:var(--cream)}
+.vp-auth-wordmark{font-family:var(--font-display);font-weight:800;font-size:40px;letter-spacing:-0.02em;color:var(--cream);margin:0 0 6px}
+.vp-auth-o{color:transparent;-webkit-text-stroke:2px var(--cream)}
+.vp-auth-tagline{font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--teal-400);display:block;margin-bottom:26px}
+.vp-auth-lede{font-size:var(--fs-body);line-height:var(--lh-body);color:var(--fog-200);margin:0 0 28px}
+
+.vp-auth-field{text-align:start;margin-bottom:20px}
+.vp-auth-field label{font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:8px}
+#vp-email{width:100%;font-family:var(--font-body);font-size:var(--fs-body);font-weight:500;color:var(--text-display);background:var(--surface-card-alt);border:2.5px solid var(--border-hairline);border-radius:var(--radius-md);padding:15px 18px;outline:none;min-height:auto;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
+#vp-email::placeholder{color:var(--text-muted)}
+#vp-email:focus{border-color:var(--amber-400);box-shadow:0 0 0 4px color-mix(in srgb, var(--amber-400) 18%, transparent)}
+html[dir="rtl"] #vp-email{text-align:right}
+.vp-auth-err{display:none;font-size:.82rem;color:var(--magenta-400);margin-top:8px}
+.vp-auth-field.invalid #vp-email{border-color:var(--magenta-500)}
+.vp-auth-field.invalid .vp-auth-err{display:block}
+
+#vp-send{width:100%;font-family:var(--font-body);font-weight:700;font-size:var(--fs-body);padding:17px 34px;border:none;cursor:pointer;color:var(--text-on-brand);background:var(--action-primary-bg);box-shadow:var(--shadow-hard-sm);clip-path:var(--clip-ribbon);transition:transform var(--duration-fast) var(--ease-brand),box-shadow var(--duration-fast) var(--ease-brand),background var(--duration-fast) var(--ease-out)}
+#vp-send:hover{background:var(--action-primary-hover);transform:translate(-2px,-2px);box-shadow:var(--shadow-hard-md)}
+#vp-send:active{transform:translate(0,0);box-shadow:var(--shadow-hard-sm)}
+#vp-send:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.vp-auth-fine{font-size:.82rem;color:var(--fog-400);margin:20px 0 0;line-height:1.5}
+.vp-auth-send-err{display:none;font-size:.82rem;color:var(--magenta-400);margin-top:12px;line-height:1.4}
+
+.vp-auth-sent{display:none}
+#vp-auth[data-stage="sent"] .vp-auth-enter{display:none}
+#vp-auth[data-stage="sent"] .vp-auth-sent{display:block}
+.vp-auth-seal{width:82px;height:82px;margin:0 auto 22px;border-radius:50%;display:grid;place-items:center;background:var(--gradient-violet);border:var(--border-thick);box-shadow:var(--shadow-hard-sm);font-size:32px;color:var(--text-on-brand)}
+.vp-auth-sent h2{font-family:var(--font-display);font-weight:800;font-size:26px;color:var(--cream);margin:0 0 12px;line-height:1.15}
+.vp-auth-sent p{font-size:var(--fs-body);line-height:1.6;color:var(--fog-200);margin:0 0 8px}
+.vp-auth-addr{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--cream);font-size:15px;margin-bottom:26px}
+.vp-auth-addr::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal-400)}
+.vp-auth-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.vp-auth-secondary{background:transparent;color:var(--text-display);font-weight:700;font-size:var(--fs-small);padding:13px 26px;cursor:pointer;border:var(--border-thick-light);border-radius:var(--radius-pill);font-family:var(--font-body);transition:background var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
+.vp-auth-secondary:hover{background:var(--cream);color:var(--text-on-light)}
+.vp-auth-resend{font-family:var(--font-body);font-weight:700;font-size:var(--fs-small);cursor:pointer;background:transparent;border:none;color:var(--teal-400);text-decoration:underline;text-underline-offset:5px;padding:13px 8px}
+.vp-auth-resend:disabled{color:var(--fog-400);cursor:not-allowed;text-decoration:none}
+@media(max-width:600px){.vp-auth-card{padding:32px 24px 30px}}
 `;
 document.head.appendChild(css);
 
 const AUTH_I18N = {
-  he:{ title:'Voiceprint', sub:'הכניסו את המייל שלכם ונשלח לכם קישור כניסה.', ph:'you@example.com',
-    btn:'שליחת קישור כניסה', sent:'שלחנו קישור למייל. פתחו אותו כדי להיכנס.',
-    err:'משהו השתבש. נסו שוב.', bad:'כתובת מייל לא תקינה.',
+  he:{ tagline:'טביעת קול',
+    lede:'הזינו כתובת אימייל ונשלח קישור להתחברות. בלי סיסמאות לזכור.',
+    emailLabel:'אימייל', ph:'you@company.com',
+    bad:'כתובת האימייל לא נראית תקינה.',
+    btn:'שליחת קישור התחברות',
+    fine:'בהמשך אתם מאשרים את תנאי השימוש ומדיניות הפרטיות.',
+    sentH:'בדקו את תיבת הדואר', sentBody:'שלחנו קישור התחברות אל',
+    sentFine:'הקישור בתוקף ל־15 דקות. לא הגיע? בדקו בתיקיית הספאם או שלחו שוב.',
+    useOther:'כתובת אחרת', resendBtn:'שליחה חוזרת', resendIn:'שליחה בעוד {s} שנ׳',
+    err:'משהו השתבש. נסו שוב.',
     noconf:'החיבור לשרת עדיין לא הוגדר. ראו את קובץ ההוראות (README).', logout:'יציאה' },
-  en:{ title:'Voiceprint', sub:'Enter your email and we\'ll send you a login link.', ph:'you@example.com',
-    btn:'Send login link', sent:'We\'ve sent a link to your email. Open it to log in.',
-    err:'Something went wrong. Please try again.', bad:'Invalid email address.',
+  en:{ tagline:'your voice, profiled',
+    lede:'Enter your email and we\'ll send you a login link. No password to remember.',
+    emailLabel:'Email', ph:'you@company.com',
+    bad:'That doesn\'t look like a valid email.',
+    btn:'send login link',
+    fine:'By continuing you agree to the terms and privacy policy.',
+    sentH:'Check your inbox', sentBody:'We\'ve sent a login link to',
+    sentFine:'The link expires in 15 minutes. Nothing there? Check spam or resend below.',
+    useOther:'use another email', resendBtn:'resend link', resendIn:'resend in {s}s',
+    err:'Something went wrong. Please try again.',
     noconf:'The server connection isn\'t set up yet. See the instructions file (README).', logout:'Log out' }
 };
 let authLang = (typeof lang !== 'undefined' && (lang==='he'||lang==='en')) ? lang : 'he';
 const AT = () => AUTH_I18N[authLang];
+let pendingNoconf = false, resendCounting = false;
 
 const overlay = document.createElement('div');
 overlay.id = 'vp-auth';
+overlay.dataset.stage = 'enter';
 overlay.innerHTML = `
   <div id="vp-auth-controls">
     <button class="theme-toggle" id="vp-theme-btn" type="button" aria-label="light/dark">
@@ -3165,21 +3224,81 @@ overlay.innerHTML = `
       <button type="button" data-l="en" class="${authLang==='en'?'active':''}">English</button>
     </div>
   </div>
-  <div class="box">
-    <h2 class="serif" id="vp-title">${AT().title}</h2>
-    <p id="vp-sub">${AT().sub}</p>
-    <input id="vp-email" type="email" dir="ltr" placeholder="${AT().ph}" autocomplete="email">
-    <button id="vp-send">${AT().btn}</button>
-    <div class="msg" id="vp-msg" style="display:none"></div>
+
+  <div class="vp-auth-deco" aria-hidden="true">
+    <div class="vp-auth-sunburst"></div>
+    <div class="vp-auth-blob"></div>
+    <div class="vp-auth-ring"></div>
+    <svg class="vp-auth-squiggle" viewBox="0 0 160 40"><path d="M4 20 Q24 2 44 20 T84 20 T124 20 T160 20"/></svg>
+  </div>
+
+  <div class="vp-auth-card">
+    <svg class="vp-auth-star" viewBox="0 0 24 24"><path d="M12 0 L14 9 L24 12 L14 15 L12 24 L10 15 L0 12 L10 9 Z"/></svg>
+    <h1 class="vp-auth-wordmark ltr" dir="ltr">V<span class="vp-auth-o">o</span>iceprint</h1>
+    <span class="vp-auth-tagline" id="vp-tagline">${AT().tagline}</span>
+
+    <div class="vp-auth-enter">
+      <p class="vp-auth-lede" id="vp-lede">${AT().lede}</p>
+      <div class="vp-auth-field" id="vp-field">
+        <label for="vp-email" id="vp-email-label">${AT().emailLabel}</label>
+        <input id="vp-email" type="email" dir="ltr" placeholder="${AT().ph}" autocomplete="email">
+        <span class="vp-auth-err" id="vp-bad">${AT().bad}</span>
+      </div>
+      <button id="vp-send" disabled>${AT().btn}</button>
+      <p class="vp-auth-fine" id="vp-fine">${AT().fine}</p>
+      <div class="vp-auth-send-err" id="vp-send-err"></div>
+    </div>
+
+    <div class="vp-auth-sent">
+      <div class="vp-auth-seal">✦</div>
+      <h2 id="vp-sent-h">${AT().sentH}</h2>
+      <p id="vp-sent-body">${AT().sentBody}</p>
+      <bdi class="vp-auth-addr" id="vp-sent-to" dir="ltr">you@example.com</bdi>
+      <p class="vp-auth-fine" id="vp-sent-fine" style="margin:0 0 22px">${AT().sentFine}</p>
+      <div class="vp-auth-row">
+        <button class="vp-auth-secondary" id="vp-back">${AT().useOther}</button>
+        <button class="vp-auth-resend" id="vp-resend">${AT().resendBtn}</button>
+      </div>
+      <div class="vp-auth-send-err" id="vp-resend-err"></div>
+    </div>
   </div>`;
 document.body.appendChild(overlay);
 
+function setFieldInvalid(isInvalid){
+  document.getElementById('vp-field').classList.toggle('invalid', !!isInvalid);
+}
+function showSendError(msg, detail){
+  const el = document.getElementById('vp-send-err');
+  el.textContent = msg;
+  if(detail){
+    const s=document.createElement('small');
+    s.style.cssText='display:block;margin-top:4px;opacity:.75;font-weight:400';
+    s.textContent=detail;
+    el.appendChild(s);
+  }
+  el.style.display='block';
+}
+function clearSendError(){
+  const el=document.getElementById('vp-send-err');
+  el.style.display='none'; el.textContent='';
+}
+
 function refreshAuthText(){
-  document.getElementById('vp-sub').textContent = AT().sub;
-  document.getElementById('vp-email').placeholder = AT().ph;
-  document.getElementById('vp-send').textContent = AT().btn;
+  const t = AT();
+  document.getElementById('vp-tagline').textContent = t.tagline;
+  document.getElementById('vp-lede').textContent = t.lede;
+  document.getElementById('vp-email-label').textContent = t.emailLabel;
+  document.getElementById('vp-email').placeholder = t.ph;
+  document.getElementById('vp-bad').textContent = t.bad;
+  document.getElementById('vp-send').textContent = t.btn;
+  document.getElementById('vp-fine').textContent = t.fine;
+  document.getElementById('vp-sent-h').textContent = t.sentH;
+  document.getElementById('vp-sent-body').textContent = t.sentBody;
+  document.getElementById('vp-sent-fine').textContent = t.sentFine;
+  document.getElementById('vp-back').textContent = t.useOther;
+  if (!resendCounting) document.getElementById('vp-resend').textContent = t.resendBtn;
   document.querySelectorAll('#vp-lang-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.l===authLang));
-  if (lastMsgKey) showMsg(lastMsgKey, lastMsgErr);
+  if (pendingNoconf) showSendError(t.noconf);
 }
 
 document.getElementById('vp-lang-toggle').addEventListener('click', (e) => {
@@ -3194,21 +3313,6 @@ document.getElementById('vp-theme-btn').addEventListener('click', () => {
   if (typeof toggleTheme === 'function') toggleTheme();
 });
 
-let lastMsgKey = null, lastMsgErr = false, lastMsgDetail = '';
-function showMsg(key, isErr, detail){
-  lastMsgKey = key; lastMsgErr = isErr; lastMsgDetail = detail||'';
-  const m = document.getElementById('vp-msg');
-  m.textContent = AT()[key];
-  if(lastMsgDetail){
-    const s=document.createElement('small');
-    s.style.cssText='display:block;margin-top:6px;opacity:.7;font-weight:400';
-    s.textContent=lastMsgDetail;
-    m.appendChild(s);
-  }
-  m.style.display='block';
-  m.className = 'msg' + (isErr ? ' err' : '');
-}
-
 /* ---- connect to Supabase using public config from the server ---- */
 let supabase = null;
 try {
@@ -3216,7 +3320,8 @@ try {
   if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) throw new Error('missing config');
   supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
 } catch (e) {
-  showMsg('noconf', true);
+  pendingNoconf = true;
+  showSendError(AT().noconf);
 }
 
 /* ---- storage backed by Supabase — same interface the app expects ---- */
@@ -3240,18 +3345,65 @@ window.__getToken = async () => {
 
 const sendBtn = document.getElementById('vp-send');
 const emailInput = document.getElementById('vp-email');
+const okEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+
+emailInput.addEventListener('input', () => {
+  sendBtn.disabled = !okEmail(emailInput.value);
+  setFieldInvalid(false);
+});
+emailInput.addEventListener('blur', () => {
+  if (emailInput.value.trim() && !okEmail(emailInput.value)) setFieldInvalid(true);
+});
+emailInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !sendBtn.disabled) sendBtn.click(); });
+
+function startResendCooldown(){
+  const btn = document.getElementById('vp-resend');
+  resendCounting = true;
+  btn.disabled = true;
+  let s = 30;
+  const tick = () => { btn.textContent = AT().resendIn.replace('{s}', s); };
+  tick();
+  const timer = setInterval(() => {
+    s -= 1;
+    if (s <= 0) { clearInterval(timer); resendCounting = false; btn.disabled = false; btn.textContent = AT().resendBtn; return; }
+    tick();
+  }, 1000);
+}
+
 sendBtn.addEventListener('click', async () => {
   const email = (emailInput.value||'').trim();
-  if (!email || !email.includes('@')) { showMsg('bad', true); return; }
-  if (!supabase) { showMsg('noconf', true); return; }
+  if (!okEmail(email)) { setFieldInvalid(true); return; }
+  if (!supabase) { showSendError(AT().noconf); return; }
+  clearSendError();
   sendBtn.disabled = true;
   try {
     const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.origin } });
     if (error) throw error;
-    showMsg('sent', false);
-  } catch(e){ showMsg('err', true, (e&&e.message)||String(e)); sendBtn.disabled = false; }
+    document.getElementById('vp-sent-to').textContent = email;
+    overlay.dataset.stage = 'sent';
+    startResendCooldown();
+  } catch(e){ showSendError(AT().err, (e&&e.message)||String(e)); sendBtn.disabled = false; }
 });
-emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
+
+document.getElementById('vp-back').addEventListener('click', () => {
+  overlay.dataset.stage = 'enter';
+  emailInput.focus();
+});
+document.getElementById('vp-resend').addEventListener('click', async () => {
+  const email = document.getElementById('vp-sent-to').textContent;
+  const errEl = document.getElementById('vp-resend-err');
+  errEl.style.display = 'none'; errEl.textContent = '';
+  if (supabase && email) {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.origin } });
+      if (error) throw error;
+    } catch(e){
+      errEl.textContent = AT().err + ' ' + ((e&&e.message)||String(e));
+      errEl.style.display = 'block';
+    }
+  }
+  startResendCooldown();
+});
 
 let done = false;
 function onAuthed(){

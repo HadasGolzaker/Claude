@@ -60,15 +60,8 @@ header .logo,header .header-controls{direction:ltr}
 .post-lang-toggle{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 
 /* ---------- layers sidebar (signature) ---------- */
+/* visuals (.layers/.layer/.dot) defined once in the "questionnaire panel" block below */
 aside{position:sticky;top:24px;align-self:start}
-.layers{border:1.5px solid var(--line);border-radius:var(--radius);background:var(--card);padding:18px}
-.layers h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:14px}
-.layer{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
-.layer:last-child{border-bottom:0}
-.layer .dots{display:flex;gap:4px;margin-inline-start:auto}
-.layer .dot{width:8px;height:8px;border-radius:50%;background:var(--line);transition:background .4s,transform .4s}
-.layer .dot.on{background:var(--accent);transform:scale(1.15)}
-.layer .name{font-weight:600;font-size:.9rem}
 @media(max-width:820px){
   aside{position:static;min-width:0}
   .layers{display:flex;gap:12px;overflow-x:auto;padding:12px;min-width:0}
@@ -91,12 +84,10 @@ aside{position:sticky;top:24px;align-self:start}
 .q-sub{color:var(--ink-soft);margin-bottom:22px;font-size:.98rem}
 .lang-hint{display:inline-flex;align-items:center;gap:8px;background:var(--lavender-soft);color:var(--ink);border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;margin-bottom:18px}
 
-/* options */
-.opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
-.opt:hover{background:var(--hover-fill)}
-.opt.selected{border-color:var(--accent);background:var(--accent);color:var(--on-accent);font-weight:600}
-.opt.selected:hover{background:var(--accent)}
-.opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--lavender);color:var(--on-accent);font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+/* options: visual states defined once in the "questionnaire panel" block below;
+   this rule only needs to exist so cascaded rules that follow have something
+   to target — kept minimal on purpose */
+.opt{position:relative}
 
 textarea,input[type=text]{
   width:100%;font:inherit;border:1.5px solid var(--line);border-radius:var(--radius-sm);
@@ -105,12 +96,6 @@ textarea,input[type=text]{
 textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 .char-note{font-size:.82rem;color:var(--ink-soft);margin-top:6px}
 
-/* uploads */
-.upload-box{border:2px dashed var(--line);border-radius:var(--radius-sm);padding:18px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:8px}
-.upload-box:hover{border-color:var(--accent)}
-.upload-box input{display:none}
-.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1.5px solid var(--line)}
 .field-label{font-weight:700;margin:22px 0 8px;display:block}
 .field-label small{font-weight:400;color:var(--ink-soft)}
 
@@ -121,10 +106,6 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .btn-accent{background:var(--accent);color:var(--on-accent)}
 .progress-label{font-size:.85rem;color:var(--ink-soft)}
 
-/* intro */
-.intro h2{font-family:var(--font-serif);font-weight:700;font-size:2.3rem;line-height:1.15;margin-bottom:14px}
-.intro p{color:var(--ink-soft);max-width:56ch;margin-bottom:12px}
-.intro .start-row{margin-top:26px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 
 /* loading */
 .loading{text-align:center;padding:60px 20px}
@@ -163,15 +144,15 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 /* writing DNA + writing rules, two columns */
 .dna-rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:8px}
 @media(max-width:700px){.dna-rules-grid{grid-template-columns:1fr;gap:6px}}
-.rules-list li{border-inline-start:3px solid var(--line);padding-inline-start:12px;border-bottom:0;margin-bottom:8px}
-.rules-list li.rule-do{border-inline-start-color:var(--olive)}
-.rules-list li.rule-dont{border-inline-start-color:var(--ink)}
+/* .dna-list.rules-list (two classes) so this reliably wins over the plain
+   .dna-list li rule below regardless of source order */
+.dna-list.rules-list li{display:flex;gap:14px;align-items:flex-start;border-inline-start:6px solid var(--teal-400);background:var(--surface-card-alt);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:14px 18px;border-bottom:0;margin-bottom:12px}
+.dna-list.rules-list li.rule-dont{border-inline-start-color:var(--magenta-500)}
+.dna-list.rules-list li b{flex:none;color:var(--cream);font-weight:700;font-size:.68rem;letter-spacing:var(--ls-label);text-transform:uppercase;padding-top:3px}
 
-.trait-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
-.trait-name{width:170px;font-weight:600;font-size:.92rem;flex-shrink:0}
-.trait-bar{flex:1;height:10px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
-.trait-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .8s ease}
-.trait-score{width:34px;text-align:center;font-weight:700;font-size:.9rem}
+.trait-bar{height:10px;background:var(--ink-800);border-radius:var(--radius-pill);overflow:hidden;margin:12px 0}
+.trait-fill{height:100%;background:var(--gradient-violet);transition:width .8s ease}
+.trait-bar.high .trait-fill{background:var(--gradient-sunburst)}
 .section-h{font-family:var(--font-serif);font-weight:600;font-size:1.15rem;margin:26px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
 .chip{display:inline-block;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius-pill);padding:5px 14px;margin:0 0 8px;margin-inline-end:8px;font-size:.88rem;font-weight:600}
 .chip-block{display:block;border-radius:var(--radius-md);padding:14px 18px;margin:0 0 10px;line-height:1.45}
@@ -182,7 +163,11 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .dna-list b{color:var(--ink)}
 .gap-note{background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:var(--radius-sm);padding:14px 16px;margin-top:18px;font-size:.92rem}
 .error-box{background:var(--danger-soft);border:1.5px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px;font-size:.92rem}
-.approved-banner{background:var(--accent);color:var(--on-accent);border-radius:var(--radius-sm);padding:18px 20px;margin-top:20px;font-weight:600}
+.vp-approved{background:var(--gradient-violet);border:var(--border-thick);border-radius:var(--radius-lg);box-shadow:var(--shadow-hard-md);padding:28px 30px;margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.vp-approved .stamp{font-size:.68rem;font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--teal-300);display:block;margin-bottom:8px}
+.vp-approved p{margin:0;font-size:1.02rem;font-weight:700;color:var(--text-on-brand);max-width:520px;line-height:1.5}
+.vp-approved .vp-btn-secondary{border-color:var(--text-on-brand);color:var(--text-on-brand)}
+.vp-approved .vp-btn-secondary:hover{background:var(--text-on-brand);color:var(--violet-700)}
 </style>
 
 <style>
@@ -235,14 +220,11 @@ body{
   background:var(--bg);color:var(--ink);
   font-weight:400;
 }
-.serif,.logo h1,.q-title,.section-h,.intro h2{font-family:var(--font-serif)}
-.intro h2{line-height:1.08}
+.serif,.logo h1,.q-title,.section-h{font-family:var(--font-serif)}
 html[lang="en"] .logo h1{font-size:2rem}
 html[lang="en"] .q-title{font-size:2rem;line-height:1.15}
-html[lang="en"] .intro h2{font-size:3rem;line-height:1.05}
 html[lang="en"] .section-h{font-size:1.4rem}
 .q-title{font-size:1.75rem;font-weight:600}
-.intro h2{font-size:2.6rem;font-weight:700}
 /* larger, readable type (body min 18px, titles min 21px) */
 .q-sub,.char-note,.dna-list li,.idea-angle,.opt,.field-label{font-size:1rem}
 .idea-title{font-size:1.05rem;font-weight:600}
@@ -251,7 +233,6 @@ html[lang="en"] .section-h{font-size:1.4rem}
 .eyebrow{font-weight:600;font-size:.75rem}
 /* Hebrew tuning across all stages */
 html[lang="he"] body{font-size:18px;line-height:1.7}
-html[lang="he"] .intro h2{font-size:2.3rem;line-height:1.2}
 html[lang="he"] .q-title{font-size:1.7rem;line-height:1.35}
 html[lang="he"] .section-h{font-size:1.3rem}
 html[lang="he"] .q-sub,html[lang="he"] .char-note,html[lang="he"] .dna-list li{font-size:1.02rem}
@@ -260,18 +241,6 @@ html[lang="en"] body{font-size:17px}
 /* ---------- flat cards & surfaces ---------- */
 /* .card carries .vp-card in the markup: background, 3px border, radius and the
    hard shadow all come from the design system. Only layout stays local. */
-.layers{
-  background:var(--card);
-  border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
-.opt{
-  background:var(--paper);
-  border:1.5px solid var(--line);border-radius:14px;
-}
-.opt:hover{background:var(--hover-fill)}
-.opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
-.opt.selected:hover{background:var(--accent)}
 textarea,input[type=text]{
   background:var(--paper);
   border:1.5px solid var(--line);border-radius:12px;color:var(--ink);
@@ -289,15 +258,11 @@ textarea,input[type=text]{
   border:1.5px solid var(--line);
 }
 .chip.hot{background:var(--peach);border-color:var(--peach)}
-.upload-box{background:var(--paper);border:2px dashed var(--line);border-radius:14px}
-.upload-box:hover{border-color:var(--accent)}
 .lang-toggle{border-color:var(--ink)}
 .gap-note{background:var(--amber-soft);border-color:var(--amber);color:var(--ink)}
 .error-box{background:var(--danger-soft);border-color:var(--danger);color:var(--danger)}
 :root[data-theme="dark"] .error-box{background:var(--danger-soft);color:var(--danger)}
 
-.trait-fill{background:var(--accent)}
-.approved-banner{background:var(--accent);color:var(--on-accent)}
 .logo span{color:var(--ink)}
 
 /* brainstorm idea pills — brand palette per category */
@@ -320,6 +285,20 @@ textarea,input[type=text]{
 .cat-check input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
 .idea-personal{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .idea-personal textarea{margin-top:6px;max-height:140px}
+
+/* ---- shared decorative shapes (maximalist "stickers"), reused across screens ----
+   The ui_kit source references static SVG assets (sunburst, ring-donut, squiggle,
+   blob-splat, star-spark) that don't exist in this project; these are CSS/inline-SVG
+   equivalents on the same design tokens, so a single definition re-themes correctly
+   across dark/light instead of needing a second asset file per shape. Position each
+   instance via inline style; these classes define only the shape itself. */
+.vp-shape{position:absolute;pointer-events:none;z-index:0}
+.vp-shape-ring{border:26px solid var(--magenta-500);border-radius:var(--radius-pill);opacity:.85}
+.vp-shape-blob{background:var(--orange-600);opacity:.3;border-radius:60% 40% 30% 70% / 55% 35% 65% 45%}
+.vp-shape-sunburst{background:repeating-conic-gradient(from -30deg at 0% 0%, var(--orange-500) 0deg 7deg, transparent 7deg 14deg);opacity:.85}
+.vp-shape-squiggle path{fill:none;stroke:var(--teal-400);stroke-width:6;stroke-linecap:round}
+.vp-shape-star{z-index:2}
+.vp-shape-star path{fill:var(--cream)}
 
 /* ===== profile screen, rebuilt on the design system ===== */
 .vp-profile{position:relative}
@@ -379,6 +358,15 @@ textarea,input[type=text]{
 .vp-trait-score{font-family:var(--font-display);font-weight:var(--fw-display);color:var(--amber-400);font-size:var(--fs-body-lg);line-height:1}
 .vp-trait-note{color:var(--text-muted);font-size:var(--fs-small);margin:10px 0 0}
 
+/* "what drives you" tab: ordinal driver cards (1 / 2 / ... / Last) */
+.vp-drivers{display:flex;flex-direction:column;gap:14px}
+.vp-driver{background:var(--surface-card-alt);border:var(--border-thick);border-radius:var(--radius-md);padding:18px 22px;box-shadow:var(--shadow-hard-sm)}
+.vp-driver .lbl{font-size:.68rem;font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;display:block;margin-bottom:7px}
+.vp-driver p{margin:0;font-size:.95rem;line-height:1.55;color:var(--fog-200)}
+.vp-driver.one .lbl{color:var(--violet-300)}
+.vp-driver.two .lbl{color:var(--magenta-400)}
+.vp-driver.three .lbl{color:var(--orange-500)}
+
 /* accordions */
 .vp-acc{background:var(--surface-card-alt);border:var(--border-thin);border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
 .vp-acc-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);background:transparent;border:0;font:inherit;cursor:pointer;padding:var(--space-5);text-align:start}
@@ -397,8 +385,9 @@ textarea,input[type=text]{
 .vp-acc.open .vp-acc-body{grid-template-rows:1fr}
 .vp-acc-inner{overflow:hidden;padding:0 var(--space-5)}
 .vp-acc.open .vp-acc-inner{padding-bottom:var(--space-5)}
-.vp-gap-row{padding:10px 0;border-bottom:var(--border-thin)}
-.vp-gap-row:last-child{border-bottom:0}
+.vp-gaps{background:var(--surface-card-alt);border:2.5px solid var(--amber-400);border-inline-start-width:6px;border-radius:var(--radius-md);padding:20px 24px}
+.vp-gap-row{color:var(--fog-200);font-size:.94rem;line-height:1.6;margin-bottom:8px}
+.vp-gap-row:last-child{margin-bottom:0}
 @media(prefers-reduced-motion:reduce){.vp-acc-body{transition:none}}
 
 .vp-refine .nav{margin-top:var(--space-4)}
@@ -450,11 +439,114 @@ textarea,input[type=text]{
 #vp-del input{width:100%;font:inherit;font-weight:700;letter-spacing:.12em;text-align:center;direction:ltr;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto}
 #vp-del input:focus{outline:2px solid var(--danger);outline-offset:1px;border-color:var(--danger)}
 #vp-del .row{display:flex;gap:12px;justify-content:center;margin-top:20px}
-/* intro name/country fields */
-.intro-fields{margin-top:24px;max-width:440px}
-.intro-fields input,.intro-fields select{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto;margin-bottom:4px;resize:none}
-.intro-fields select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
-.intro-fields .field-label{margin:14px 0 8px}
+/* generic field wrapper (label + input/select + optional help line), used by
+   onboarding and reused by later question screens with the same pattern */
+.vp-field{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.vp-field label{font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-muted)}
+.vp-field .help{font-size:.82rem;color:var(--text-muted)}
+
+/* onboarding: two-column intro (headline + tip) / panel (form) */
+.vp-onb{position:relative}
+.vp-onb-deco{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.vp-onb-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,0.85fr);gap:clamp(28px,6vw,64px);align-items:start}
+@media(max-width:900px){.vp-onb-grid{grid-template-columns:1fr}}
+.vp-onb-badge{display:inline-flex;padding:6px 14px;border-radius:var(--radius-pill);background:var(--violet-600);color:var(--text-on-brand);font-weight:700;font-size:var(--fs-micro);letter-spacing:var(--ls-label);text-transform:uppercase}
+.vp-onb-tip{background:var(--surface-card);border:2.5px solid var(--ink-black);border-inline-start:6px solid var(--amber-400);border-radius:var(--radius-md);box-shadow:var(--shadow-hard-sm);padding:18px 22px;max-width:520px;margin:20px 0 16px}
+.vp-onb-tip span{font-weight:700;font-size:var(--fs-micro);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--amber-400)}
+.vp-onb-tip p{font-size:.94rem;line-height:1.55;color:var(--text-display);margin:8px 0 0}
+.vp-onb-note{font-size:.94rem;line-height:1.6;color:var(--fog-400);margin:0;max-width:520px}
+.vp-onb-panel{position:relative;display:flex;flex-direction:column;gap:6px}
+.vp-onb-panel .vp-panel-h{margin-bottom:6px}
+@media(max-width:600px){.vp-onb-grid{gap:24px}}
+
+/* questionnaire panel (open/single/rank/uploads all share this shell) */
+#main-card{position:relative}
+.vp-q-deco{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit}
+.vp-q-title{font-family:var(--font-display);font-weight:var(--fw-display);font-size:clamp(28px,3.2vw,44px);line-height:1.04;letter-spacing:var(--ls-display);color:var(--text-display);margin:16px 0 14px;max-width:56ch}
+.vp-q-sub{font-size:var(--fs-body-lg);line-height:1.5;color:var(--fog-200);margin:0 0 24px;max-width:70ch}
+.vp-q-hint{display:inline-flex;align-items:center;gap:10px;background:var(--surface-card-alt);border:2.5px solid var(--ink-black);border-inline-start:6px solid var(--amber-400);border-radius:var(--radius-md);box-shadow:var(--shadow-hard-sm);padding:12px 18px;font-size:.88rem;font-weight:700;color:var(--text-display);margin-bottom:24px}
+.vp-q-footer{display:flex;align-items:center;justify-content:space-between;margin-top:32px;gap:20px}
+.vp-q-counter{font-family:var(--font-display);font-weight:700;font-size:.94rem;color:var(--fog-400)}
+.vp-q-progress{height:8px;border-radius:var(--radius-pill);background:var(--ink-800);overflow:hidden;margin-top:20px}
+.vp-q-progress i{display:block;height:100%;background:var(--gradient-violet);transition:width .3s var(--ease-out)}
+
+/* single-select options: default -> hover (amber edge + lift) -> selected (violet fill) */
+.opt{display:flex;align-items:center;gap:16px;width:100%;text-align:start;font:inherit;font-size:1rem;font-weight:500;cursor:pointer;color:var(--text-body);background:var(--surface-card-alt);border:2.5px solid var(--border-hairline);border-radius:var(--radius-md);padding:18px 22px;margin-bottom:12px;transition:transform var(--duration-fast) var(--ease-brand),box-shadow var(--duration-fast) var(--ease-brand),background var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
+.opt::before{content:'';width:20px;height:20px;border-radius:50%;flex:none;border:2.5px solid var(--ink-600);background:transparent;transition:all var(--duration-fast) var(--ease-brand)}
+.opt:hover{background:var(--surface-raised);color:var(--text-display);border-color:var(--amber-400);transform:translate(-2px,-2px);box-shadow:var(--shadow-hard-sm)}
+.opt:hover::before{border-color:var(--amber-400)}
+.opt.selected{background:var(--violet-600);color:var(--text-on-brand);font-weight:700;border-color:var(--ink-black);box-shadow:var(--shadow-hard-sm);transform:none}
+.opt.selected::before{border-color:var(--text-on-brand);background:var(--text-on-brand);box-shadow:inset 0 0 0 4px var(--violet-600)}
+.opt.selected:hover{background:var(--violet-500);transform:translate(-2px,-2px);box-shadow:var(--shadow-hard-md)}
+
+/* Q3 drag-and-drop ranking (same pointer-based drag logic, restyled) */
+.rank-cap{font-size:.8rem;font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--fog-400);margin-bottom:12px;display:block}
+.rank-slot{display:flex;align-items:center;gap:16px;min-height:64px;border-radius:var(--radius-md);padding:12px 16px;border:2.5px dashed var(--ink-600);background:transparent;transition:background var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-brand),transform var(--duration-fast) var(--ease-brand)}
+.rank-slot.over{border-color:var(--amber-400);background:color-mix(in srgb, var(--amber-400) 8%, transparent);box-shadow:0 0 0 4px color-mix(in srgb, var(--amber-400) 14%, transparent);transform:translate(-2px,-2px)}
+.rank-slot.filled{border:2.5px solid var(--ink-black);background:var(--violet-600);box-shadow:var(--shadow-hard-sm)}
+.slot-num{width:34px;height:34px;flex-shrink:0;border-radius:50%;background:var(--ink-800);color:var(--fog-400);border:2.5px solid var(--ink-600);font-family:var(--font-display);font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center}
+.rank-slot.filled .slot-num{background:var(--ink-black);color:var(--text-on-brand);border-color:var(--ink-black)}
+.slot-empty{color:var(--text-muted);font-size:.95rem}
+.rank-remove{width:30px;height:30px;flex:none;border-radius:50%;cursor:pointer;background:transparent;border:2px solid color-mix(in srgb, var(--text-on-brand) 55%, transparent);color:var(--text-on-brand);font-size:.8rem;line-height:1;display:grid;place-items:center;margin-inline-start:auto;transition:all var(--duration-fast) var(--ease-brand)}
+.rank-remove:hover{background:var(--magenta-500);border-color:var(--magenta-500);transform:scale(1.08)}
+.rank-pool.over{outline:2.5px dashed var(--magenta-500);outline-offset:12px;border-radius:var(--radius-md)}
+.rank-pool.pool-done{opacity:.5}
+.rank-chip{border:2.5px solid var(--border-hairline);background:var(--surface-card-alt);color:var(--text-body);border-radius:var(--radius-pill);padding:12px 22px;font:inherit;font-weight:600;font-size:.94rem;cursor:grab;user-select:none;text-align:start;touch-action:none;transition:transform var(--duration-fast) var(--ease-brand),box-shadow var(--duration-fast) var(--ease-brand),border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
+.rank-chip:hover{color:var(--text-display);border-color:var(--amber-400);transform:translate(-2px,-2px);box-shadow:var(--shadow-hard-sm)}
+.rank-chip.in-slot{flex:1;background:transparent;border:0;color:var(--text-on-brand);font-weight:700;font-size:1rem;padding:0;cursor:default}
+.rank-chip.in-slot:hover{transform:none;box-shadow:none}
+.rank-chip.drag-source{opacity:.35}
+.rank-ghost{border:2.5px solid var(--border-hairline);background:var(--surface-card-alt);color:var(--text-body);border-radius:var(--radius-pill);padding:12px 22px;font-weight:600;font-size:.94rem;box-shadow:var(--shadow-hard-md);opacity:.95;cursor:grabbing;display:flex;align-items:center}
+
+/* Q10 evidence: opt-out checkbox, field/hint pattern, upload drop zone, file list */
+.vp-optout{display:flex;align-items:center;gap:14px;cursor:pointer;background:var(--surface-card-alt);border:2.5px solid var(--border-hairline);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:28px;transition:border-color var(--duration-fast) var(--ease-out)}
+.vp-optout:hover{border-color:var(--amber-400)}
+.vp-optout input{position:absolute;opacity:0;width:1px;height:1px}
+.vp-optout-box{width:26px;height:26px;flex:none;border-radius:8px;display:grid;place-items:center;border:2.5px solid var(--border-hairline);background:var(--surface-card);color:var(--ink-black);font-weight:900;font-size:.9rem;transition:all var(--duration-fast) var(--ease-brand)}
+.vp-optout-box span{opacity:0}
+.vp-optout input:checked ~ .vp-optout-box{background:var(--amber-400);border-color:var(--amber-400)}
+.vp-optout input:checked ~ .vp-optout-box span{opacity:1}
+.vp-optout > span:last-child{font-size:.98rem;font-weight:600;color:var(--text-display)}
+
+.vp-q-field{margin-bottom:30px}
+.vp-q-field-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.vp-q-field-head .name{font-family:var(--font-display);font-weight:700;font-size:1.02rem;color:var(--cream)}
+.vp-q-field-head .hint{font-size:.86rem;color:var(--fog-400)}
+.vp-q-field-head .opt-flag{font-size:.68rem;font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--teal-400);border:2px solid var(--teal-400);border-radius:var(--radius-pill);padding:2px 10px}
+
+.vp-stat-row{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.vp-pill-stat{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:var(--radius-pill);font-size:.7rem;font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;background:var(--ink-800);color:var(--fog-400);border:2px solid var(--ink-700)}
+.vp-pill-stat[hidden]{display:none}
+.vp-pill-stat.ok{background:var(--violet-600);color:var(--text-on-brand);border-color:var(--ink-black)}
+.vp-pill-stat.warn{background:transparent;color:var(--amber-400);border-color:var(--amber-400)}
+
+.vp-drop{display:flex;align-items:center;gap:14px;cursor:pointer;border:2.5px dashed var(--ink-600);border-radius:var(--radius-md);padding:20px 22px;background:transparent;color:var(--text-muted);font-size:.95rem;transition:all var(--duration-fast) var(--ease-brand)}
+.vp-drop:hover{border-color:var(--amber-400);color:var(--text-display);transform:translate(-2px,-2px);box-shadow:var(--shadow-hard-sm)}
+.vp-drop-plus{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;border:2.5px solid currentColor;font-size:1.15rem;font-weight:700}
+.vp-files{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.vp-file{display:flex;align-items:center;gap:14px;background:var(--surface-card-alt);border:2.5px solid var(--ink-black);border-radius:var(--radius-md);box-shadow:var(--shadow-hard-sm);padding:12px 16px}
+.vp-file-thumb{width:48px;height:48px;flex:none;border-radius:10px;object-fit:cover;border:2.5px solid var(--ink-black)}
+.vp-file-meta{flex:1;min-width:0}
+.vp-file-name{font-size:.9rem;font-weight:700;color:var(--text-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vp-file-size{font-size:.78rem;color:var(--fog-400);margin-top:2px}
+.vp-file-size .ok{color:var(--teal-400);font-weight:700;text-transform:uppercase;letter-spacing:var(--ls-label)}
+.vp-file-kill{width:32px;height:32px;flex:none;border-radius:50%;cursor:pointer;background:transparent;border:2.5px solid var(--border-hairline);color:var(--fog-300);font-size:.78rem;display:grid;place-items:center;transition:all var(--duration-fast) var(--ease-brand)}
+.vp-file-kill:hover{background:var(--magenta-500);border-color:var(--magenta-500);color:var(--text-on-brand);transform:scale(1.08)}
+
+/* aside "profile layers" rail, matches every question-type screen */
+aside{width:100%}
+.layers{background:var(--surface-card);border:var(--border-thick);border-radius:var(--radius-lg);box-shadow:var(--shadow-hard-md);padding:26px 24px}
+.layers h3{font-weight:700;font-size:.72rem;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--fog-400);margin:0 0 18px}
+.layer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1.5px solid var(--border-hairline)}
+.layer:last-child{border-bottom:none}
+.layer .name{font-weight:700;font-size:.92rem;color:var(--text-display)}
+.layer .dots{display:flex;gap:5px}
+.layer .dot{width:8px;height:8px;border-radius:50%;background:var(--ink-700);transition:background .3s}
+.layer .dot.on{background:var(--violet-500)}
+.layer .dot.on.warm{background:var(--orange-500)}
+.layer .dot.on.hot{background:var(--magenta-500)}
+.vp-layers-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:22px;font-size:.68rem;color:var(--fog-400);letter-spacing:var(--ls-label);text-transform:uppercase;font-weight:700}
+@media(max-width:820px){aside{min-width:0}}
 /* searchable country combobox */
 .combo{position:relative}
 .combo-list{position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:20;max-height:240px;overflow-y:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:4px}
@@ -462,27 +554,11 @@ textarea,input[type=text]{
 .combo-opt{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.98rem}
 .combo-opt:hover,.combo-opt.active{background:var(--accent);color:var(--on-accent)}
 .combo-empty{padding:10px 12px;color:var(--ink-soft);font-size:.92rem}
-/* Q3 drag-and-drop ranking */
+/* Q3 drag-and-drop ranking: layout containers only — visual states are
+   defined once in the "questionnaire panel" block above */
 .rank-wrap{display:flex;flex-direction:column;gap:18px;margin-bottom:8px}
-.rank-cap{font-size:.85rem;font-weight:700;margin-bottom:8px}
 .rank-slots{display:flex;flex-direction:column;gap:10px}
-.rank-slot{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line);border-radius:12px;padding:8px 12px;min-height:58px;transition:border-color .15s,background .15s}
-.rank-slot.filled{border-style:solid;border-color:var(--accent)}
-.rank-slot.over{border-color:var(--accent);border-style:solid;background:var(--accent-soft)}
-.slot-num{width:30px;height:30px;flex-shrink:0;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.92rem}
-.slot-empty{color:var(--ink-soft);font-size:.9rem;opacity:.7}
-.rank-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;border:1.5px dashed transparent;border-radius:12px;padding:6px;transition:border-color .15s,background .15s}
-.rank-pool.over{border-color:var(--accent);background:var(--accent-soft)}
-.rank-pool.pool-done{opacity:.55}
-.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:var(--radius-pill);padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:grab;user-select:none;text-align:start;touch-action:none}
-.rank-chip:hover{background:var(--hover-fill)}
-.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:var(--on-accent);border-radius:var(--radius-sm)}
-.rank-chip.in-slot:hover{background:var(--accent)}
-.rank-chip.drag-source{opacity:.35}
-.rank-ghost{border:1.5px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:var(--radius-sm);padding:9px 15px;font-weight:600;font-size:.92rem;box-shadow:var(--shadow-soft);opacity:.95;cursor:grabbing;display:flex;align-items:center}
-/* Q10 no-LinkedIn toggle */
-.no-li-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.95rem;cursor:pointer;margin-bottom:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
-.no-li-toggle input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+.rank-pool{display:flex;flex-wrap:wrap;gap:10px;min-height:44px;border:1.5px dashed transparent;border-radius:var(--radius-md);padding:6px;transition:border-color .15s,background .15s}
 .theme-toggle{width:40px;height:40px;border-radius:var(--radius-pill);border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
 .theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}
@@ -514,9 +590,6 @@ textarea,input[type=text]{
   .card{padding:22px 16px}
   .q-title{font-size:1.42rem}
   html[lang="en"] .q-title{font-size:1.55rem}
-  .intro h2{font-size:1.9rem}
-  html[lang="en"] .intro h2{font-size:2.1rem}
-  html[lang="he"] .intro h2{font-size:1.85rem}
   html[lang="en"] .section-h,.section-h{font-size:1.15rem}
 
   /* nav row: keep buttons reachable, allow wrap */
@@ -622,12 +695,13 @@ const I18N = {
     tagline:'טביעת קול', back:'חזרה', next:'המשך', of:'מתוך',
     intro_h:'לפני שנכתוב פוסט אחד - בואו נלמד איך נשמע הקול שלכם.',
     intro_p1:'עשר שאלות. חלקן קצרות, חלקן פתוחות. מהתשובות ייבנה פרופיל בחמש שכבות: אישיות (Big 5), מניעים וערכים, טיפוס אניגרמה, סגנון חשיבה, וה-DNA של הכתיבה שלכם.',
-    intro_p2:'טיפ חשוב: על שאלות הכתיבה החופשית, כתבו בשפה שבה אתם מפרסמים בלינקדאין. שאר השאלות - באיזו שפה שנוח לכם.',
+    onb_badge:'שלב 1 מתוך 3', onb_tip_label:'טיפ חשוב', onb_panel_h:'הגדירו את הפרופיל שלכם',
+    intro_p2:'על שאלות הכתיבה החופשית, כתבו בשפה שבה אתם מפרסמים בלינקדאין. שאר השאלות - באיזו שפה שנוח לכם.',
     intro_p3:'מילוי השאלון לוקח כ-10 דקות. אין תשובות נכונות — שווה למלא אותו בתשומת לב וברוגע: ככל שהתשובות אמיתיות ומדויקות יותר, כך הפרופיל שייבנה יהיה מדויק יותר.',
     start:'מתחילים ←',
-    name_label:'השם שלכם (זה יהיה שם הפרופיל)',
+    name_label:'השם שלכם', name_help:'זה יהיה שם הפרופיל.',
     name_ph:'למשל: דנה',
-    country_label:'מדינה (מכייל את מודל התרבות)',
+    country_label:'מדינה', country_help:'המדינה מכיילת את מודל התרבות.',
     country_ph:'חיפוש מדינה...',
     country_none:'לא נמצאה מדינה',
     add_profile:'+ פרופיל חדש',
@@ -659,7 +733,8 @@ const I18N = {
     refine_ph:'למשל: הטון שלי פחות רשמי ממה שכתבתם, ואימוג׳ים אף פעם לא נכנסים לפוסטים שלי',
     refine_btn:'עדכנו את הפרופיל',
     approve_btn:'הפרופיל מדויק - אשרו ושמרו',
-    approved:'הפרופיל נשמר. השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרו יהפוך לפוסט בקול שלכם.',
+    approved_stamp:'הפרופיל נשמר',
+    approved:'השלב הבא: מסך כתיבת הפוסטים - שם כל מה שתספרו יהפוך לפוסט בקול שלכם.',
     saved_local:'הפרופיל נשמר בהצלחה.',
     save_warn:'לא הצלחתי לשמור לאחסון קבוע - הפרופיל זמין בסשן הנוכחי בלבד.',
     err_api:'משהו השתבש בניתוח. נסו שוב.',
@@ -670,6 +745,8 @@ const I18N = {
     local_h:'לוקאליזציה - שפה ותרבות', story_h:'סיפוריות',
     rules_h:'כללי הכתיבה',
     layers_h:'שכבות הפרופיל', summary_h:'הסיכום שלכם', avatar_caption_lead:'כך אנחנו מדמיינות אותך:',
+    legend_traits:'תכונות', legend_motives:'מניעים', legend_voice:'קול',
+    driver_last:'אחרון', rule_do:'כן', rule_dont:'לא',
     avatar_photo_caption:'כך אתם נראים לפי הפרופיל.',
     story_struct:'מבנה', story_moves:'מהלכים אופייניים', story_templates:'תבניות סיפור',
     ev:'על סמך',
@@ -684,6 +761,10 @@ const I18N = {
     alt_about_label:'ספרו על עצמכם ועל מה שאתם עושים', alt_about_small:'אופציונלי.',
     alt_about_ph:'מי אתם, במה אתם עוסקים, ועל מה תרצו לכתוב...',
     about_ph:'הדביקו כאן...',
+    posts_detected_one:'פוסט זוהה', posts_detected_many:'פוסטים זוהו',
+    words_label:'מילים', more_to_go:'עוד נדרשים כדי להגיע ל-3',
+    ready_label:'מוכן', remove_file_label:'הסרת קובץ',
+    rank_remove_label:'הסרה',
     to_composer:'למסך כתיבת הפוסטים ←',
     composer_h:'מה קרה היום?',
     composer_sub:'ספרו חופשי - אירוע, שיחה, מחשבה, תסכול, ניצחון קטן. הקלדה או הקלטה. אני אדאג שזה יישמע כמוכם.',
@@ -766,12 +847,13 @@ const I18N = {
     tagline:'your voice, profiled', back:'Back', next:'Next', of:'of',
     intro_h:'Before we write a single post - let\'s learn how you sound.',
     intro_p1:'Ten questions. Some quick, some open. From your answers we\'ll build a five-layer profile: personality (Big 5), motives & values, Enneagram type, thinking style, and your writing DNA.',
-    intro_p2:'Important tip: on the free-writing questions, write in the language you post in on LinkedIn. Everything else - whatever feels natural.',
+    onb_badge:'Step 1 of 3', onb_tip_label:'Important tip', onb_panel_h:'Set up your profile',
+    intro_p2:'On the free-writing questions, write in the language you post in on LinkedIn. Everything else - whatever feels natural.',
     intro_p3:'The questionnaire takes about 10 minutes. There are no right answers — it\'s worth filling it out with care and without rushing: the more honest and precise your answers, the sharper and more accurate your profile.',
-    start:'Let\'s begin →',
-    name_label:'Your name (this will be the profile name)',
+    start:'let\'s begin →',
+    name_label:'Your name', name_help:'This becomes the profile name.',
     name_ph:'e.g. Dana',
-    country_label:'Country (calibrates the culture model)',
+    country_label:'Country', country_help:'Country calibrates the culture model.',
     country_ph:'Search a country...',
     country_none:'No country found',
     add_profile:'+ New profile',
@@ -803,7 +885,8 @@ const I18N = {
     refine_ph:'e.g. I\'m far less cautious than you wrote, and I never use emojis',
     refine_btn:'Update the profile',
     approve_btn:'It\'s accurate - approve & save',
-    approved:'Profile saved. Next up: the post-writing screen - where anything you tell me becomes a post in your voice.',
+    approved_stamp:'Profile saved',
+    approved:'Next up: the post-writing screen - where anything you tell me becomes a post in your voice.',
     saved_local:'Profile saved successfully.',
     save_warn:'Couldn\'t reach persistent storage - profile is available for this session only.',
     err_api:'Something went wrong during analysis. Try again.',
@@ -814,6 +897,8 @@ const I18N = {
     local_h:'Localization - language & culture', story_h:'Storytelling',
     rules_h:'Writing rules',
     layers_h:'Profile layers', summary_h:'Your summary', avatar_caption_lead:'Here\'s how we picture you:',
+    legend_traits:'traits', legend_motives:'motives', legend_voice:'voice',
+    driver_last:'Last', rule_do:'do', rule_dont:'don\'t',
     avatar_photo_caption:'This is how you look, based on the profile.',
     story_struct:'Structure', story_moves:'Signature moves', story_templates:'Story templates',
     ev:'based on',
@@ -828,6 +913,10 @@ const I18N = {
     alt_about_label:'Tell us about yourself and what you do', alt_about_small:'Optional.',
     alt_about_ph:'Who you are, what you do, and what you\'d like to write about...',
     about_ph:'Paste here...',
+    posts_detected_one:'post detected', posts_detected_many:'posts detected',
+    words_label:'words', more_to_go:'more to reach 3',
+    ready_label:'ready', remove_file_label:'Remove file',
+    rank_remove_label:'Remove',
     to_composer:'To the post-writing screen →',
     composer_h:'What happened today?',
     composer_sub:'Tell it freely - an event, a conversation, a thought, a frustration, a small win. Type or record. I\'ll make it sound like you.',
@@ -1222,7 +1311,12 @@ function startNewProfile(){
 wireUserMenu();
 
 /* ---------- sidebar ---------- */
+/* which of the 3 legend categories each layer belongs to (traits/motives/voice),
+   matching the ui_kit's "traits · motives · voice" rail legend */
+const LAYER_CATEGORY = {big5:'',motives:'warm',ennea:'',cog:'',dna:'hot',local:'warm',story:'hot'};
+
 function renderLayers(){
+  const t=T();
   const filled = {};
   LAYERS.forEach(L=>filled[L.id]=0);
   Object.keys(answers).forEach(qid=>{
@@ -1230,14 +1324,19 @@ function renderLayers(){
     (FEEDS[qid]||[]).forEach(id=>filled[id]=(filled[id]||0)+1);
   });
   const el = document.getElementById('layers-panel');
-  el.innerHTML = `<h3>${lang==='he'?'שכבות הפרופיל':'Profile layers'}</h3>` +
-    LAYERS.map((L,li)=>{
+  el.innerHTML = `<h3>${t.layers_h}</h3>` +
+    LAYERS.map(L=>{
       const n = Math.min(filled[L.id]||0, L.slots);
-      const g=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'][li%5];
+      const cat=LAYER_CATEGORY[L.id]||'';
       let dots='';
-      for(let i=0;i<L.slots;i++) dots+=`<span class="dot ${i<n?'on':''}" style="${i<n?'background:'+g:''}"></span>`;
+      for(let i=0;i<L.slots;i++) dots+=`<span class="dot${i<n?' on '+cat:''}"></span>`;
       return `<div class="layer"><span class="name">${L[lang]}</span><span class="dots">${dots}</span></div>`;
-    }).join('');
+    }).join('') +
+    `<div class="vp-layers-legend">
+      <span style="color:var(--violet-500)">● ${t.legend_traits}</span>
+      <span style="color:var(--orange-500)">● ${t.legend_motives}</span>
+      <span style="color:var(--magenta-500)">● ${t.legend_voice}</span>
+    </div>`;
 }
 
 function answered(qid){
@@ -1276,22 +1375,43 @@ function render(){
 
 function introHTML(){
   const t=T();
-  return `<div class="intro step active">
-    <h2 class="serif">${t.intro_h}</h2>
-    <p>${t.intro_p1}</p>
-    <p><b>${t.intro_p2}</b></p>
-    <p>${t.intro_p3}</p>
-    <div class="intro-fields">
-      <label class="field-label" for="intro-name">${t.name_label}</label>
-      <input type="text" id="intro-name" placeholder="${t.name_ph}" value="${escapeHtml(profileName)}" class="vp-input">
-      <label class="field-label" for="intro-country">${t.country_label}</label>
-      <div class="combo">
-        <input type="text" id="intro-country" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" placeholder="${t.country_ph}" class="vp-input">
-        <div class="combo-list" id="country-list" role="listbox" hidden></div>
-      </div>
+  return `<div class="step active vp-onb">
+    <div class="vp-onb-deco" aria-hidden="true">
+      <div class="vp-shape vp-shape-ring" style="bottom:-40px;inset-inline-start:-30px;width:120px;height:120px;border-width:16px"></div>
+      <svg class="vp-shape vp-shape-squiggle" viewBox="0 0 130 40" style="bottom:10px;inset-inline-end:4%;width:130px;height:auto"><path d="M4 20 Q22 2 40 20 T76 20 T112 20"/></svg>
     </div>
-    <div class="start-row">
-      <button class="vp-btn" id="start-btn" onclick="goStep(1)" disabled>${t.start}</button>
+    <div class="vp-onb-grid">
+      <div>
+        <span class="vp-onb-badge">${t.onb_badge}</span>
+        <h1 class="vp-display">${t.intro_h}</h1>
+        <p class="vp-display-sub" style="max-width:520px">${t.intro_p1}</p>
+        <div class="vp-onb-tip">
+          <span>${t.onb_tip_label}</span>
+          <p>${t.intro_p2}</p>
+        </div>
+        <p class="vp-onb-note">${t.intro_p3}</p>
+      </div>
+
+      <div class="vp-card vp-onb-panel">
+        <svg class="vp-shape vp-shape-star" viewBox="0 0 24 24" style="top:-18px;inset-inline-start:-14px;width:50px;height:50px"><path d="M12 0 L14 9 L24 12 L14 15 L12 24 L10 15 L0 12 L10 9 Z"/></svg>
+        <h2 class="vp-panel-h">${t.onb_panel_h}</h2>
+        <div class="vp-field">
+          <label for="intro-name">${t.name_label}</label>
+          <input type="text" id="intro-name" placeholder="${t.name_ph}" value="${escapeHtml(profileName)}" class="vp-input">
+          <span class="help">${t.name_help}</span>
+        </div>
+        <div class="vp-field">
+          <label for="intro-country">${t.country_label}</label>
+          <div class="combo">
+            <input type="text" id="intro-country" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" placeholder="${t.country_ph}" class="vp-input">
+            <div class="combo-list" id="country-list" role="listbox" hidden></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px">
+          <button class="vp-btn" id="start-btn" onclick="goStep(1)" disabled>${t.start}</button>
+          <span class="help">${t.country_help}</span>
+        </div>
+      </div>
     </div>
   </div>`;
 }
@@ -1352,12 +1472,12 @@ function questionHTML(q){
   const t=T(), L=q[lang];
   let body='';
   if(q.type==='open'){
-    body = (q.writeLang?`<div class="lang-hint">${t.write_lang_hint}</div>`:'') +
-      `<textarea id="ta" placeholder="" class="vp-input">${answers[q.id]||''}</textarea>
+    body = (q.writeLang?`<div class="vp-q-hint">${t.write_lang_hint}</div>`:'') +
+      `<textarea id="ta" placeholder="" class="vp-input" style="min-height:220px">${escapeHtml(answers[q.id]||'')}</textarea>
        <div class="char-note">${t.open_note}</div>`;
   }
   if(q.type==='single'){
-    body = q.opts.map(o=>`<button class="opt ${answers[q.id]===o.v?'selected':''}" data-v="${o.v}">${o[lang]}</button>`).join('');
+    body = `<div class="options">`+q.opts.map(o=>`<button class="opt ${answers[q.id]===o.v?'selected':''}" data-v="${o.v}">${o[lang]}</button>`).join('')+`</div>`;
   }
   if(q.type==='rank'){
     const sel = answers[q.id]||[];
@@ -1367,50 +1487,79 @@ function questionHTML(q){
       const v=sel[i];
       slots.push(`<div class="rank-slot ${v?'filled':''}" data-slot="${i}">
         <span class="slot-num">${i+1}</span>
-        ${v?`<span class="rank-chip in-slot" data-v="${v}">${label(v)}</span>`
+        ${v?`<span class="rank-chip in-slot" data-v="${v}">${label(v)}</span><button type="button" class="rank-remove" data-v="${v}" aria-label="${t.rank_remove_label}">✕</button>`
             :`<span class="slot-empty">${t.rank_drop}</span>`}
       </div>`);
     }
     const pool=q.opts.filter(o=>!sel.includes(o.v))
       .map(o=>`<span class="rank-chip" data-v="${o.v}">${o[lang]}</span>`).join('');
     const poolDone = sel.length>=q.max;
-    body = `<div class="char-note" style="margin-bottom:14px">${t.rank_note}</div>
+    body = `<p class="vp-q-sub" style="margin-bottom:24px">${t.rank_note}</p>
       <div class="rank-wrap">
-        <div><div class="rank-cap">${t.rank_slots_cap}</div><div class="rank-slots" id="rank-slots">${slots.join('')}</div></div>
-        <div><div class="rank-cap">${t.rank_pool_cap}</div><div class="rank-pool ${poolDone?'pool-done':''}" id="rank-pool">${pool||`<span class="slot-empty">—</span>`}</div></div>
+        <div><span class="rank-cap">${t.rank_slots_cap}</span><div class="rank-slots" id="rank-slots">${slots.join('')}</div></div>
+        <div><span class="rank-cap">${t.rank_pool_cap}</span><div class="rank-pool ${poolDone?'pool-done':''}" id="rank-pool">${pool||`<span class="slot-empty">—</span>`}</div></div>
       </div>`;
   }
   if(q.type==='uploads'){
     const noLi=uploads.noLinkedIn;
     const postsLabel=noLi?t.alt_posts_label:t.posts_label, postsSmall=noLi?t.alt_posts_small:t.posts_small, postsPh=noLi?t.alt_posts_ph:t.posts_ph;
     const aboutLabel=noLi?t.alt_about_label:t.about_label, aboutSmall=noLi?t.alt_about_small:t.about_small, aboutPh=noLi?t.alt_about_ph:t.about_ph;
+    const blocks=uploads.posts.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+    const words=uploads.posts.trim()?uploads.posts.trim().split(/\s+/).length:0;
+    const postsOk=blocks.length>=3;
+    const kb=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
     body = `
-      <label class="no-li-toggle"><input type="checkbox" id="no-li" ${noLi?'checked':''}> ${t.no_li}</label>
+      <label class="vp-optout"><input type="checkbox" id="no-li" ${noLi?'checked':''}><span class="vp-optout-box"><span>✓</span></span><span>${t.no_li}</span></label>
 
-      <label class="field-label">${postsLabel} <small>· ${postsSmall}</small></label>
-      <textarea id="posts-ta" placeholder="${postsPh}" class="vp-input">${uploads.posts}</textarea>
+      <div class="vp-q-field">
+        <div class="vp-q-field-head"><span class="name">${postsLabel}</span><span class="hint">${postsSmall}</span></div>
+        <textarea id="posts-ta" placeholder="${postsPh}" class="vp-input" style="min-height:200px">${escapeHtml(uploads.posts)}</textarea>
+        <div class="vp-stat-row">
+          <span class="vp-pill-stat${postsOk?' ok':''}" id="post-count">${blocks.length} ${blocks.length===1?t.posts_detected_one:t.posts_detected_many}</span>
+          <span class="vp-pill-stat" id="word-count">${words} ${t.words_label}</span>
+          <span class="vp-pill-stat warn" id="post-hint" ${(postsOk||noLi)?'hidden':''}>${3-blocks.length} ${t.more_to_go}</span>
+        </div>
+      </div>
 
-      <label class="field-label">${t.pic_label} <small>· ${t.pic_small}</small></label>
-      <label class="upload-box"><input type="file" id="img-input" accept="image/png,image/jpeg,image/webp" multiple>
-        ${t.pic_btn}</label>
-      <div class="thumbs" id="thumbs">${uploads.images.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
+      <div class="vp-q-field">
+        <div class="vp-q-field-head"><span class="name">${t.pic_label}</span><span class="hint">${t.pic_small}</span></div>
+        <label class="vp-drop"><input type="file" id="img-input" accept="image/png,image/jpeg,image/webp" multiple hidden><span class="vp-drop-plus">+</span><span>${t.pic_btn}</span></label>
+        <div class="vp-files" id="thumbs">${uploads.images.map((im,i)=>`
+          <div class="vp-file">
+            <img class="vp-file-thumb" src="data:${im.media_type};base64,${im.data}" alt="">
+            <div class="vp-file-meta">
+              <div class="vp-file-name">${escapeHtml(im.name||'')}</div>
+              <div class="vp-file-size">${kb(im.size||0)} · <span class="ok">${t.ready_label}</span></div>
+            </div>
+            <button type="button" class="vp-file-kill" data-idx="${i}" aria-label="${t.remove_file_label}">✕</button>
+          </div>`).join('')}</div>
+      </div>
 
-      <label class="field-label">${aboutLabel} <small>· ${aboutSmall}</small></label>
-      <textarea id="about-ta" style="min-height:90px" placeholder="${aboutPh}" class="vp-input">${uploads.about}</textarea>`;
+      <div class="vp-q-field">
+        <div class="vp-q-field-head"><span class="name">${aboutLabel}</span><span class="hint">${aboutSmall}</span></div>
+        <textarea id="about-ta" style="min-height:130px" placeholder="${aboutPh}" class="vp-input">${escapeHtml(uploads.about)}</textarea>
+      </div>`;
   }
 
   const isLast = step===QUESTIONS.length-1;
+  const pct = Math.round(((step+1)/QUESTIONS.length)*100);
   return `<div class="step active">
+    <div class="vp-q-deco" aria-hidden="true">
+      <div class="vp-shape vp-shape-ring" style="bottom:-30px;inset-inline-start:-20px;width:110px;height:110px;border-width:15px"></div>
+      <svg class="vp-shape vp-shape-squiggle" viewBox="0 0 130 40" style="bottom:20px;inset-inline-end:4%;width:120px;height:auto"><path d="M4 20 Q22 2 40 20 T76 20 T112 20"/></svg>
+    </div>
+    <svg class="vp-shape vp-shape-star" viewBox="0 0 24 24" style="top:-16px;inset-inline-end:-12px;width:50px;height:50px"><path d="M12 0 L14 9 L24 12 L14 15 L12 24 L10 15 L0 12 L10 9 Z"/></svg>
     <div class="eyebrow vp-label">${L.ey}</div>
-    <h2 class="q-title">${L.t}</h2>
-    ${L.s?`<p class="q-sub">${L.s}</p>`:''}
+    <h1 class="vp-q-title">${L.t}</h1>
+    ${L.s?`<p class="vp-q-sub">${L.s}</p>`:''}
     ${body}
-    <div class="nav">
+    <div class="vp-q-footer">
       <button class="vp-btn-secondary" onclick="goStep(-1)">${t.back}</button>
-      <span class="progress-label">${step+1} ${t.of} ${QUESTIONS.length}</span>
+      <span class="vp-q-counter">${step+1} ${t.of} ${QUESTIONS.length}</span>
       <button class="vp-btn" id="next-btn" ${answered(q.id)?'':'disabled'}
         onclick="goStep(1)">${isLast?t.generate:t.next}</button>
     </div>
+    <div class="vp-q-progress"><i style="width:${pct}%"></i></div>
   </div>`;
 }
 function goStep(delta){ step+=delta; saveDraft(); render(); }
@@ -1428,8 +1577,23 @@ function wireQuestion(q){
   if(q.type==='rank'){ wireRank(q); }
   if(q.type==='uploads'){
     const pt=document.getElementById('posts-ta'), ab=document.getElementById('about-ta');
+    const t=T();
+    /* live post/word-count pills update in place (not a full render()) so the
+       textarea keeps focus and cursor position while typing */
+    function syncPostStats(){
+      const blocks=pt.value.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+      const words=pt.value.trim()?pt.value.trim().split(/\s+/).length:0;
+      const ok=blocks.length>=3;
+      const pc=document.getElementById('post-count');
+      pc.textContent=`${blocks.length} ${blocks.length===1?t.posts_detected_one:t.posts_detected_many}`;
+      pc.className='vp-pill-stat'+(ok?' ok':'');
+      document.getElementById('word-count').textContent=`${words} ${t.words_label}`;
+      const hint=document.getElementById('post-hint');
+      hint.hidden = ok || uploads.noLinkedIn;
+      hint.textContent=`${3-blocks.length} ${t.more_to_go}`;
+    }
     document.getElementById('no-li').addEventListener('change',e=>{ uploads.noLinkedIn=e.target.checked; scheduleDraftSave(); render(); });
-    pt.addEventListener('input',()=>{uploads.posts=pt.value;refreshNext(q);renderLayers();scheduleDraftSave();});
+    pt.addEventListener('input',()=>{uploads.posts=pt.value;refreshNext(q);renderLayers();scheduleDraftSave();syncPostStats();});
     ab.addEventListener('input',()=>{uploads.about=ab.value;scheduleDraftSave();});
     document.getElementById('img-input').addEventListener('change',async e=>{
       for(const f of Array.from(e.target.files).slice(0,4-uploads.images.length)){
@@ -1439,8 +1603,16 @@ function wireQuestion(q){
           r.onerror=()=>rej(new Error('read failed'));
           r.readAsDataURL(f);
         });
-        uploads.images.push({media_type:f.type,data});
+        uploads.images.push({media_type:f.type,data,name:f.name,size:f.size});
       }
+      scheduleDraftSave();
+      render();
+    });
+    document.getElementById('thumbs').addEventListener('click',e=>{
+      const b=e.target.closest('.vp-file-kill');
+      if(!b) return;
+      uploads.images.splice(+b.dataset.idx,1);
+      scheduleDraftSave();
       render();
     });
   }
@@ -1518,6 +1690,10 @@ function wireRank(q){
     window.addEventListener('pointerup',onUp);
   }
   document.querySelectorAll('.rank-chip[data-v]').forEach(chip=>chip.addEventListener('pointerdown',onDown));
+  slotsEl.addEventListener('click',e=>{
+    const b=e.target.closest('.rank-remove');
+    if(b) remove(b.dataset.v);
+  });
 }
 
 /* =========================================================
@@ -2004,20 +2180,16 @@ const AVATAR_FALLBACK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="curren
 function profileHTML(){
   const t=T(), p=profile;
   const traits=['openness','conscientiousness','extraversion','agreeableness','neuroticism'];
-  const traitGrads=['var(--g-blue)','var(--g-orange)','var(--g-pink)','var(--g-green)','var(--g-lime)'];
-  const bars = traits.map((tr,ti)=>{
-    const d=p.big5[tr]||{score:3,evidence:''};
-    return `<div class="trait-row">
-      <span class="trait-name">${t.traits[tr]}</span>
-      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%;background:${traitGrads[ti%traitGrads.length]}"></div></div>
-      <span class="trait-score">${d.score}</span>
-    </div>
-    <div class="char-note" style="margin:-6px 0 12px">${t.ev}: ${d.evidence||''}</div>`;
-  }).join('');
 
-  const motiveGrads=['var(--g-pink)','var(--g-blue)','var(--g-orange)'];
-  const motives=(p.motives||[]).map((m,i)=>
-    `<span class="chip chip-block" style="background:${motiveGrads[i%motiveGrads.length]};color:var(--on-primary);border-color:transparent">${lang==='he'?(m.label_he||m.id):(m.label_en||m.id)}${m.note?` · ${m.note}`:''}</span>`).join('');
+  /* ordinal driver cards for the "what drives you" tab: 1 / 2 / ... / Last,
+     each cycling through the three accent colours, matching the reference */
+  const driverClasses=['one','two','three'];
+  const motiveList=p.motives||[];
+  const drivers=motiveList.map((m,i)=>{
+    const label=lang==='he'?(m.label_he||m.id):(m.label_en||m.id);
+    const ord=(i===motiveList.length-1 && motiveList.length>1)?t.driver_last:String(i+1);
+    return `<div class="vp-driver ${driverClasses[i%driverClasses.length]}"><span class="lbl">${ord} · ${label}</span>${m.note?`<p>${m.note}</p>`:''}</div>`;
+  }).join('');
 
   const en=p.enneagram||{};
   const cg=p.cognitive||{};
@@ -2039,26 +2211,27 @@ function profileHTML(){
 
   const gaps=(p.gaps&&p.gaps.length)?`<div class="gap-note"><b>${t.gaps_h}</b><br>${p.gaps.join('<br>')}</div>`:'';
 
-  /* merged writing rules — do + dont together, no separate headers, just a subtle
-     colored marker per item so it's still easy to tell them apart at a glance */
+  /* merged writing rules — do + dont together, no separate headers, just a
+     bold DO/DON'T label and a colored left border so they're easy to scan */
   const rules=[
     ...(dna.do||[]).map(x=>({text:x,kind:'do'})),
     ...(dna.dont||[]).map(x=>({text:x,kind:'dont'}))
-  ].map(r=>`<li class="rule-${r.kind}">${r.text}</li>`).join('');
+  ].map(r=>`<li class="rule-${r.kind}"><b>${r.kind==='do'?t.rule_do:t.rule_dont}</b>${r.text}</li>`).join('');
 
   /* the six model layers, now one tab each */
-  const big5Grid=`<div class="vp-trait-grid">`+traits.map((tr,ti)=>{
+  const big5Grid=`<div class="vp-trait-grid">`+traits.map(tr=>{
     const d=p.big5[tr]||{score:3,evidence:''};
+    const high=d.score>=4;
     return `<div class="vp-trait">
       <div class="vp-trait-top"><span class="vp-trait-name">${t.traits[tr]}</span><span class="vp-trait-score">${d.score}</span></div>
-      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%;background:${traitGrads[ti%traitGrads.length]}"></div></div>
+      <div class="trait-bar${high?' high':''}"><div class="trait-fill" style="width:${d.score*20}%"></div></div>
       ${d.evidence?`<p class="vp-trait-note">${d.evidence}</p>`:''}
     </div>`;
   }).join('')+`</div>`;
 
   const layers=[
     {label:t.big5_h,    sub:t.big5_sub,    body:big5Grid},
-    {label:t.motives_h, sub:t.motives_sub, body:`<div class="vp-chips">${motives||'—'}</div>`},
+    {label:t.motives_h, sub:t.motives_sub, body:`<div class="vp-drivers">${drivers||'—'}</div>`},
     {label:t.ennea_h,   sub:t.ennea_sub,   body:`<div class="vp-dots"><span class="vp-dot">${lang==='he'?(en.name_he||''):(en.name_en||'')}</span>${en.type?`<span class="vp-dot">${en.type}</span>`:''}</div>${en.core?`<p class="vp-panel-text">${en.core}</p>`:''}`},
     {label:t.cog_h,     sub:t.cog_sub,     body:`<div class="vp-dots">${cg.convergent_divergent?`<span class="vp-dot">${cg.convergent_divergent}</span>`:''}${cg.systemizer_empathizer?`<span class="vp-dot">${cg.systemizer_empathizer}</span>`:''}</div>${cg.note?`<p class="vp-panel-text">${cg.note}</p>`:''}`},
     {label:t.local_h,   sub:t.local_sub,   body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<p class="vp-panel-text">${loc.note}</p>`:''}`},
@@ -2089,7 +2262,7 @@ function profileHTML(){
     `<ul class="dna-list rules-list">${rules}</ul>`);
   const accGaps=(p.gaps&&p.gaps.length)
     ? acc('gaps', t.gaps_h, t.badge_flags.replace('{n}',p.gaps.length),
-        `<div class="gap-note">${p.gaps.map(g=>`<div class="vp-gap-row">${g}</div>`).join('')}</div>`)
+        `<div class="vp-gaps">${p.gaps.map(g=>`<div class="vp-gap-row">${g}</div>`).join('')}</div>`)
     : '';
 
   /* quick-facts snapshot for the hero's middle card, computed from data we already have */
@@ -2146,7 +2319,10 @@ function profileHTML(){
     ${accRules}
     ${accGaps}
 
-    ${approved?`<div class="approved-banner">${t.approved}<br><button class="vp-btn" style="background:var(--on-accent);color:var(--accent);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
+    ${approved?`<div class="vp-approved">
+      <div><span class="stamp">${t.approved_stamp}</span><p>${t.approved}</p></div>
+      <button class="vp-btn-secondary" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button>
+    </div>`:`
     <div class="vp-panel vp-refine">
       <h3 class="vp-panel-h">${t.refine_label}</h3>
       <textarea id="refine-ta" class="vp-input" style="min-height:90px" placeholder="${t.refine_ph}"></textarea>

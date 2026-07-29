@@ -321,6 +321,88 @@ textarea,input[type=text]{
 .idea-personal{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .idea-personal textarea{margin-top:6px;max-height:140px}
 
+/* ===== profile screen, rebuilt on the design system ===== */
+.vp-profile{position:relative}
+/* decorative shapes, purely atmospheric */
+.vp-deco{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;border-radius:inherit}
+/* a full ring pushed partly off-canvas: reads as a partial arc without a
+   clip-path, which would not mirror under RTL */
+.vp-deco-ring{position:absolute;top:150px;inset-inline-end:-118px;width:190px;height:190px;border:26px solid var(--magenta-500);border-radius:var(--radius-pill);opacity:.85}
+.vp-deco-arch{position:absolute;top:90px;inset-inline-end:60px;width:120px;height:170px;background:var(--orange-600);border-radius:var(--radius-arch);opacity:.28}
+.vp-profile > *:not(.vp-deco){position:relative;z-index:1}
+
+.vp-display{font-family:var(--font-display);font-weight:var(--fw-display);font-size:var(--fs-h1);line-height:var(--lh-heading);letter-spacing:var(--ls-display);color:var(--text-display);margin:6px 0 10px}
+.vp-display-sub{color:var(--text-muted);max-width:52ch;margin-bottom:var(--space-6)}
+
+/* hero trio */
+.vp-hero{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6)}
+@media(max-width:900px){.vp-hero{grid-template-columns:1fr}}
+.vp-hero-summary,.vp-hero-facts,.vp-hero-portrait{border-radius:var(--radius-lg);padding:var(--space-5)}
+.vp-hero-summary{background:var(--gradient-violet);color:var(--text-on-brand);box-shadow:var(--shadow-glow-violet)}
+.vp-hero-summary .vp-hero-h{color:var(--text-on-brand)}
+.vp-hero-text{font-size:var(--fs-body);line-height:var(--lh-body);margin:0}
+.vp-hero-facts,.vp-hero-portrait{background:var(--surface-card-alt);border:var(--border-thin)}
+.vp-hero-h{font-family:var(--font-display);font-weight:var(--fw-display);font-size:var(--fs-h3);color:var(--text-display);margin-bottom:var(--space-3)}
+.vp-facts{list-style:none;margin:0;padding:0}
+.vp-facts li{display:flex;flex-wrap:wrap;gap:2px var(--space-3);justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:var(--border-thin);min-width:0}
+.vp-facts li:last-child{border-bottom:0}
+.vp-fact-k{font-weight:var(--fw-body-bold);color:var(--text-display);flex:0 1 auto;min-width:0}
+.vp-fact-v{color:var(--text-muted);text-align:end;min-width:0;overflow-wrap:break-word;margin-inline-start:auto}
+.vp-hero-portrait{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-2)}
+.vp-portrait-img{width:110px;height:110px;border-radius:var(--radius-pill);overflow:hidden;background:var(--gradient-magenta);display:flex;align-items:center;justify-content:center;color:var(--text-on-brand);margin-bottom:var(--space-2)}
+.vp-portrait-img img{width:100%;height:100%;object-fit:cover}
+.vp-portrait-img svg{width:46px;height:46px}
+.vp-portrait-note{color:var(--text-muted);font-size:var(--fs-small);margin:0}
+
+/* tabs */
+.vp-tabs{display:flex;gap:var(--space-5);overflow-x:auto;border-bottom:var(--border-thin);margin-bottom:var(--space-5);scrollbar-width:none}
+.vp-tabs::-webkit-scrollbar{display:none}
+.vp-tab{flex:0 0 auto;border:0;background:transparent;font:inherit;font-weight:var(--fw-body-medium);font-size:var(--fs-small);color:var(--text-muted);padding:0 0 12px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1.5px;transition:color var(--duration-fast) var(--ease-out)}
+.vp-tab:hover{color:var(--text-display)}
+.vp-tab.active{color:var(--text-display);font-weight:var(--fw-body-bold);border-bottom-color:var(--teal-400)}
+
+/* panel */
+.vp-panel{background:var(--surface-card-alt);border:var(--border-thin);border-radius:var(--radius-lg);padding:var(--space-5);margin-bottom:var(--space-4)}
+.vp-panel-h{font-family:var(--font-display);font-weight:var(--fw-display);font-size:var(--fs-h3);color:var(--text-display);margin:0 0 4px}
+.vp-panel-sub{color:var(--text-muted);font-size:var(--fs-small);margin:0 0 var(--space-5)}
+.vp-panel-text{color:var(--text-body);margin:var(--space-3) 0 0;max-width:70ch}
+.vp-chips{display:flex;flex-wrap:wrap;gap:8px}
+.vp-dots{display:flex;flex-wrap:wrap;gap:var(--space-5)}
+.vp-dot{display:inline-flex;align-items:center;gap:7px;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-display)}
+.vp-dot::before{content:'';width:8px;height:8px;border-radius:var(--radius-pill);background:var(--magenta-500)}
+
+/* big-5 trait cards */
+.vp-trait-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3)}
+.vp-trait{background:var(--surface-card);border:var(--border-thin);border-radius:var(--radius-md);padding:var(--space-4)}
+.vp-trait-top{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-3);margin-bottom:10px}
+.vp-trait-name{font-weight:var(--fw-body-bold);color:var(--text-display);font-size:var(--fs-small)}
+.vp-trait-score{font-family:var(--font-display);font-weight:var(--fw-display);color:var(--amber-400);font-size:var(--fs-body-lg);line-height:1}
+.vp-trait-note{color:var(--text-muted);font-size:var(--fs-small);margin:10px 0 0}
+
+/* accordions */
+.vp-acc{background:var(--surface-card-alt);border:var(--border-thin);border-radius:var(--radius-lg);margin-bottom:var(--space-3);overflow:hidden}
+.vp-acc-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);background:transparent;border:0;font:inherit;cursor:pointer;padding:var(--space-5);text-align:start}
+.vp-acc-title{font-family:var(--font-display);font-weight:var(--fw-display);font-size:var(--fs-h3);color:var(--text-display)}
+.vp-acc-meta{display:flex;align-items:center;gap:var(--space-3);flex-shrink:0}
+.vp-acc-badge{font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-muted)}
+.vp-acc-toggle{width:30px;height:30px;border-radius:var(--radius-pill);border:2px solid var(--border-hairline);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;transition:background var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out)}
+.vp-acc-toggle::before,.vp-acc-toggle::after{content:'';position:absolute;background:var(--text-display);border-radius:2px;transition:transform var(--duration-base) var(--ease-brand)}
+.vp-acc-toggle::before{width:12px;height:2px}
+.vp-acc-toggle::after{width:2px;height:12px}
+.vp-acc.open .vp-acc-toggle{background:var(--amber-400);border-color:var(--amber-400)}
+.vp-acc.open .vp-acc-toggle::before,.vp-acc.open .vp-acc-toggle::after{background:var(--ink-black)}
+.vp-acc.open .vp-acc-toggle::before{transform:rotate(45deg)}
+.vp-acc.open .vp-acc-toggle::after{transform:rotate(45deg)}
+.vp-acc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--duration-base) var(--ease-out)}
+.vp-acc.open .vp-acc-body{grid-template-rows:1fr}
+.vp-acc-inner{overflow:hidden;padding:0 var(--space-5)}
+.vp-acc.open .vp-acc-inner{padding-bottom:var(--space-5)}
+.vp-gap-row{padding:10px 0;border-bottom:var(--border-thin)}
+.vp-gap-row:last-child{border-bottom:0}
+@media(prefers-reduced-motion:reduce){.vp-acc-body{transition:none}}
+
+.vp-refine .nav{margin-top:var(--space-4)}
+
 /* post refine: rewrite-whole-post vs select-a-snippet-to-edit */
 .refine-option{margin-top:12px;padding:14px 16px;border:1.5px dashed var(--line);border-radius:12px}
 .refine-option .field-label{margin:0 0 4px}
@@ -335,22 +417,24 @@ textarea,input[type=text]{
 .header-controls{display:flex;gap:12px;align-items:center;flex-shrink:0}
 /* user menu (history / profiles / delete / logout / language / theme) */
 .user-menu-wrap{position:relative}
-.user-menu-panel{position:absolute;top:calc(100% + 8px);inset-inline-end:0;z-index:30;min-width:220px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;text-align:start}
+/* menu: the design system ships no menu spec, so it is composed from the same
+   primitives as .vp-card — thick border, hard shadow, teal micro labels */
+.user-menu-panel{position:absolute;top:calc(100% + 10px);inset-inline-end:0;z-index:30;min-width:250px;background:var(--surface-card);border:var(--border-thick);border-radius:var(--radius-lg);box-shadow:var(--shadow-hard-md);padding:var(--space-2);text-align:start}
 .user-menu-panel[hidden]{display:none}
-.user-menu-label{padding:8px 12px 4px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.6}
-.user-menu-item{display:block;width:100%;text-align:start;border:0;background:transparent;color:var(--ink);font:inherit;font-size:.92rem;padding:10px 12px;border-radius:8px;cursor:pointer}
+.user-menu-label{padding:10px 12px 4px;font-size:var(--fs-micro);font-weight:700;text-transform:uppercase;letter-spacing:var(--ls-label);color:var(--teal-400)}
+.user-menu-item{display:block;width:100%;text-align:start;border:0;background:transparent;color:var(--text-display);font:inherit;font-weight:var(--fw-body-medium);font-size:var(--fs-small);padding:11px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:background var(--duration-fast) var(--ease-out)}
 .user-menu-item:hover{background:var(--hover-fill)}
-.user-menu-item.active{font-weight:700}
+.user-menu-item.active{font-weight:var(--fw-body-bold);background:color-mix(in srgb, var(--violet-500) 20%, transparent)}
 .user-menu-item.danger{color:var(--danger)}
 .profile-row{display:flex;align-items:center;gap:2px}
 .profile-row .user-menu-item{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.profile-del-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;background:transparent;color:var(--ink-soft);border-radius:8px;cursor:pointer}
+.profile-del-btn{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;background:transparent;color:var(--text-muted);border-radius:var(--radius-sm);cursor:pointer;transition:background var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
 .profile-del-btn:hover{background:var(--hover-fill);color:var(--danger)}
 .profile-del-btn svg{width:16px;height:16px}
-.user-menu-divider{height:1px;background:var(--line);margin:6px 4px}
-.user-menu-segment{display:flex;border:1.5px solid var(--line);border-radius:var(--radius-pill);overflow:hidden;margin:0 4px 8px}
-.user-menu-segment button{flex:1;border:0;background:transparent;padding:7px 10px;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;color:var(--ink)}
-.user-menu-segment button.active{background:var(--ink);color:var(--paper)}
+.user-menu-divider{height:1.5px;background:var(--border-hairline);margin:var(--space-2) 4px}
+.user-menu-segment{display:flex;border:2px solid var(--border-hairline);border-radius:var(--radius-pill);overflow:hidden;margin:0 4px var(--space-2)}
+.user-menu-segment button{flex:1;border:0;background:transparent;padding:8px 10px;font:inherit;font-weight:var(--fw-body-bold);font-size:var(--fs-small);cursor:pointer;color:var(--text-display);transition:background var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
+.user-menu-segment button.active{background:var(--action-primary-bg);color:var(--action-primary-text)}
 /* logout button lives in the user menu now; the auth module still creates
    #vp-logout and wires the real sign-out click (and injects its own visible
    styling for it later at runtime) — !important keeps it invisible regardless */
@@ -559,7 +643,18 @@ const I18N = {
     generate:'בנו את הפרופיל שלי',
     analyzing:['קוראים את התשובות שלכם...','מזהים דפוסי שפה...','מצליבים מניעים מול תכונות...','מרכיבים את טביעת הקול...'],
     profile_h:'טביעת הקול שלכם',
-    profile_sub:'ככה נראה הפרופיל שלכם. עברו עליו - ואם משהו לא מדויק, תקנו אותו למטה.',
+    profile_sub:'עברו עליו, פתחו שכבה כדי לראות את הנימוק. אם משהו לא מדויק, תקנו אותי למטה.',
+    profile_display_h:'ככה קראתי אתכם.',
+    portrait_label:'ככה אנחנו מדמיינים אתכם',
+    big5_sub:'ניקוד 1 עד 5 מהתשובות הסגורות שלכם, עם הנימוק לכל אחת.',
+    motives_sub:'מה מניע אתכם מתחת לפני השטח.',
+    ennea_sub:'התבנית הרגשית שחוזרת אצלכם.',
+    cog_sub:'איך אתם עוברים משאלה לתשובה.',
+    local_sub:'למי אתם מדברים, ובאיזו שפה.',
+    story_sub:'איך אתם בונים סיפור.',
+    badge_traits:'{n} תכונות',
+    badge_rules:'{d} כן · {n} לא',
+    badge_flags:'{n} דגלים',
     refine_label:'משהו לא מדויק? כתבו מה לתקן:',
     refine_ph:'למשל: הטון שלי פחות רשמי ממה שכתבתם, ואימוג׳ים אף פעם לא נכנסים לפוסטים שלי',
     refine_btn:'עדכנו את הפרופיל',
@@ -692,7 +787,18 @@ const I18N = {
     generate:'Build my profile',
     analyzing:['Reading your answers...','Detecting language patterns...','Cross-checking motives vs. traits...','Assembling your voiceprint...'],
     profile_h:'Your Voiceprint',
-    profile_sub:'This is how I read you. Review it - if anything is off, correct me below.',
+    profile_sub:'Review it, open a layer to see the reasoning. If anything is off, correct me at the bottom.',
+    profile_display_h:'This is how I read you.',
+    portrait_label:'Here\'s how we picture you',
+    big5_sub:'Scored 1 to 5 from your closed answers, with the reasoning behind each.',
+    motives_sub:'What drives you underneath the surface.',
+    ennea_sub:'The emotional pattern that keeps showing up.',
+    cog_sub:'How you move from question to answer.',
+    local_sub:'Who you speak to, and in which language.',
+    story_sub:'How you build a story.',
+    badge_traits:'{n} traits',
+    badge_rules:'{d} do · {n} don\'t',
+    badge_flags:'{n} flags',
     refine_label:'Something off? Tell me what to fix:',
     refine_ph:'e.g. I\'m far less cautious than you wrote, and I never use emojis',
     refine_btn:'Update the profile',
@@ -915,6 +1021,10 @@ function effectivePostLang(){ return postLang||defaultPostLang(); }
 let ideasMode='profile', ideasTopic='', ideasCats={news:true,professional:true,personal:true,hobby:true};
 const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3, STEP_HISTORY = QUESTIONS.length+4, STEP_REPLY = QUESTIONS.length+5;
 let preMenuStep = null; /* step to return to when leaving the history screen */
+/* profile screen: which model layer is open as a tab, and which of the three
+   collapsible sections are expanded (gaps starts open — it is the actionable one) */
+let profileTab = 0;
+let accOpen = {dna:false, rules:false, gaps:true};
 
 /* ---------- multi-profile state ---------- */
 let profileName='', profileCountry='';
@@ -1154,7 +1264,7 @@ function render(){
   if(appEl) appEl.classList.toggle('no-aside', !showAside);
   if(step===-1){ card.innerHTML = introHTML(); wireIntro(); return; }
   if(step===QUESTIONS.length){ card.innerHTML = generateHTML(); return; }
-  if(step===QUESTIONS.length+1){ card.innerHTML = profileHTML(); wireRefine(); return; }
+  if(step===QUESTIONS.length+1){ card.innerHTML = profileHTML(); wireProfile(); wireRefine(); return; }
   if(step===STEP_COMPOSER){ card.innerHTML = composerHTML(); wireComposer(); return; }
   if(step===STEP_RESULT){ card.innerHTML = resultHTML(); wireResult(); return; }
   if(step===STEP_HISTORY){ card.innerHTML = historyHTML(); wireHistory(); return; }
@@ -1936,17 +2046,51 @@ function profileHTML(){
     ...(dna.dont||[]).map(x=>({text:x,kind:'dont'}))
   ].map(r=>`<li class="rule-${r.kind}">${r.text}</li>`).join('');
 
-  /* six colored, horizontally-scrollable model cards */
-  const layerColors=['var(--g-blue)','var(--g-pink)','var(--g-green)','var(--g-lime)','var(--g-orange)','var(--g-blue)'];
+  /* the six model layers, now one tab each */
+  const big5Grid=`<div class="vp-trait-grid">`+traits.map((tr,ti)=>{
+    const d=p.big5[tr]||{score:3,evidence:''};
+    return `<div class="vp-trait">
+      <div class="vp-trait-top"><span class="vp-trait-name">${t.traits[tr]}</span><span class="vp-trait-score">${d.score}</span></div>
+      <div class="trait-bar"><div class="trait-fill" style="width:${d.score*20}%;background:${traitGrads[ti%traitGrads.length]}"></div></div>
+      ${d.evidence?`<p class="vp-trait-note">${d.evidence}</p>`:''}
+    </div>`;
+  }).join('')+`</div>`;
+
   const layers=[
-    {label:t.big5_h, body:bars},
-    {label:t.motives_h, body:motives||'—'},
-    {label:t.ennea_h, body:`<span class="chip hot">${lang==='he'?(en.name_he||''):(en.name_en||'')} · ${en.type||''}</span><div class="char-note">${en.core||''}</div>`},
-    {label:t.cog_h, body:`<span class="chip">${cg.convergent_divergent||''}</span> <span class="chip">${cg.systemizer_empathizer||''}</span><div class="char-note">${cg.note||''}</div>`},
-    {label:t.local_h, body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<div class="char-note">${loc.note}</div>`:''}`},
-    {label:t.story_h, body:`${st.structure?`<div class="char-note" style="margin-bottom:8px"><b>${t.story_struct}:</b> ${st.structure}</div>`:''}${stMoves?`<div class="char-note"><b>${t.story_moves}:</b></div><div style="margin:4px 0 10px">${stMoves}</div>`:''}${stTemplates?`<div class="char-note"><b>${t.story_templates}:</b></div><ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<div class="char-note">${st.note}</div>`:''}`}
+    {label:t.big5_h,    sub:t.big5_sub,    body:big5Grid},
+    {label:t.motives_h, sub:t.motives_sub, body:`<div class="vp-chips">${motives||'—'}</div>`},
+    {label:t.ennea_h,   sub:t.ennea_sub,   body:`<div class="vp-dots"><span class="vp-dot">${lang==='he'?(en.name_he||''):(en.name_en||'')}</span>${en.type?`<span class="vp-dot">${en.type}</span>`:''}</div>${en.core?`<p class="vp-panel-text">${en.core}</p>`:''}`},
+    {label:t.cog_h,     sub:t.cog_sub,     body:`<div class="vp-dots">${cg.convergent_divergent?`<span class="vp-dot">${cg.convergent_divergent}</span>`:''}${cg.systemizer_empathizer?`<span class="vp-dot">${cg.systemizer_empathizer}</span>`:''}</div>${cg.note?`<p class="vp-panel-text">${cg.note}</p>`:''}`},
+    {label:t.local_h,   sub:t.local_sub,   body:`<ul class="dna-list">${locRows}</ul>${loc.note?`<p class="vp-panel-text">${loc.note}</p>`:''}`},
+    {label:t.story_h,   sub:t.story_sub,   body:`${st.structure?`<div class="vp-dots"><span class="vp-dot">${st.structure}</span></div>`:''}${stMoves?`<div class="vp-chips" style="margin-bottom:12px">${stMoves}</div>`:''}${stTemplates?`<ul class="dna-list">${stTemplates}</ul>`:''}${st.note?`<p class="vp-panel-text">${st.note}</p>`:''}`}
   ];
-  const layerScroll=`<div class="layer-scroll">${layers.map((l,i)=>`<div class="layer-card" style="background:${layerColors[i%layerColors.length]}"><div class="section-h">${l.label}</div>${l.body}</div>`).join('')}</div>`;
+  const ti0=Math.min(Math.max(profileTab,0),layers.length-1);
+  const tabsHTML=`<div class="vp-tabs" role="tablist">${layers.map((l,i)=>
+    `<button type="button" class="vp-tab${i===ti0?' active':''}" role="tab" aria-selected="${i===ti0}" data-tab="${i}">${l.label}</button>`).join('')}</div>`;
+  const panelHTML=`<div class="vp-panel" role="tabpanel">
+    <h3 class="vp-panel-h">${layers[ti0].label}</h3>
+    ${layers[ti0].sub?`<p class="vp-panel-sub">${layers[ti0].sub}</p>`:''}
+    ${layers[ti0].body}
+  </div>`;
+
+  /* collapsible detail sections */
+  const acc=(key,label,badge,body)=>`<section class="vp-acc${accOpen[key]?' open':''}">
+    <button type="button" class="vp-acc-head" data-acc="${key}" aria-expanded="${accOpen[key]?'true':'false'}">
+      <span class="vp-acc-title">${label}</span>
+      <span class="vp-acc-meta"><span class="vp-acc-badge">${badge}</span><span class="vp-acc-toggle" aria-hidden="true"></span></span>
+    </button>
+    <div class="vp-acc-body"><div class="vp-acc-inner">${body}</div></div>
+  </section>`;
+
+  const dnaCount=[dna.language,dna.sentence_length,dna.punctuation,dna.emoji,dna.hook_style,dna.humor,dna.endings].filter(Boolean).length+(dna.signature_phrases||[]).length;
+  const accDNA=acc('dna', t.dna_h, t.badge_traits.replace('{n}',dnaCount),
+    `<ul class="dna-list">${dnaRows}</ul>${sigs?`<div class="vp-chips" style="margin-top:12px">${sigs}</div>`:''}`);
+  const accRules=acc('rules', t.rules_h, t.badge_rules.replace('{d}',(dna.do||[]).length).replace('{n}',(dna.dont||[]).length),
+    `<ul class="dna-list rules-list">${rules}</ul>`);
+  const accGaps=(p.gaps&&p.gaps.length)
+    ? acc('gaps', t.gaps_h, t.badge_flags.replace('{n}',p.gaps.length),
+        `<div class="gap-note">${p.gaps.map(g=>`<div class="vp-gap-row">${g}</div>`).join('')}</div>`)
+    : '';
 
   /* quick-facts snapshot for the hero's middle card, computed from data we already have */
   const big5TopIdx = traits.reduce((best,tr,i)=>((p.big5[tr]&&p.big5[tr].score)||0) > ((p.big5[traits[best]]&&p.big5[traits[best]].score)||0) ? i : best, 0);
@@ -1962,59 +2106,71 @@ function profileHTML(){
 
   /* avatar: a real uploaded photo wins; otherwise a generated portrait once
      it's ready; until then, initials + a text impression as the meantime state */
-  let avatarInner, avatarCaptionHTML;
+  let avatarInner, impressionText;
   if(p.photo && p.photo.data){
     avatarInner = `<img src="data:${p.photo.media_type};base64,${p.photo.data}" alt="">`;
-    avatarCaptionHTML = p.photo.source==='generated' ? `<div class="avatar-caption"><b>${t.avatar_photo_caption}</b></div>` : '';
+    impressionText = p.photo.source==='generated' ? (t.avatar_photo_caption||'') : '';
   } else {
     const initials=(profileName||'').trim().split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
     avatarInner = initials ? `<span class="avatar-initials">${escapeHtml(initials)}</span>` : AVATAR_FALLBACK_SVG;
-    avatarCaptionHTML = p.visual_impression ? `<div class="avatar-caption"><b>${t.avatar_caption_lead}</b>${escapeHtml(p.visual_impression)}</div>` : '';
+    impressionText = p.visual_impression ? escapeHtml(p.visual_impression) : '';
   }
 
-  return `<div class="step active">
+  return `<div class="step active vp-profile">
+    <div class="vp-deco" aria-hidden="true"><span class="vp-deco-ring"></span><span class="vp-deco-arch"></span></div>
+
     <div class="eyebrow vp-label">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
-    ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
+    <h1 class="vp-display">${t.profile_display_h}</h1>
+    ${approved?'':`<p class="vp-display-sub">${t.profile_sub}</p>`}
 
-    <div class="persona-hero">
-      <div class="persona-summary">
-        <div class="section-h">${t.summary_h}</div>
-        <div class="serif persona-summary-text">${p.summary||''}</div>
+    <div class="vp-hero">
+      <div class="vp-hero-summary">
+        <div class="vp-hero-h">${t.summary_h}</div>
+        <p class="vp-hero-text">${p.summary||''}</p>
       </div>
-      <div class="persona-layers">
-        <div class="section-h">${t.layers_h}</div>
-        <ul class="dna-list">${layerFacts.map(f=>`<li><b>${f.label}:</b> ${f.value}</li>`).join('')}</ul>
+      <div class="vp-hero-facts">
+        <div class="vp-hero-h">${t.layers_h}</div>
+        <ul class="vp-facts">${layerFacts.map(f=>`<li><span class="vp-fact-k">${f.label}</span><span class="vp-fact-v">${f.value}</span></li>`).join('')}</ul>
       </div>
-      <div class="persona-photo">
-        <div class="avatar-placeholder">${avatarInner}</div>
-        ${avatarCaptionHTML}
+      <div class="vp-hero-portrait">
+        <div class="vp-portrait-img">${avatarInner}</div>
+        <div class="vp-label">${t.portrait_label}</div>
+        ${impressionText?`<p class="vp-portrait-note">${impressionText}</p>`:''}
       </div>
     </div>
 
-    ${layerScroll}
+    ${tabsHTML}
+    ${panelHTML}
 
-    <div class="dna-rules-grid">
-      <div>
-        <div class="section-h">${t.dna_h}</div>
-        <ul class="dna-list">${dnaRows}</ul>
-        <div style="margin-top:10px">${sigs}</div>
-      </div>
-      <div>
-        <div class="section-h">${t.rules_h}</div>
-        <ul class="dna-list rules-list">${rules}</ul>
-      </div>
-    </div>
-
-    ${gaps}
+    ${accDNA}
+    ${accRules}
+    ${accGaps}
 
     ${approved?`<div class="approved-banner">${t.approved}<br><button class="vp-btn" style="background:var(--on-accent);color:var(--accent);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
-    <div class="section-h">${t.refine_label}</div>
-    <textarea id="refine-ta" style="min-height:90px" placeholder="${t.refine_ph}" class="vp-input"></textarea>
-    <div class="nav">
-      <button class="vp-btn-secondary" id="refine-btn">${t.refine_btn}</button>
-      <button class="vp-btn btn-accent" id="approve-btn">${t.approve_btn}</button>
+    <div class="vp-panel vp-refine">
+      <h3 class="vp-panel-h">${t.refine_label}</h3>
+      <textarea id="refine-ta" class="vp-input" style="min-height:90px" placeholder="${t.refine_ph}"></textarea>
+      <div class="nav">
+        <button class="vp-btn-secondary" id="refine-btn">${t.refine_btn}</button>
+        <button class="vp-btn" id="approve-btn">${t.approve_btn}</button>
+      </div>
     </div>`}
   </div>`;
+}
+
+/* tabs + accordions on the profile screen */
+function wireProfile(){
+  /* render() re-runs wireProfile()/wireRefine() itself — re-wiring here too would
+     double-bind every handler, making each accordion click toggle twice */
+  document.querySelectorAll('.vp-tab').forEach(b=>b.addEventListener('click',()=>{
+    profileTab=+b.dataset.tab; render();
+  }));
+  document.querySelectorAll('.vp-acc-head').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.acc; accOpen[k]=!accOpen[k];
+    const sec=b.closest('.vp-acc');
+    sec.classList.toggle('open',accOpen[k]);
+    b.setAttribute('aria-expanded',accOpen[k]?'true':'false');
+  }));
 }
 
 function wireRefine(){

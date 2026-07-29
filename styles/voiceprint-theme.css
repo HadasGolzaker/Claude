@@ -1,0 +1,347 @@
+/* ==========================================================================
+   Voiceprint — Maximalist / Neo-Brutalist theme
+   SINGLE SOURCE OF TRUTH. One flat file, no folder structure, no @import chain.
+
+   Drop this one file into your app and link it FIRST, before any other CSS.
+   Then use only var(--...) in your components — never a hard-coded hex or font.
+
+   Contents
+     1. Font loading (Latin + Hebrew)
+     2. Colors — dark (default)
+     3. Colors — light  ([data-theme="light"] on <html>)
+     4. Typography scale
+     5. Hebrew / RTL scope  (lang="he" on <html>)
+     6. Spacing & layout
+     7. Radii, borders, shadows, motion
+     8. Base resets + the 3 signature primitives (ribbon CTA, hard-shadow card, focus ring)
+
+   Themes:   <html data-theme="light">   ·   default (no attribute) = dark
+   Language: <html lang="he" dir="rtl">  ·   default lang="en"
+   ========================================================================== */
+
+/* --- 1. fonts ------------------------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Secular+One&family=Miriam+Libre:wght@400;700&family=Assistant:wght@400;600;700&display=swap');
+
+/* --- 2. colors: dark (default) ------------------------------------------ */
+:root {
+  /* base neutrals — void black canvas + cream ink */
+  --ink-black: #0a090d;
+  --ink-950: #100e14;
+  --ink-900: #17141d;
+  --ink-800: #211c29;
+  --ink-700: #342c3f;
+  --ink-600: #4a3f58;
+  --fog-400: #9c93a8;
+  --fog-300: #b6aec2;
+  --fog-200: #cec7d8;
+  --cream: #fce0e4;
+  --cream-soft: #fef1ee;
+  --paper: #fff9f5;
+
+  /* brand accents — candy family */
+  --violet-700: #4c1a99;
+  --violet-600: #6c2bf0;
+  --violet-500: #8b4dff;
+  --violet-300: #c3a8ff;
+  --magenta-600: #d41d76;
+  --magenta-500: #f23f8c;
+  --magenta-400: #ff6fa8;
+  --orange-600: #e8590c;
+  --orange-500: #ff7a29;
+  --amber-400: #ffc93d;
+  --yellow-400: #ffe066;
+  --teal-400: #38d9c9;
+  --teal-300: #7be8db;
+
+  /* semantic aliases — PREFER THESE in components */
+  --surface-canvas: var(--ink-black);
+  --surface-card: var(--ink-900);
+  --surface-card-alt: var(--ink-800);
+  --surface-raised: var(--ink-700);
+  --surface-paper: var(--paper);
+
+  --text-display: var(--cream);
+  --text-body: var(--fog-200);
+  --text-muted: var(--fog-400);
+  --text-on-light: var(--ink-black);
+  --text-on-brand: #ffffff;
+
+  --border-hairline: rgba(255, 255, 255, 0.14);
+  --border-hard: var(--ink-black);
+  --focus-ring: var(--amber-400);
+
+  --action-primary-bg: var(--violet-600);
+  --action-primary-hover: var(--violet-500);
+  --action-primary-text: #ffffff;
+  --action-secondary-bg: transparent;
+  --action-secondary-border: var(--cream);
+
+  --gradient-violet: linear-gradient(160deg, var(--violet-500), var(--violet-700));
+  --gradient-sunburst: linear-gradient(135deg, var(--amber-400), var(--orange-600));
+  --gradient-magenta: linear-gradient(160deg, var(--magenta-400), var(--magenta-600));
+}
+
+/* --- 3. colors: light --------------------------------------------------- */
+/* Neutrals invert to warm paper; accents darken so every text pairing clears 4.5:1.
+   --ink-black stays near-black on purpose: it is the brutalist border/shadow colour. */
+[data-theme="light"] {
+  --ink-black: #17130f;
+  --ink-950: #ece5db;
+  --ink-900: #ffffff;
+  --ink-800: #f5efe7;
+  --ink-700: #e2d8cb;
+  --ink-600: #b0a292;
+  --fog-400: #6b6157;
+  --fog-300: #574e46;
+  --fog-200: #3a342f;
+  --cream: #17130f;
+  --cream-soft: #2a2420;
+  --paper: #ffffff;
+
+  --violet-700: #3d0f8a;
+  --violet-600: #5b18d9;
+  --violet-500: #6c2bf0;
+  --violet-300: #5b18d9;
+  --magenta-600: #97104f;
+  --magenta-500: #c4136a;
+  --magenta-400: #a8125a;
+  --orange-600: #b8480a;
+  --orange-500: #c9510b;
+  --amber-400: #9a6400;
+  --yellow-400: #b98d00;
+  --teal-400: #0a6f62;
+  --teal-300: #085c51;
+
+  --surface-canvas: #f2ece4;
+  --surface-card: #ffffff;
+  --surface-card-alt: #f7f1ea;
+  --surface-raised: #efe7dd;
+  --surface-paper: #ffffff;
+
+  --text-display: #17130f;
+  --text-body: #3a342f;
+  --text-muted: #6b6157;
+  --text-on-light: #fff9f5;
+  --text-on-brand: #ffffff;
+
+  --border-hairline: rgba(23, 19, 15, 0.2);
+  --border-hard: var(--ink-black);
+  --focus-ring: #9a6400;
+
+  --action-primary-bg: #5b18d9;
+  --action-primary-hover: #6c2bf0;
+  --action-primary-text: #ffffff;
+  --action-secondary-border: var(--ink-black);
+
+  --gradient-violet: linear-gradient(160deg, #6c2bf0, #3d0f8a);
+  --gradient-sunburst: linear-gradient(135deg, #d99000, #b8480a);
+  --gradient-magenta: linear-gradient(160deg, #d63b86, #97104f);
+
+  --shadow-hard-sm: 4px 4px 0 rgba(23, 19, 15, 0.95);
+  --shadow-hard-md: 8px 8px 0 rgba(23, 19, 15, 0.95);
+  --shadow-hard-cream: 6px 6px 0 var(--ink-black);
+  --shadow-glow-violet: 0 0 60px rgba(91, 24, 217, 0.22);
+  --shadow-glow-magenta: 0 0 50px rgba(196, 19, 106, 0.2);
+  --shadow-soft: 0 24px 70px rgba(23, 19, 15, 0.16);
+}
+
+/* --- 4. typography ----------------------------------------------------- */
+:root {
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+
+  --fs-display-xl: clamp(48px, 7vw, 104px);
+  --fs-display-lg: clamp(36px, 5vw, 72px);
+  --fs-h1: clamp(30px, 3.4vw, 48px);
+  --fs-h2: clamp(24px, 2.6vw, 34px);
+  --fs-h3: 24px;
+  --fs-body-lg: 20px;
+  --fs-body: 16px;
+  --fs-small: 14px;
+  --fs-micro: 12px;
+
+  --fw-display: 800;
+  --fw-body-regular: 400;
+  --fw-body-medium: 500;
+  --fw-body-bold: 700;
+
+  --lh-display: 0.98;
+  --lh-heading: 1.1;
+  --lh-body: 1.55;
+
+  --ls-display: -0.02em;
+  --ls-label: 0.08em;
+}
+
+/* --- 5. Hebrew / RTL scope --------------------------------------------- */
+/* Display: Secular One — heavy geometric Hebrew, the Unbounded counterpart.
+   Ships ONE weight, so never request bold (rule below enforces it).
+   Body: Miriam Libre — sturdy characterful grotesk; Assistant is the fallback. */
+[lang="he"] {
+  --font-display: 'Secular One', 'Rubik', sans-serif;
+  --font-body: 'Miriam Libre', 'Assistant', sans-serif;
+  /* Hebrew has no caps and a taller x-height: ease tracking, open the leading */
+  --fw-display: 400;
+  --ls-display: -0.01em;
+  --ls-label: 0.06em;
+  --lh-display: 1.08;
+  --lh-heading: 1.22;
+  --lh-body: 1.7;
+}
+
+/* no synthetic bold on Secular One; Latin wordmarks marked .ltr stay Unbounded 800 */
+[lang="he"] :is(h1, h2, h3, .display):not(.ltr) { font-weight: 400 !important; }
+[lang="he"] .wordmark.ltr { font-weight: 800 !important; font-family: 'Unbounded', sans-serif; }
+
+/* bidi hygiene — isolate Latin runs (brand names, emails, URLs, code) inside Hebrew copy */
+[lang="he"] .ltr,
+[lang="he"] bdi { direction: ltr; unicode-bidi: isolate; }
+[lang="he"] input[dir="ltr"],
+[lang="he"] textarea[dir="ltr"] { direction: ltr; text-align: right; }
+/* directional glyphs mirror: wrap arrows in <span class="arrow">→</span> */
+[lang="he"] .arrow { display: inline-block; transform: scaleX(-1); }
+
+/* --- 6. spacing & layout ---------------------------------------------- */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  --container-max: 1280px;
+  --container-pad: clamp(20px, 5vw, 80px);
+}
+
+/* --- 7. radii, borders, shadows, motion ------------------------------- */
+:root {
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 32px;
+  --radius-xl: 48px;
+  --radius-pill: 999px;
+  --radius-arch: 50% 50% 0 0;
+
+  --border-thin: 1.5px solid var(--border-hairline);
+  --border-thick: 3px solid var(--ink-black);
+  --border-thick-light: 3px solid var(--cream);
+
+  --shadow-hard-sm: 4px 4px 0 rgba(0, 0, 0, 0.9);
+  --shadow-hard-md: 8px 8px 0 rgba(0, 0, 0, 0.9);
+  --shadow-hard-cream: 6px 6px 0 var(--cream);
+  --shadow-glow-violet: 0 0 60px rgba(108, 43, 240, 0.45);
+  --shadow-glow-magenta: 0 0 50px rgba(242, 63, 140, 0.4);
+  --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.55);
+
+  --ease-brand: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 140ms;
+  --duration-base: 260ms;
+
+  /* the notched-ribbon CTA silhouette, as a reusable value */
+  --clip-ribbon: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+}
+
+/* --- 8. base + signature primitives ----------------------------------- */
+body {
+  margin: 0;
+  background: var(--surface-canvas);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+a { color: var(--cream); }
+a:hover { color: var(--amber-400); }
+
+:where(h1, h2, h3) {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  color: var(--text-display);
+  letter-spacing: var(--ls-display);
+  line-height: var(--lh-heading);
+}
+
+/* focus ring — amber glow, applies to every interactive element */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus-ring) 20%, transparent);
+}
+
+/* eyebrow / micro label */
+.vp-label {
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--teal-400);
+}
+
+/* the signature CTA: notched ribbon + hard shadow that lifts on hover */
+.vp-btn {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--fs-body);
+  padding: 16px 34px;
+  border: none;
+  cursor: pointer;
+  color: var(--action-primary-text);
+  background: var(--action-primary-bg);
+  box-shadow: var(--shadow-hard-sm);
+  clip-path: var(--clip-ribbon);
+  transition: transform var(--duration-fast) var(--ease-brand),
+              box-shadow var(--duration-fast) var(--ease-brand),
+              background var(--duration-fast) var(--ease-out);
+}
+.vp-btn:hover { background: var(--action-primary-hover); transform: translate(-2px, -2px); box-shadow: var(--shadow-hard-md); }
+.vp-btn:active { transform: translate(0, 0); box-shadow: var(--shadow-hard-sm); }
+.vp-btn[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* secondary: cream pill outline that inverts on hover */
+.vp-btn-secondary {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--fs-small);
+  padding: 13px 26px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-display);
+  border: 3px solid var(--action-secondary-border);
+  border-radius: var(--radius-pill);
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.vp-btn-secondary:hover { background: var(--cream); color: var(--text-on-light); }
+
+/* the hard-shadow "sticker" card */
+.vp-card {
+  background: var(--surface-card);
+  border: var(--border-thick);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-md);
+  padding: var(--space-6);
+}
+
+/* form field */
+.vp-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--text-display);
+  background: var(--surface-card-alt);
+  border: 2.5px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 15px 18px;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+.vp-input::placeholder { color: var(--text-muted); }
+.vp-input:focus { border-color: var(--focus-ring); box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus-ring) 20%, transparent); }

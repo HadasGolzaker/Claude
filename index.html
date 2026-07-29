@@ -5,23 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Voiceprint · טביעת קול</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&family=Noto+Serif:wght@600;700;800&family=Noto+Serif+Hebrew:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- design system: MUST stay first, every rule below builds on its tokens -->
+<link rel="stylesheet" href="styles/voiceprint-theme.css">
 <style>
+/* This app's semantic names are kept as a thin alias layer over the design
+   system in styles/voiceprint-theme.css, so the ~400 existing var(--ink) /
+   var(--card) call sites below pick up the theme without being rewritten.
+   Typography aliases live here; the colour aliases are set per theme further
+   down. Never put a raw hex or font stack in this file: add it to the theme. */
 :root{
-  --paper:#FAFAFA;
-  --ink:#000000;
-  --ink-soft:#000000;
-  --accent:#E4C4E1;      /* soft lavender — primary accent */
-  --accent-soft:#F4E9F3;
-  --amber:#B5793A;
-  --line:#DEDCD0;
-  --card:#FAFAFA;
-  --danger:#B23A3A;
-  --radius:16px;
-  --font-serif:'Noto Serif Hebrew','Noto Serif',serif;
-  --font-sans:'Arimo',sans-serif;
+  --font-serif:var(--font-display);
+  --font-sans:var(--font-body);
+  --radius:var(--radius-md);
 }
 *{box-sizing:border-box;margin:0;padding:0}
+/* set for one frame by setTheme() — see the comment there */
+html.vp-theme-switching,
+html.vp-theme-switching *,
+html.vp-theme-switching *::before,
+html.vp-theme-switching *::after{transition:none !important}
 html,body{height:100%}
 body{
   font-family:var(--font-sans);
@@ -51,7 +54,7 @@ header .logo,header .header-controls{direction:ltr}
 .logo{display:flex;align-items:baseline;gap:10px;min-width:0}
 .logo h1{font-family:var(--font-serif);font-weight:700;font-size:1.6rem;letter-spacing:-.01em;flex-shrink:0}
 .logo span{color:var(--ink);font-weight:700;font-size:.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lang-toggle{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.lang-toggle{display:flex;border:1.5px solid var(--ink);border-radius:var(--radius-pill);overflow:hidden}
 .lang-toggle button{border:0;background:transparent;padding:6px 16px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
 .lang-toggle button.active{background:var(--ink);color:var(--paper)}
 .post-lang-toggle{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
@@ -76,34 +79,34 @@ aside{position:sticky;top:24px;align-self:start}
 }
 
 /* ---------- cards / steps ---------- */
-.card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:34px 36px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.card{/* visuals come from .vp-card in the design system */}
 @media(max-width:600px){.card{padding:24px 20px}}
 .step{display:none;animation:rise .45s ease}
 .step.active{display:block}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.step{animation:none}}
 
-.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin-bottom:10px}
+.eyebrow{margin-bottom:10px;display:block} /* type comes from .vp-label */
 .q-title{font-family:var(--font-serif);font-weight:600;font-size:1.55rem;line-height:1.25;margin-bottom:8px}
 .q-sub{color:var(--ink-soft);margin-bottom:22px;font-size:.98rem}
 .lang-hint{display:inline-flex;align-items:center;gap:8px;background:var(--lavender-soft);color:var(--ink);border-radius:8px;padding:6px 12px;font-size:.88rem;font-weight:600;margin-bottom:18px}
 
 /* options */
-.opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+.opt{display:block;width:100%;text-align:start;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
 .opt:hover{background:var(--hover-fill)}
-.opt.selected{border-color:var(--accent);background:var(--accent);color:#000;font-weight:600}
+.opt.selected{border-color:var(--accent);background:var(--accent);color:var(--on-accent);font-weight:600}
 .opt.selected:hover{background:var(--accent)}
-.opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--lavender);color:#000;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.opt .rank-badge{position:absolute;inset-inline-end:12px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--lavender);color:var(--on-accent);font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center}
 
 textarea,input[type=text]{
-  width:100%;font:inherit;border:1.5px solid var(--line);border-radius:10px;
+  width:100%;font:inherit;border:1.5px solid var(--line);border-radius:var(--radius-sm);
   padding:14px 16px;background:var(--paper);resize:vertical;min-height:150px;color:var(--ink)
 }
 textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
 .char-note{font-size:.82rem;color:var(--ink-soft);margin-top:6px}
 
 /* uploads */
-.upload-box{border:2px dashed var(--line);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:8px}
+.upload-box{border:2px dashed var(--line);border-radius:var(--radius-sm);padding:18px;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:8px}
 .upload-box:hover{border-color:var(--accent)}
 .upload-box input{display:none}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -113,12 +116,9 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 
 /* nav */
 .nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:18px}
-.btn{border:0;font:inherit;font-weight:700;border-radius:999px;padding:12px 28px;cursor:pointer;transition:transform .1s}
+.btn{border:0;font:inherit;font-weight:700;border-radius:var(--radius-pill);padding:12px 28px;cursor:pointer;transition:transform .1s}
 .btn:active{transform:scale(.98)}
-.btn-primary{background:var(--ink);color:var(--paper)}
-.btn-primary:disabled{opacity:.35;cursor:not-allowed}
-.btn-ghost{background:transparent;color:var(--ink-soft);border:1.5px solid var(--line)}
-.btn-accent{background:var(--accent);color:#000}
+.btn-accent{background:var(--accent);color:var(--on-accent)}
 .progress-label{font-size:.85rem;color:var(--ink-soft)}
 
 /* intro */
@@ -146,18 +146,18 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .avatar-caption b{display:block;margin-bottom:4px;color:var(--ink);font-weight:600}
 .persona-layers .section-h{margin-top:0}
 .persona-summary{background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;justify-content:center}
-.persona-summary .section-h{color:var(--bg);border-bottom-color:rgba(128,128,128,.35);margin-top:0}
+.persona-summary .section-h{color:var(--bg);border-bottom-color:color-mix(in srgb, var(--on-accent) 30%, transparent);margin-top:0}
 .persona-summary-text{font-size:1.08rem;line-height:1.6}
 
 /* horizontal-scroll model-layer cards */
 .layer-scroll{display:flex;gap:14px;overflow-x:auto;padding:6px 0 14px;margin-bottom:12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
-.layer-card{flex:0 0 auto;width:78%;max-width:300px;border-radius:var(--radius);padding:18px 20px;scroll-snap-align:start;color:#000}
-.layer-card .section-h{margin:0 0 12px;border:0;padding:0;color:#000}
+.layer-card{flex:0 0 auto;width:78%;max-width:300px;border-radius:var(--radius);padding:18px 20px;scroll-snap-align:start;color:var(--on-accent)}
+.layer-card .section-h{margin:0 0 12px;border:0;padding:0;color:var(--on-accent)}
 .layer-card .trait-name{width:88px;font-size:.82rem}
 .layer-card .trait-score{width:22px;font-size:.82rem}
-.layer-card .char-note{color:#000;opacity:.72}
-.layer-card .chip,.layer-card .chip-block{background:rgba(255,255,255,.55);border-color:rgba(0,0,0,.15)}
-.layer-card .dna-list li{border-bottom-color:rgba(0,0,0,.18)}
+.layer-card .char-note{color:var(--on-accent);opacity:.72}
+.layer-card .chip,.layer-card .chip-block{background:color-mix(in srgb, var(--surface-paper) 55%, transparent);border-color:color-mix(in srgb, var(--on-accent) 15%, transparent)}
+.layer-card .dna-list li{border-bottom-color:color-mix(in srgb, var(--on-accent) 18%, transparent)}
 @media(min-width:600px){.layer-card{width:280px}}
 
 /* writing DNA + writing rules, two columns */
@@ -173,73 +173,62 @@ textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;bo
 .trait-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .8s ease}
 .trait-score{width:34px;text-align:center;font-weight:700;font-size:.9rem}
 .section-h{font-family:var(--font-serif);font-weight:600;font-size:1.15rem;margin:26px 0 12px;padding-bottom:6px;border-bottom:1.5px solid var(--line)}
-.chip{display:inline-block;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:5px 14px;margin:0 0 8px;margin-inline-end:8px;font-size:.88rem;font-weight:600}
-.chip-block{display:block;border-radius:16px;padding:14px 18px;margin:0 0 10px;line-height:1.45}
-.chip.hot{border-color:var(--amber);background:#FBF3E2}
+.chip{display:inline-block;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--radius-pill);padding:5px 14px;margin:0 0 8px;margin-inline-end:8px;font-size:.88rem;font-weight:600}
+.chip-block{display:block;border-radius:var(--radius-md);padding:14px 18px;margin:0 0 10px;line-height:1.45}
+.chip.hot{border-color:var(--amber);background:var(--amber-soft)}
 .dna-list{list-style:none}
 .dna-list li{padding:8px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
 .dna-list li:last-child{border:0}
 .dna-list b{color:var(--ink)}
-.gap-note{background:#FBF3E2;border:1.5px solid var(--amber);border-radius:10px;padding:14px 16px;margin-top:18px;font-size:.92rem}
-.error-box{background:#FBE9E9;border:1.5px solid var(--danger);color:var(--danger);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.92rem}
-.approved-banner{background:var(--accent);color:#000;border-radius:10px;padding:18px 20px;margin-top:20px;font-weight:600}
+.gap-note{background:var(--amber-soft);border:1.5px solid var(--amber);border-radius:var(--radius-sm);padding:14px 16px;margin-top:18px;font-size:.92rem}
+.error-box{background:var(--danger-soft);border:1.5px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px;font-size:.92rem}
+.approved-banner{background:var(--accent);color:var(--on-accent);border-radius:var(--radius-sm);padding:18px 20px;margin-top:20px;font-weight:600}
 </style>
 
 <style>
 /* ==========================================================
    OPPO BRAND PASS — clean, flat, minimal (overrides above)
    ========================================================== */
+/* ---- colour aliases -> design-system tokens (dark is the theme default) ---- */
 :root{
-  --radius:16px;
-  --bg:#F2F1E8;
-  --paper:#FAFAFA;
-  --card:#FAFAFA;
-  --ink:#000000;
-  --ink-soft:#000000;
-  --line:#DEDCD0;
-  --accent:#E4C4E1;        /* soft lavender — primary accent */
-  --accent-soft:#F4E9F3;
-  --amber:#B5793A;
-  --amber-soft:#FEDCC6;    /* peach */
-  --danger:#B23A3A;
-  --danger-soft:#FBE9E9;
-  --lavender:#E4C4E1;
-  --lavender-soft:#F4E9F3;
-  --olive:#C3C986;
-  --olive-soft:#F0F1E1;
-  --peach:#FEDCC6;
-  --shadow:0 1px 0 rgba(0,0,0,.03);
-  --hover-fill:#EEEDE3;
-  --g-blue:#E4C4E1;
-  --g-orange:#FF6000;
-  --g-pink:#FEDCC6;
-  --g-green:#C3C986;
-  --g-lime:#D8DC9E;
-  --on-primary:#000000;
+  --radius:var(--radius-md);
+  --bg:var(--surface-canvas);
+  --paper:var(--surface-card-alt);
+  --card:var(--surface-card);
+  --ink:var(--text-display);
+  --ink-soft:var(--text-muted);
+  --line:var(--border-hairline);
+  --accent:var(--violet-300);        /* pale enough that --on-accent is ink */
+  --accent-soft:color-mix(in srgb, var(--violet-300) 22%, transparent);
+  --amber:var(--amber-400);
+  --amber-soft:color-mix(in srgb, var(--amber-400) 24%, transparent);
+  --danger:var(--magenta-500);
+  --danger-soft:color-mix(in srgb, var(--magenta-500) 20%, transparent);
+  --lavender:var(--violet-300);
+  --lavender-soft:color-mix(in srgb, var(--violet-300) 24%, transparent);
+  --olive:var(--teal-400);
+  --olive-soft:color-mix(in srgb, var(--teal-400) 22%, transparent);
+  --peach:var(--orange-500);
+  --shadow:var(--shadow-hard-sm);
+  --hover-fill:color-mix(in srgb, var(--text-display) 10%, transparent);
+  /* category accents for idea/comment pills */
+  --g-blue:var(--violet-300);
+  --g-orange:var(--orange-500);
+  --g-pink:var(--magenta-400);
+  --g-green:var(--teal-400);
+  --g-lime:var(--yellow-400);
+  --on-primary:var(--action-primary-text);
+  --on-accent:var(--ink-black);      /* text sitting on --accent / --g-* fills */
 }
-:root[data-theme="dark"]{
-  --bg:#000000;
-  --paper:#0D0D0C;
-  --card:#000000;
-  --ink:#FFFFFF;
-  --ink-soft:#FFFFFF;
-  --line:rgba(255,255,255,.16);
-  --accent:#E4C4E1;
-  --accent-soft:rgba(228,196,225,.24);
-  --amber:#E4B27C;
-  --amber-soft:rgba(254,220,198,.26);
-  --danger:#E27878;
-  --danger-soft:rgba(178,58,58,.20);
-  --lavender:#E4C4E1;
-  --lavender-soft:rgba(228,196,225,.26);
-  --olive:#C3C986;
-  --olive-soft:rgba(195,201,134,.26);
-  --peach:#FEDCC6;
-  --shadow:0 1px 0 rgba(0,0,0,.4);
-  --hover-fill:rgba(255,255,255,.08);
-  --g-lime:#F5E14C;
+/* Light mode: hand-picked pairings from the theme, never a filter inversion.
+   Accents darken here, so text on them flips to the light ink. */
+:root[data-theme="light"]{
+  --accent:var(--action-primary-bg);
+  --lavender:var(--action-primary-bg);
+  --danger:var(--magenta-600);
+  --peach:var(--orange-600);
+  --on-accent:var(--action-primary-text);
 }
-html[lang="en"]{--font-serif:'Noto Serif','Noto Serif Hebrew',serif}
 body{
   font-family:var(--font-sans);
   font-size:18px;line-height:1.62;
@@ -269,11 +258,8 @@ html[lang="he"] .q-sub,html[lang="he"] .char-note,html[lang="he"] .dna-list li{f
 html[lang="en"] body{font-size:17px}
 
 /* ---------- flat cards & surfaces ---------- */
-.card{
-  background:var(--card);
-  border:1px solid var(--line);border-radius:var(--radius);
-  box-shadow:var(--shadow);
-}
+/* .card carries .vp-card in the markup: background, 3px border, radius and the
+   hard shadow all come from the design system. Only layout stays local. */
 .layers{
   background:var(--card);
   border:1px solid var(--line);border-radius:var(--radius);
@@ -284,7 +270,7 @@ html[lang="en"] body{font-size:17px}
   border:1.5px solid var(--line);border-radius:14px;
 }
 .opt:hover{background:var(--hover-fill)}
-.opt.selected{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
 .opt.selected:hover{background:var(--accent)}
 textarea,input[type=text]{
   background:var(--paper);
@@ -292,17 +278,12 @@ textarea,input[type=text]{
 }
 
 /* ---------- buttons: black primary pill, outline secondary, grey hover ---------- */
-.btn{border-radius:999px;font-weight:600}
-.btn-primary{background:var(--ink);color:var(--bg)}
-.btn-primary:hover{opacity:.88}
-.btn-primary:disabled{opacity:.35}
-.btn-ghost{
-  background:transparent;
-  border:1.5px solid var(--ink);color:var(--ink);
-}
-.btn-ghost:hover{background:var(--hover-fill)}
-.btn-accent{background:var(--accent);color:#000}
-.btn-accent:hover{filter:brightness(1.06)}
+.btn{border-radius:var(--radius-pill);font-weight:600}
+.btn-accent{background:var(--accent);color:var(--on-accent)}
+.btn-accent:hover{background:var(--accent);filter:brightness(1.06)}
+.btn-danger:hover{background:var(--danger);filter:brightness(1.06)}
+/* the theme styles .vp-btn[disabled]; give the secondary the same treatment */
+.vp-btn-secondary[disabled]{opacity:.45;cursor:not-allowed}
 .chip{
   background:var(--paper);
   border:1.5px solid var(--line);
@@ -316,13 +297,13 @@ textarea,input[type=text]{
 :root[data-theme="dark"] .error-box{background:var(--danger-soft);color:var(--danger)}
 
 .trait-fill{background:var(--accent)}
-.approved-banner{background:var(--accent);color:#000}
+.approved-banner{background:var(--accent);color:var(--on-accent)}
 .logo span{color:var(--ink)}
 
 /* brainstorm idea pills — brand palette per category */
 .idea-pills{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-.idea-pill{border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);animation:ideaIn .5s cubic-bezier(.2,.7,.2,1) both}
-.idea-head{width:100%;text-align:start;border:0;cursor:pointer;background:var(--pg);color:#000;font:inherit;padding:14px 18px;display:flex;flex-direction:column;gap:2px}
+.idea-pill{border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-hard-sm);animation:ideaIn .5s cubic-bezier(.2,.7,.2,1) both}
+.idea-head{width:100%;text-align:start;border:0;cursor:pointer;background:var(--pg);color:var(--on-accent);font:inherit;padding:14px 18px;display:flex;flex-direction:column;gap:2px}
 .idea-cat{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.66}
 .idea-title{font-weight:600;font-size:1.02rem;line-height:1.25}
 .idea-body{max-height:0;overflow:hidden;background:var(--card);transition:max-height .35s ease,padding .35s ease;padding:0 18px}
@@ -367,7 +348,7 @@ textarea,input[type=text]{
 .profile-del-btn:hover{background:var(--hover-fill);color:var(--danger)}
 .profile-del-btn svg{width:16px;height:16px}
 .user-menu-divider{height:1px;background:var(--line);margin:6px 4px}
-.user-menu-segment{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;margin:0 4px 8px}
+.user-menu-segment{display:flex;border:1.5px solid var(--line);border-radius:var(--radius-pill);overflow:hidden;margin:0 4px 8px}
 .user-menu-segment button{flex:1;border:0;background:transparent;padding:7px 10px;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;color:var(--ink)}
 .user-menu-segment button.active{background:var(--ink);color:var(--paper)}
 /* logout button lives in the user menu now; the auth module still creates
@@ -375,7 +356,7 @@ textarea,input[type=text]{
    styling for it later at runtime) — !important keeps it invisible regardless */
 #vp-logout{display:none!important}
 /* delete-profile confirmation */
-.btn-danger{background:var(--danger);color:#fff}
+.btn-danger{background:var(--danger);color:var(--text-on-brand)}
 .btn-danger:disabled{opacity:.35;cursor:not-allowed}
 #vp-del{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1200}
 #vp-del .box{max-width:440px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 32px;text-align:center;box-shadow:var(--shadow)}
@@ -395,7 +376,7 @@ textarea,input[type=text]{
 .combo-list{position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:20;max-height:240px;overflow-y:auto;background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:4px}
 .combo-list[hidden]{display:none}
 .combo-opt{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.98rem}
-.combo-opt:hover,.combo-opt.active{background:var(--accent);color:#000}
+.combo-opt:hover,.combo-opt.active{background:var(--accent);color:var(--on-accent)}
 .combo-empty{padding:10px 12px;color:var(--ink-soft);font-size:.92rem}
 /* Q3 drag-and-drop ranking */
 .rank-wrap{display:flex;flex-direction:column;gap:18px;margin-bottom:8px}
@@ -409,16 +390,16 @@ textarea,input[type=text]{
 .rank-pool{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;border:1.5px dashed transparent;border-radius:12px;padding:6px;transition:border-color .15s,background .15s}
 .rank-pool.over{border-color:var(--accent);background:var(--accent-soft)}
 .rank-pool.pool-done{opacity:.55}
-.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:grab;user-select:none;text-align:start;touch-action:none}
+.rank-chip{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:var(--radius-pill);padding:9px 15px;font:inherit;font-weight:600;font-size:.92rem;cursor:grab;user-select:none;text-align:start;touch-action:none}
 .rank-chip:hover{background:var(--hover-fill)}
-.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:#000;border-radius:10px}
+.rank-chip.in-slot{flex:1;background:var(--accent);border-color:var(--accent);color:var(--on-accent);border-radius:var(--radius-sm)}
 .rank-chip.in-slot:hover{background:var(--accent)}
 .rank-chip.drag-source{opacity:.35}
-.rank-ghost{border:1.5px solid var(--accent);background:var(--accent);color:#000;border-radius:10px;padding:9px 15px;font-weight:600;font-size:.92rem;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:.95;cursor:grabbing;display:flex;align-items:center}
+.rank-ghost{border:1.5px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:var(--radius-sm);padding:9px 15px;font-weight:600;font-size:.92rem;box-shadow:var(--shadow-soft);opacity:.95;cursor:grabbing;display:flex;align-items:center}
 /* Q10 no-LinkedIn toggle */
 .no-li-toggle{display:flex;align-items:center;gap:9px;font-weight:600;font-size:.95rem;cursor:pointer;margin-bottom:18px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--paper)}
 .no-li-toggle input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
-.theme-toggle{width:40px;height:40px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
+.theme-toggle{width:40px;height:40px;border-radius:var(--radius-pill);border:1.5px solid var(--ink);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);padding:0}
 .theme-toggle:hover{background:var(--hover-fill)}
 .theme-toggle svg{width:18px;height:18px}
 .theme-toggle .sun{display:none}
@@ -484,8 +465,18 @@ textarea,input[type=text]{
   var m=s||((window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light');
   document.documentElement.setAttribute('data-theme',m);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 function setTheme(mode){
-  document.documentElement.setAttribute('data-theme',mode);
+  var de=document.documentElement;
+  /* Suppress transitions across the swap. A property that is BOTH transitioned
+     and fed by a custom property (e.g. .vp-btn-secondary's colour) can stay
+     stuck on the old theme's value when the attribute flips, because the
+     in-flight transition is not re-resolved against the new token. Killing
+     transitions for one frame forces a clean re-resolve, and stops every
+     colour on the page animating at once, which looked messy anyway. */
+  de.classList.add('vp-theme-switching');
+  de.setAttribute('data-theme',mode);
   try{localStorage.setItem('vp_theme',mode);}catch(e){}
+  void de.offsetHeight; /* flush: resolve the new colours before re-enabling */
+  requestAnimationFrame(function(){ de.classList.remove('vp-theme-switching'); });
   if(typeof renderProfilePicker==='function') renderProfilePicker(); /* refresh the menu's active state */
 }
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
@@ -507,7 +498,7 @@ function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme
   </header>
 
   <main>
-    <div class="card" id="main-card"></div>
+    <div class="card vp-card" id="main-card"></div>
   </main>
 
   <aside>
@@ -1052,8 +1043,8 @@ function openDeleteModal(id){
     <p class="del-type">${t.del_type}</p>
     <input id="vp-del-input" type="text" autocomplete="off" spellcheck="false" placeholder="DELETE">
     <div class="row">
-      <button class="btn btn-ghost" id="vp-del-cancel">${t.del_cancel}</button>
-      <button class="btn btn-danger" id="vp-del-confirm" disabled>${t.del_btn}</button>
+      <button class="vp-btn-secondary" id="vp-del-cancel">${t.del_cancel}</button>
+      <button class="vp-btn btn-danger" id="vp-del-confirm" disabled>${t.del_btn}</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
@@ -1182,15 +1173,15 @@ function introHTML(){
     <p>${t.intro_p3}</p>
     <div class="intro-fields">
       <label class="field-label" for="intro-name">${t.name_label}</label>
-      <input type="text" id="intro-name" placeholder="${t.name_ph}" value="${escapeHtml(profileName)}">
+      <input type="text" id="intro-name" placeholder="${t.name_ph}" value="${escapeHtml(profileName)}" class="vp-input">
       <label class="field-label" for="intro-country">${t.country_label}</label>
       <div class="combo">
-        <input type="text" id="intro-country" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" placeholder="${t.country_ph}">
+        <input type="text" id="intro-country" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" placeholder="${t.country_ph}" class="vp-input">
         <div class="combo-list" id="country-list" role="listbox" hidden></div>
       </div>
     </div>
     <div class="start-row">
-      <button class="btn btn-primary" id="start-btn" onclick="goStep(1)" disabled>${t.start}</button>
+      <button class="vp-btn" id="start-btn" onclick="goStep(1)" disabled>${t.start}</button>
     </div>
   </div>`;
 }
@@ -1252,7 +1243,7 @@ function questionHTML(q){
   let body='';
   if(q.type==='open'){
     body = (q.writeLang?`<div class="lang-hint">${t.write_lang_hint}</div>`:'') +
-      `<textarea id="ta" placeholder="">${answers[q.id]||''}</textarea>
+      `<textarea id="ta" placeholder="" class="vp-input">${answers[q.id]||''}</textarea>
        <div class="char-note">${t.open_note}</div>`;
   }
   if(q.type==='single'){
@@ -1287,7 +1278,7 @@ function questionHTML(q){
       <label class="no-li-toggle"><input type="checkbox" id="no-li" ${noLi?'checked':''}> ${t.no_li}</label>
 
       <label class="field-label">${postsLabel} <small>· ${postsSmall}</small></label>
-      <textarea id="posts-ta" placeholder="${postsPh}">${uploads.posts}</textarea>
+      <textarea id="posts-ta" placeholder="${postsPh}" class="vp-input">${uploads.posts}</textarea>
 
       <label class="field-label">${t.pic_label} <small>· ${t.pic_small}</small></label>
       <label class="upload-box"><input type="file" id="img-input" accept="image/png,image/jpeg,image/webp" multiple>
@@ -1295,19 +1286,19 @@ function questionHTML(q){
       <div class="thumbs" id="thumbs">${uploads.images.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
 
       <label class="field-label">${aboutLabel} <small>· ${aboutSmall}</small></label>
-      <textarea id="about-ta" style="min-height:90px" placeholder="${aboutPh}">${uploads.about}</textarea>`;
+      <textarea id="about-ta" style="min-height:90px" placeholder="${aboutPh}" class="vp-input">${uploads.about}</textarea>`;
   }
 
   const isLast = step===QUESTIONS.length-1;
   return `<div class="step active">
-    <div class="eyebrow">${L.ey}</div>
+    <div class="eyebrow vp-label">${L.ey}</div>
     <h2 class="q-title">${L.t}</h2>
     ${L.s?`<p class="q-sub">${L.s}</p>`:''}
     ${body}
     <div class="nav">
-      <button class="btn btn-ghost" onclick="goStep(-1)">${t.back}</button>
+      <button class="vp-btn-secondary" onclick="goStep(-1)">${t.back}</button>
       <span class="progress-label">${step+1} ${t.of} ${QUESTIONS.length}</span>
-      <button class="btn btn-primary" id="next-btn" ${answered(q.id)?'':'disabled'}
+      <button class="vp-btn" id="next-btn" ${answered(q.id)?'':'disabled'}
         onclick="goStep(1)">${isLast?t.generate:t.next}</button>
     </div>
   </div>`;
@@ -1803,10 +1794,10 @@ async function runGeneration(refineNote){
       <div class="gap-note" style="margin-top:14px">
         <b>${lang==='he'?'פתרון: מפתח API אישי':'Fix: personal API key'}</b><br>
         ${lang==='he'?'הקובץ רץ מחוץ ל-Claude, אז צריך מפתח משלכם (אותו אחד מהגנרטור). הוא לא נשמר בשום מקום - רק בזיכרון של העמוד.':'The file runs outside Claude, so it needs your own key. It is not stored anywhere - memory only.'}<br>
-        <input type="text" id="api-key-input" style="min-height:auto;margin-top:8px" placeholder="sk-ant-..." value="${apiKey}">
+        <input type="text" id="api-key-input" style="min-height:auto;margin-top:8px" placeholder="sk-ant-..." value="${apiKey}" class="vp-input">
       </div>`:''}
-      <div class="nav"><button class="btn btn-ghost" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
-      <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
+      <div class="nav"><button class="vp-btn-secondary" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
+      <button class="vp-btn" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
   }
 }
 
@@ -1892,7 +1883,7 @@ async function translateProfile(target){
     render();
     if(failed && card){
       const t=T();
-      card.insertAdjacentHTML('beforeend',`<div class="gap-note" id="translate-err" style="margin-top:14px">${target==='he'?'התרגום האוטומטי נכשל - עדיין מוצג בשפה הקודמת.':'Automatic translation failed - still showing the previous language.'} <button class="btn btn-ghost" style="padding:6px 16px;margin-top:8px" onclick="document.getElementById('translate-err').remove();translateProfile('${target}')">${t.retry}</button><br><small style="opacity:.6">${escapeHtml(errMsg)}</small></div>`);
+      card.insertAdjacentHTML('beforeend',`<div class="gap-note" id="translate-err" style="margin-top:14px">${target==='he'?'התרגום האוטומטי נכשל - עדיין מוצג בשפה הקודמת.':'Automatic translation failed - still showing the previous language.'} <button class="vp-btn-secondary" style="padding:6px 16px;margin-top:8px" onclick="document.getElementById('translate-err').remove();translateProfile('${target}')">${t.retry}</button><br><small style="opacity:.6">${escapeHtml(errMsg)}</small></div>`);
     }
   }
 }
@@ -1982,7 +1973,7 @@ function profileHTML(){
   }
 
   return `<div class="step active">
-    <div class="eyebrow">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
+    <div class="eyebrow vp-label">${t.profile_h}${profileName?` · ${escapeHtml(profileName)}`:''}</div>
     ${approved?'':`<p class="q-sub">${t.profile_sub}</p>`}
 
     <div class="persona-hero">
@@ -2016,12 +2007,12 @@ function profileHTML(){
 
     ${gaps}
 
-    ${approved?`<div class="approved-banner">${t.approved}<br><button class="btn" style="background:#fff;color:#000;margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
+    ${approved?`<div class="approved-banner">${t.approved}<br><button class="vp-btn" style="background:var(--on-accent);color:var(--accent);margin-top:14px" onclick="step=STEP_COMPOSER;render()">${t.to_composer}</button></div>`:`
     <div class="section-h">${t.refine_label}</div>
-    <textarea id="refine-ta" style="min-height:90px" placeholder="${t.refine_ph}"></textarea>
+    <textarea id="refine-ta" style="min-height:90px" placeholder="${t.refine_ph}" class="vp-input"></textarea>
     <div class="nav">
-      <button class="btn btn-ghost" id="refine-btn">${t.refine_btn}</button>
-      <button class="btn btn-accent" id="approve-btn">${t.approve_btn}</button>
+      <button class="vp-btn-secondary" id="refine-btn">${t.refine_btn}</button>
+      <button class="vp-btn btn-accent" id="approve-btn">${t.approve_btn}</button>
     </div>`}
   </div>`;
 }
@@ -2117,27 +2108,27 @@ async function rewritePostLang(targetLang, prevLang){
 function composerHTML(){
   const t=T();
   return `<div class="step active">
-    <div class="eyebrow">Voiceprint</div>
+    <div class="eyebrow vp-label">Voiceprint</div>
     <h2 class="q-title">${t.composer_h}</h2>
     <p class="q-sub">${t.composer_sub}</p>
     ${postLangToggleHTML()}
-    <textarea id="post-input" style="min-height:180px" placeholder="${t.input_ph}">${escapeHtml(postInput)}</textarea>
+    <textarea id="post-input" style="min-height:180px" placeholder="${t.input_ph}" class="vp-input">${escapeHtml(postInput)}</textarea>
     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-ghost" id="rec-btn">${recog?t.rec_stop:t.rec_start}</button>
-      <button class="btn btn-ghost" id="ideas-btn">${t.ideas_btn}</button>
+      <button class="vp-btn-secondary" id="rec-btn">${recog?t.rec_stop:t.rec_start}</button>
+      <button class="vp-btn-secondary" id="ideas-btn">${t.ideas_btn}</button>
     </div>
     <div id="ideas-box"></div>
 
     <label class="field-label">${t.link_label} <small>· ${t.link_small}</small></label>
-    <input type="text" id="post-link" style="min-height:auto" placeholder="https://..." value="${escapeHtml(postLink)}">
+    <input type="text" id="post-link" style="min-height:auto" placeholder="https://..." value="${escapeHtml(postLink)}" class="vp-input">
 
     <label class="field-label">${t.img_label} <small>· ${t.img_small}</small></label>
     <label class="upload-box"><input type="file" id="post-img" accept="image/png,image/jpeg,image/webp" multiple>+</label>
     <div class="thumbs">${postImages.map(im=>`<img src="data:${im.media_type};base64,${im.data}">`).join('')}</div>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="if(recog)recog.stop();step=QUESTIONS.length+1;render()">${t.back_profile}</button>
-      <button class="btn btn-primary" id="gen-btn" ${postInput.trim().length>=20?'':'disabled'} onclick="startPostGen()">${t.gen_post}</button>
+      <button class="vp-btn-secondary" onclick="if(recog)recog.stop();step=QUESTIONS.length+1;render()">${t.back_profile}</button>
+      <button class="vp-btn" id="gen-btn" ${postInput.trim().length>=20?'':'disabled'} onclick="startPostGen()">${t.gen_post}</button>
     </div>
   </div>`;
 }
@@ -2206,11 +2197,11 @@ function ideasSetupHTML(){
     <button type="button" class="opt ${ideasMode==='profile'?'selected':''}" data-mode="profile">${t.ideas_mode_profile}</button>
     <button type="button" class="opt ${ideasMode==='topic'?'selected':''}" data-mode="topic">${t.ideas_mode_topic}</button>
     <div id="ideas-topic-wrap" style="${ideasMode==='topic'?'':'display:none'}">
-      <input type="text" id="ideas-topic-input" style="min-height:auto" placeholder="${t.ideas_topic_ph}" value="${escapeHtml(ideasTopic)}">
+      <input type="text" id="ideas-topic-input" style="min-height:auto" placeholder="${t.ideas_topic_ph}" value="${escapeHtml(ideasTopic)}" class="vp-input">
     </div>
     <label class="field-label" style="margin-top:12px">${t.ideas_cats_h}</label>
     <div class="cat-checks">${catRow}</div>
-    <button class="btn btn-primary" id="ideas-generate-btn" ${ideasGenDisabled()?'disabled':''}>${t.ideas_generate_btn}</button>
+    <button class="vp-btn" id="ideas-generate-btn" ${ideasGenDisabled()?'disabled':''}>${t.ideas_generate_btn}</button>
   </div>`;
 }
 
@@ -2308,10 +2299,10 @@ function renderIdeas(ideas){
         <div class="idea-angle">${escapeHtml(idea.angle||'')}</div>
         <div class="idea-personal">
           <label class="field-label">${t.ideas_personal_label}</label>
-          <textarea class="idea-personal-input" data-idx="${idx}" style="min-height:60px" placeholder="${t.ideas_personal_ph}"></textarea>
+          <textarea class="vp-input idea-personal-input" data-idx="${idx}" style="min-height:60px" placeholder="${t.ideas_personal_ph}"></textarea>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-            <button class="btn btn-ghost idea-use-plain" data-use="${idx}">${t.ideas_use_plain}</button>
-            <button class="btn btn-primary idea-use-personal" data-use="${idx}">${t.ideas_use_personal}</button>
+            <button class="vp-btn-secondary idea-use-plain" data-use="${idx}">${t.ideas_use_plain}</button>
+            <button class="vp-btn idea-use-personal" data-use="${idx}">${t.ideas_use_personal}</button>
           </div>
         </div>
       </div>
@@ -2424,10 +2415,10 @@ async function startPostGen(refineNote){
     console.error('post gen error:',err);
     card.innerHTML=`<div class="step active">
       <div class="error-box">${t.err_api}<br><small style="opacity:.7">${escapeHtml((err&&err.message)||'')}</small></div>
-      ${String(err&&err.message).includes('fetch')?`<div class="gap-note" style="margin-top:12px"><input type="text" id="api-key-input" style="min-height:auto" placeholder="sk-ant-..." value="${escapeHtml(apiKey)}"></div>`:''}
+      ${String(err&&err.message).includes('fetch')?`<div class="gap-note" style="margin-top:12px"><input type="text" id="api-key-input" style="min-height:auto" placeholder="sk-ant-..." value="${escapeHtml(apiKey)}" class="vp-input"></div>`:''}
       <div class="nav">
-        <button class="btn btn-ghost" onclick="step=STEP_COMPOSER;render()">${t.back}</button>
-        <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();startPostGen(lastRefineNote)">${t.retry}</button>
+        <button class="vp-btn-secondary" onclick="step=STEP_COMPOSER;render()">${t.back}</button>
+        <button class="vp-btn" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();startPostGen(lastRefineNote)">${t.retry}</button>
       </div></div>`;
   }
 }
@@ -2438,39 +2429,39 @@ function resultHTML(){
   const postBlock=`<div id="post-display" style="background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:22px;white-space:pre-wrap;font-size:1.02rem">${escapeHtml(p.post)}</div>`;
   if(!postApproved){
     return `<div class="step active">
-      <div class="eyebrow">${t.result_h}</div>
+      <div class="eyebrow vp-label">${t.result_h}</div>
       ${postLangToggleHTML()}
       ${postBlock}
       ${hooks?`<div class="section-h">${t.alt_hooks}</div>${hooks}`:''}
       <div class="section-h">${t.refine_h}</div>
       <div class="refine-option">
         <div class="field-label">${t.refine_rewrite_label}</div>
-        <textarea id="post-refine" style="min-height:80px;margin-top:6px" placeholder="${t.refine_post_ph}"></textarea>
-        <button class="btn btn-ghost" style="margin-top:10px" onclick="const n=document.getElementById('post-refine').value.trim();if(n)startPostGen(n)">${t.regen}</button>
+        <textarea id="post-refine" style="min-height:80px;margin-top:6px" placeholder="${t.refine_post_ph}" class="vp-input"></textarea>
+        <button class="vp-btn-secondary" style="margin-top:10px" onclick="const n=document.getElementById('post-refine').value.trim();if(n)startPostGen(n)">${t.regen}</button>
       </div>
       <div class="refine-option">
         <div class="field-label">${t.refine_select_label}</div>
       </div>
       <div class="nav">
-        <button class="btn btn-primary" onclick="approvePost()">${t.approve_post}</button>
+        <button class="vp-btn" onclick="approvePost()">${t.approve_post}</button>
       </div>
     </div>`;
   }
   return `<div class="step active">
-    <div class="eyebrow">${t.result_h}</div>
+    <div class="eyebrow vp-label">${t.result_h}</div>
     ${postLangToggleHTML()}
     ${postBlock}
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-accent" id="copy-btn" onclick="copyPost()">${t.copy}</button>
-      <button class="btn btn-primary" id="li-open-btn" onclick="openLinkedIn()">${t.li_open}</button>
+      <button class="vp-btn btn-accent" id="copy-btn" onclick="copyPost()">${t.copy}</button>
+      <button class="vp-btn" id="li-open-btn" onclick="openLinkedIn()">${t.li_open}</button>
     </div>
     ${hooks?`<div class="section-h">${t.alt_hooks}</div>${hooks}`:''}
     <div class="section-h">${t.comments_h}</div>
     <div class="q-sub" style="margin-top:-8px;margin-bottom:10px">${t.comments_sub}</div>
-    <div id="comments-box">${comments?renderCommentsHTML():`<button class="btn btn-ghost" id="gen-comments-btn" onclick="startCommentsGen()">${t.gen_comments_btn}</button>`}</div>
+    <div id="comments-box">${comments?renderCommentsHTML():`<button class="vp-btn-secondary" id="gen-comments-btn" onclick="startCommentsGen()">${t.gen_comments_btn}</button>`}</div>
     <div class="nav">
-      <button class="btn btn-ghost" onclick="postApproved=false;render()">${t.edit_again}</button>
-      <button class="btn btn-ghost" onclick="startNewPost()">${t.new_post}</button>
+      <button class="vp-btn-secondary" onclick="postApproved=false;render()">${t.edit_again}</button>
+      <button class="vp-btn-secondary" onclick="startNewPost()">${t.new_post}</button>
     </div>
   </div>`;
 }
@@ -2537,10 +2528,10 @@ function showSelectionPopup(range){
   if(!pop){ pop=document.createElement('div'); pop.id='sel-popup'; document.body.appendChild(pop); }
   pop.innerHTML=`
     <div class="sel-popup-quote">${escapeHtml(selRange.text)}</div>
-    <textarea id="sel-popup-input" placeholder="${t.select_edit_ph}"></textarea>
+    <textarea id="sel-popup-input" placeholder="${t.select_edit_ph}" class="vp-input"></textarea>
     <div class="sel-popup-actions">
-      <button class="btn btn-ghost" id="sel-popup-cancel">${t.cancel}</button>
-      <button class="btn btn-primary" id="sel-popup-submit">${t.select_edit_btn}</button>
+      <button class="vp-btn-secondary" id="sel-popup-cancel">${t.cancel}</button>
+      <button class="vp-btn" id="sel-popup-submit">${t.select_edit_btn}</button>
     </div>`;
   const rect=range.getBoundingClientRect();
   pop.hidden=false;
@@ -2615,10 +2606,10 @@ function renderCommentsHTML(){
       <div class="idea-body" style="max-height:none;padding:16px 18px">
         <div class="idea-angle">${escapeHtml(c)}</div>
         <div class="idea-personal">
-          <textarea class="comment-tweak-input" data-idx="${idx}" style="min-height:50px" placeholder="${t.comment_tweak_ph}"></textarea>
+          <textarea class="vp-input comment-tweak-input" data-idx="${idx}" style="min-height:50px" placeholder="${t.comment_tweak_ph}"></textarea>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-            <button class="btn btn-ghost comment-tweak-btn" data-idx="${idx}">${t.comment_tweak_btn}</button>
-            <button class="btn btn-primary comment-copy-btn" data-idx="${idx}">${t.comment_copy}</button>
+            <button class="vp-btn-secondary comment-tweak-btn" data-idx="${idx}">${t.comment_tweak_btn}</button>
+            <button class="vp-btn comment-copy-btn" data-idx="${idx}">${t.comment_copy}</button>
           </div>
         </div>
       </div>
@@ -2682,24 +2673,24 @@ function wireComments(){
 function replyHTML(){
   const t=T();
   return `<div class="step active">
-    <div class="eyebrow">Voiceprint</div>
+    <div class="eyebrow vp-label">Voiceprint</div>
     <h2 class="q-title">${t.reply_h}</h2>
     <p class="q-sub">${t.reply_sub}</p>
 
     <label class="field-label">${t.reply_source_label}</label>
-    <textarea id="reply-source" style="min-height:150px" placeholder="${t.reply_source_ph}">${escapeHtml(replySource)}</textarea>
+    <textarea id="reply-source" style="min-height:150px" placeholder="${t.reply_source_ph}" class="vp-input">${escapeHtml(replySource)}</textarea>
 
     <label class="field-label">${t.reply_note_label} <small>· ${t.reply_note_small}</small></label>
-    <textarea id="reply-note" style="min-height:60px" placeholder="${t.reply_note_ph}">${escapeHtml(replyNote)}</textarea>
+    <textarea id="reply-note" style="min-height:60px" placeholder="${t.reply_note_ph}" class="vp-input">${escapeHtml(replyNote)}</textarea>
 
     <div style="margin-top:12px">
-      <button class="btn btn-primary" id="reply-gen-btn" ${replySource.trim().length>=20?'':'disabled'}>${t.reply_gen_btn}</button>
+      <button class="vp-btn" id="reply-gen-btn" ${replySource.trim().length>=20?'':'disabled'}>${t.reply_gen_btn}</button>
     </div>
 
     <div id="replies-box">${replies?renderRepliesHTML():''}</div>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="step=(preMenuStep??STEP_COMPOSER);preMenuStep=null;render()">${t.back}</button>
+      <button class="vp-btn-secondary" onclick="step=(preMenuStep??STEP_COMPOSER);preMenuStep=null;render()">${t.back}</button>
     </div>
   </div>`;
 }
@@ -2727,10 +2718,10 @@ function renderRepliesHTML(){
       <div class="idea-body" style="max-height:none;padding:16px 18px">
         <div class="idea-angle">${escapeHtml(r.text||'')}</div>
         <div class="idea-personal">
-          <textarea class="reply-tweak-input" data-idx="${idx}" style="min-height:50px" placeholder="${t.comment_tweak_ph}"></textarea>
+          <textarea class="vp-input reply-tweak-input" data-idx="${idx}" style="min-height:50px" placeholder="${t.comment_tweak_ph}"></textarea>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-            <button class="btn btn-ghost reply-tweak-btn" data-idx="${idx}">${t.comment_tweak_btn}</button>
-            <button class="btn btn-primary reply-copy-btn" data-idx="${idx}">${t.reply_copy}</button>
+            <button class="vp-btn-secondary reply-tweak-btn" data-idx="${idx}">${t.comment_tweak_btn}</button>
+            <button class="vp-btn reply-copy-btn" data-idx="${idx}">${t.reply_copy}</button>
           </div>
         </div>
       </div>
@@ -2864,11 +2855,11 @@ async function loadHistoryEntries(){
 function historyHTML(){
   const t=T();
   return `<div class="step active">
-    <div class="eyebrow">Voiceprint</div>
+    <div class="eyebrow vp-label">Voiceprint</div>
     <h2 class="q-title">${t.menu_history}</h2>
     <div id="history-list"><div class="loading" style="padding:24px 0"><div class="pulse" style="width:40px;height:40px;border-width:3px"></div></div></div>
     <div class="nav">
-      <button class="btn btn-ghost" onclick="step=(preMenuStep??(QUESTIONS.length+1));preMenuStep=null;render()">${t.back}</button>
+      <button class="vp-btn-secondary" onclick="step=(preMenuStep??(QUESTIONS.length+1));preMenuStep=null;render()">${t.back}</button>
     </div>
   </div>`;
 }
@@ -2892,7 +2883,7 @@ async function wireHistory(){
       </button>
       <div class="idea-body">
         <div class="idea-angle" style="white-space:pre-wrap">${escapeHtml(entry.post||'')}</div>
-        <button class="btn btn-ghost history-copy" data-idx="${idx}">${t.copy}</button>
+        <button class="vp-btn-secondary history-copy" data-idx="${idx}">${t.copy}</button>
       </div>
     </div>`;
   }).join('')+`</div>`;

@@ -343,6 +343,27 @@ textarea,input[type=text]{
 #vp-del input{width:100%;font:inherit;font-weight:700;letter-spacing:.12em;text-align:center;direction:ltr;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto}
 #vp-del input:focus{outline:2px solid var(--danger);outline-offset:1px;border-color:var(--danger)}
 #vp-del .row{display:flex;gap:12px;justify-content:center;margin-top:20px}
+/* writer sharing: share modal + manage-shares modal */
+.profile-line{display:flex;align-items:center;gap:2px}
+.profile-line .profile-row{flex:1;min-width:0}
+.profile-row small{display:block;font-size:.75rem;font-weight:400;opacity:.6;direction:ltr;text-align:start;overflow:hidden;text-overflow:ellipsis}
+.unshare-btn{flex:none;border:0;background:transparent;color:var(--ink);opacity:.65;padding:8px;border-radius:8px;cursor:pointer;display:flex}
+.unshare-btn:hover{opacity:1;background:var(--hover-fill)}
+.unshare-btn svg{width:18px;height:18px}
+#vp-share{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:1200}
+#vp-share .box{max-width:440px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 32px;box-shadow:var(--shadow)}
+#vp-share h2{font-family:var(--font-serif);font-weight:600;font-size:1.7rem;margin-bottom:10px;text-align:center}
+#vp-share p{margin-bottom:14px}
+#vp-share label{display:block;font-weight:700;font-size:.9rem;margin:12px 0 6px}
+#vp-share select,#vp-share input{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto}
+#vp-share input{direction:ltr;text-align:start}
+#vp-share .share-msg{margin-top:12px;font-size:.9rem}
+#vp-share .share-msg.err{color:var(--danger)}
+#vp-share .share-list{list-style:none;padding:0;margin:0}
+#vp-share .share-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+#vp-share .share-list li span{direction:ltr;overflow:hidden;text-overflow:ellipsis}
+#vp-share .share-list .btn{padding:6px 14px;flex:none}
+#vp-share .row{display:flex;gap:12px;justify-content:center;margin-top:20px}
 /* intro name/country fields */
 .intro-fields{margin-top:24px;max-width:440px}
 .intro-fields input,.intro-fields select{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper);color:var(--ink);min-height:auto;margin-bottom:4px;resize:none}
@@ -437,6 +458,8 @@ textarea,input[type=text]{
   /* delete modal */
   #vp-del .box{padding:26px 20px}
   #vp-del .row{flex-wrap:wrap}
+  #vp-share .box{padding:26px 20px}
+  #vp-share .row{flex-wrap:wrap}
 
   /* Q3 ranking + chips comfortable for touch */
   .rank-chip{font-size:.9rem;padding:9px 13px}
@@ -532,6 +555,23 @@ const I18N = {
     menu_history:'היסטוריית פוסטים',
     menu_profiles_label:'פרופילים',
     menu_delete_profile:'מחיקת הפרופיל הנוכחי',
+    menu_share:'שיתוף כותב',
+    menu_shared_label:'שותפו איתי',
+    share_title:'שיתוף כותב',
+    share_desc:'בחרו פרופיל והזינו את המייל של מי שיכתוב בשמכם. תהיה לו גישה רק לפרופיל הזה.',
+    share_profile:'פרופיל',
+    share_email:'כתובת מייל',
+    share_btn:'שיתוף',
+    share_close:'סגירה',
+    share_bad_email:'כתובת מייל לא תקינה.',
+    share_self:'זו הכתובת שלכם - אין צורך לשתף איתה.',
+    share_done:'הפרופיל שותף עם {email}. כדי להתחיל, צריך להיכנס לאתר עם כתובת המייל הזו.',
+    share_err:'השיתוף נכשל. נסו שוב.',
+    unshare_title:'הסרת שיתוף',
+    unshare_desc:'כתובות שיש להן גישה לפרופיל {name}:',
+    unshare_btn:'הסרה',
+    unshare_none:'הפרופיל לא משותף כרגע עם אף אחד.',
+    unshare_err:'ההסרה נכשלה. נסו שוב.',
     menu_logout:'יציאה מהחשבון',
     menu_language_label:'שפה',
     menu_theme_label:'תצוגה',
@@ -630,6 +670,23 @@ const I18N = {
     menu_history:'Post history',
     menu_profiles_label:'Profiles',
     menu_delete_profile:'Delete current profile',
+    menu_share:'Share writer',
+    menu_shared_label:'Shared with me',
+    share_title:'Share writer',
+    share_desc:'Pick a profile and enter the email of the person who will write as you. They will get access to this profile only.',
+    share_profile:'Profile',
+    share_email:'Email address',
+    share_btn:'Share',
+    share_close:'Close',
+    share_bad_email:'Invalid email address.',
+    share_self:'That is your own address - no need to share with it.',
+    share_done:'The profile is now shared with {email}. To start, they sign in to the site with that email.',
+    share_err:'Sharing failed. Please try again.',
+    unshare_title:'Remove sharing',
+    unshare_desc:'Addresses with access to the profile {name}:',
+    unshare_btn:'Remove',
+    unshare_none:'This profile is not shared with anyone right now.',
+    unshare_err:'Removing failed. Please try again.',
     menu_logout:'Log out',
     menu_language_label:'Language',
     menu_theme_label:'Appearance',
@@ -817,6 +874,42 @@ let profilesStore={activeId:null,profiles:[]}; /* persisted under 'voiceprint_pr
 let activeProfileId=null; /* null while composing a brand-new profile */
 const genId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 async function persistProfiles(){ if(window.storage) await window.storage.set('voiceprint_profiles', JSON.stringify(profilesStore)); }
+
+/* ---------- writer sharing state ---------- */
+let ownedShares={};    /* my profileId -> [emails it is shared with] */
+let receivedShares=[]; /* profiles other people shared with me: {owner_id, owner_email, profile_id, entry} */
+let activeShared=null; /* {owner_id, profile_id} while writing with someone else's profile */
+const sharedIsActive=s=>!!activeShared && activeShared.owner_id===s.owner_id && activeShared.profile_id===s.profile_id;
+
+/* a shared profile was written by another account, and the profile screen
+   renders its text as HTML — neutralise markup characters before using it */
+function defang(v){
+  if(typeof v==='string') return v.replace(/[<>"]/g,c=>({'<':'‹','>':'›','"':'”'})[c]);
+  if(Array.isArray(v)) return v.map(defang);
+  if(v&&typeof v==='object'){ const o={}; Object.keys(v).forEach(k=>o[k]=defang(v[k])); return o; }
+  return v;
+}
+
+async function loadShares(){
+  if(!window.shares) return;
+  try{
+    const [owned,received]=await Promise.all([window.shares.listOwned(), window.shares.listReceived()]);
+    ownedShares={};
+    owned.forEach(r=>{ (ownedShares[r.profile_id]=ownedShares[r.profile_id]||[]).push(r.email); });
+    receivedShares=received.map(r=>{
+      let entry=null;
+      try{ entry=defang(JSON.parse(r.profile)); }catch(e){}
+      return entry&&entry.profile ? {owner_id:r.owner_id, owner_email:r.owner_email||'', profile_id:r.profile_id, entry} : null;
+    }).filter(Boolean);
+  }catch(e){ console.warn('shares load failed',e); }
+  renderProfilePicker();
+}
+
+/* keep the copy that recipients see in step with the owner's latest version */
+function syncShares(entry){
+  if(!entry || !window.shares || !(ownedShares[entry.id]||[]).length) return;
+  window.shares.sync(entry).catch(e=>console.warn('share sync failed',e));
+}
 const COUNTRY_CODES=('AF,AL,DZ,AD,AO,AG,AR,AM,AU,AT,AZ,BS,BH,BD,BB,BY,BE,BZ,BJ,BT,BO,BA,BW,BR,BN,BG,BF,BI,KH,CM,CA,CV,CF,TD,CL,CN,CO,KM,CG,CD,CR,CI,HR,CU,CY,CZ,DK,DJ,DM,DO,EC,EG,SV,GQ,ER,EE,SZ,ET,FJ,FI,FR,GA,GM,GE,DE,GH,GR,GD,GT,GN,GW,GY,HT,HN,HK,HU,IS,IN,ID,IR,IQ,IE,IL,IT,JM,JP,JO,KZ,KE,KI,KW,KG,LA,LV,LB,LS,LR,LY,LI,LT,LU,MG,MW,MY,MV,ML,MT,MH,MR,MU,MX,FM,MD,MC,MN,ME,MA,MZ,MM,NA,NR,NP,NL,NZ,NI,NE,NG,KP,MK,NO,OM,PK,PW,PA,PG,PY,PE,PH,PL,PT,QA,RO,RU,RW,KN,LC,VC,WS,SM,ST,SA,SN,RS,SC,SL,SG,SK,SI,SB,SO,ZA,KR,SS,ES,LK,SD,SR,SE,CH,SY,TW,TJ,TZ,TH,TL,TG,TO,TT,TN,TR,TM,TV,UG,UA,AE,GB,US,UY,UZ,VU,VA,VE,VN,YE,ZM,ZW').split(',');
 function countryName(code,inLang){ if(!code) return ''; try{ return new Intl.DisplayNames([inLang||'en'],{type:'region'}).of(code)||code; }catch(e){ return code; } }
 
@@ -838,15 +931,24 @@ function renderProfilePicker(){
   if(!panel) return;
   const t=T();
   const list=profilesStore.profiles;
+  const unshareIcon=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 20c0-3.9 3.1-6 7-6s7 2.1 7 6"/><path d="M16 11h6"/></svg>`;
   const profileRows=list.map(p=>
-    `<button type="button" class="user-menu-item profile-row${p.id===activeProfileId?' active':''}" data-action="switch" data-id="${p.id}">${escapeHtml(p.name)}</button>`
-  ).join('') + `<button type="button" class="user-menu-item" data-action="new-profile">${t.add_profile}</button>`;
+    `<div class="profile-line"><button type="button" class="user-menu-item profile-row${p.id===activeProfileId?' active':''}" data-action="switch" data-id="${p.id}">${escapeHtml(p.name)}</button>`
+    + ((ownedShares[p.id]||[]).length?`<button type="button" class="unshare-btn" data-action="manage-shares" data-id="${p.id}" title="${t.unshare_title}" aria-label="${t.unshare_title}">${unshareIcon}</button>`:'')
+    + `</div>`
+  ).join('') + `<button type="button" class="user-menu-item" data-action="new-profile">${t.add_profile}</button>`
+    + (list.length?`<button type="button" class="user-menu-item" data-action="share">${t.menu_share}</button>`:'');
+  const sharedRows=receivedShares.length?`<div class="user-menu-divider"></div><div class="user-menu-label">${t.menu_shared_label}</div>`
+    + receivedShares.map((s,i)=>
+      `<button type="button" class="user-menu-item profile-row${sharedIsActive(s)?' active':''}" data-action="switch-shared" data-idx="${i}">${escapeHtml(s.entry.name||'')}<small>${escapeHtml(s.owner_email)}</small></button>`
+    ).join(''):'';
   const curTheme = document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light';
   panel.innerHTML = `
     <button type="button" class="user-menu-item" data-action="history">${t.menu_history}</button>
     <div class="user-menu-divider"></div>
     <div class="user-menu-label">${t.menu_profiles_label}</div>
     ${profileRows}
+    ${sharedRows}
     <div class="user-menu-divider"></div>
     <div class="user-menu-label">${t.menu_language_label}</div>
     <div class="user-menu-segment">
@@ -892,6 +994,9 @@ function wireUserMenu(){
       case 'switch': switchProfile(item.dataset.id); break;
       case 'new-profile': startNewProfile(); break;
       case 'delete-profile': openDeleteModal(); break;
+      case 'share': openShareModal(); break;
+      case 'manage-shares': openUnshareModal(item.dataset.id); break;
+      case 'switch-shared': switchShared(+item.dataset.idx); break;
       case 'set-lang': setLang(item.dataset.lang); break;
       case 'set-theme': setTheme(item.dataset.mode); break;
       case 'logout': { const b=document.getElementById('vp-logout'); if(b) b.click(); break; }
@@ -932,9 +1037,116 @@ function openDeleteModal(){
   inp.focus();
 }
 
+/* ---------- writer sharing (share a profile by email / remove a share) ---------- */
+function openShareModal(){
+  const t=T();
+  const list=profilesStore.profiles;
+  if(!list.length || !window.shares) return;
+  const ov=document.createElement('div');
+  ov.id='vp-share';
+  ov.innerHTML=`<div class="box">
+    <h2>${t.share_title}</h2>
+    <p>${t.share_desc}</p>
+    <label for="vp-share-profile">${t.share_profile}</label>
+    <select id="vp-share-profile">${list.map(p=>`<option value="${p.id}"${p.id===activeProfileId?' selected':''}>${escapeHtml(p.name)}</option>`).join('')}</select>
+    <label for="vp-share-email">${t.share_email}</label>
+    <input id="vp-share-email" type="email" autocomplete="off" spellcheck="false" placeholder="name@example.com">
+    <div class="share-msg" id="vp-share-msg"></div>
+    <div class="row">
+      <button class="btn btn-ghost" id="vp-share-cancel">${t.del_cancel}</button>
+      <button class="btn btn-primary" id="vp-share-go">${t.share_btn}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  const sel=ov.querySelector('#vp-share-profile');
+  const inp=ov.querySelector('#vp-share-email');
+  const msg=ov.querySelector('#vp-share-msg');
+  const go=ov.querySelector('#vp-share-go');
+  const cancel=ov.querySelector('#vp-share-cancel');
+  const say=(text,isErr)=>{ msg.textContent=text; msg.className='share-msg'+(isErr?' err':''); };
+  cancel.addEventListener('click',()=>ov.remove());
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') go.click(); });
+  go.addEventListener('click',async()=>{
+    const email=(inp.value||'').trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ say(t.share_bad_email,true); return; }
+    const entry=profilesStore.profiles.find(p=>p.id===sel.value);
+    if(!entry) return;
+    go.disabled=true;
+    try{
+      const mine=await window.shares.myEmail();
+      if(mine && mine.toLowerCase()===email){ say(t.share_self,true); go.disabled=false; return; }
+      await window.shares.add(entry,email);
+      const arr=ownedShares[entry.id]=ownedShares[entry.id]||[];
+      if(!arr.includes(email)) arr.push(email);
+      renderProfilePicker();
+      say(t.share_done.replace('{email}',email),false);
+      inp.value='';
+      cancel.textContent=t.share_close;
+    }catch(e){ console.warn('share failed',e); say(t.share_err,true); }
+    go.disabled=false;
+  });
+  inp.focus();
+}
+
+function openUnshareModal(profileId){
+  const t=T();
+  const entry=profilesStore.profiles.find(p=>p.id===profileId);
+  if(!entry || !window.shares) return;
+  const ov=document.createElement('div');
+  ov.id='vp-share';
+  const draw=()=>{
+    const emails=ownedShares[profileId]||[];
+    ov.innerHTML=`<div class="box">
+      <h2>${t.unshare_title}</h2>
+      <p>${emails.length?t.unshare_desc.replace('{name}','<b>'+escapeHtml(entry.name)+'</b>'):t.unshare_none}</p>
+      <ul class="share-list">${emails.map(em=>`<li><span>${escapeHtml(em)}</span><button class="btn btn-danger" data-email="${escapeHtml(em)}">${t.unshare_btn}</button></li>`).join('')}</ul>
+      <div class="share-msg err" id="vp-share-msg"></div>
+      <div class="row"><button class="btn btn-ghost" id="vp-share-cancel">${t.share_close}</button></div>
+    </div>`;
+    ov.querySelector('#vp-share-cancel').addEventListener('click',()=>ov.remove());
+    ov.querySelectorAll('[data-email]').forEach(b=>b.addEventListener('click',async()=>{
+      const email=b.dataset.email;
+      b.disabled=true;
+      try{
+        await window.shares.remove(profileId,email);
+        ownedShares[profileId]=(ownedShares[profileId]||[]).filter(x=>x!==email);
+        if(!ownedShares[profileId].length) delete ownedShares[profileId];
+        renderProfilePicker();
+        draw();
+      }catch(e){
+        console.warn('unshare failed',e);
+        b.disabled=false;
+        ov.querySelector('#vp-share-msg').textContent=t.unshare_err;
+      }
+    }));
+  };
+  draw();
+  document.body.appendChild(ov);
+}
+
+/* use a profile someone shared with me — read-only: nothing here is
+   saved back to my own profiles list */
+function switchShared(idx){
+  const s=receivedShares[idx];
+  if(!s) return;
+  activeProfileId=null; activeShared={owner_id:s.owner_id, profile_id:s.profile_id};
+  profile=JSON.parse(JSON.stringify(s.entry.profile));
+  profileName=s.entry.name||''; profileCountry=s.entry.country||'';
+  if(!profile._lang) profile._lang=s.entry.lang||lang;
+  approved=true;
+  currentPost=null; postInput=''; postLink=''; postImages=[]; lastRefineNote=null;
+  step=QUESTIONS.length+1;
+  renderProfilePicker(); renderLayers(); render();
+  if(profile._lang!==lang) translateProfile(lang);
+}
+
 async function deleteActiveProfile(){
   const id=activeProfileId;
   if(!id) return;
+  if((ownedShares[id]||[]).length && window.shares){
+    window.shares.removeProfile(id).catch(e=>console.warn('share cleanup failed',e));
+    delete ownedShares[id];
+  }
   profilesStore.profiles=profilesStore.profiles.filter(p=>p.id!==id);
   const next=profilesStore.profiles[0];
   if(next){
@@ -949,7 +1161,7 @@ async function deleteActiveProfile(){
 function switchProfile(id){
   const entry=profilesStore.profiles.find(p=>p.id===id);
   if(!entry) return;
-  activeProfileId=id; profilesStore.activeId=id;
+  activeProfileId=id; profilesStore.activeId=id; activeShared=null;
   persistProfiles().catch(()=>{});
   profile=entry.profile; profileName=entry.name; profileCountry=entry.country||'';
   if(profile && !profile._lang) profile._lang=entry.lang||lang;
@@ -961,7 +1173,7 @@ function switchProfile(id){
 }
 
 function startNewProfile(){
-  activeProfileId=null;
+  activeProfileId=null; activeShared=null;
   profile=null; approved=false;
   Object.keys(answers).forEach(k=>delete answers[k]);
   uploads={posts:'',about:'',images:[],noLinkedIn:false};
@@ -1619,7 +1831,7 @@ async function translateProfile(target){
     profile = translated;
     /* keep the stored copy in sync so we don't re-translate on every visit */
     const entry = activeProfileId ? profilesStore.profiles.find(p=>p.id===activeProfileId) : null;
-    if(entry){ entry.profile=profile; entry.lang=target; persistProfiles().catch(()=>{}); }
+    if(entry){ entry.profile=profile; entry.lang=target; persistProfiles().catch(()=>{}); syncShares(entry); }
   }catch(err){
     console.error('profile translation failed:',err);
     failed=true; errMsg=(err&&err.message)||'';
@@ -1749,6 +1961,7 @@ async function saveProfile(){
   profileName=name;
   try{
     await persistProfiles();
+    syncShares(entry);
   }catch(err){
     console.warn('storage failed',err);
     render(); renderProfilePicker();
@@ -2202,6 +2415,7 @@ async function wireHistory(){
 (async function boot(){
   await window.__authReady;
   renderLayers();
+  await loadShares();
   try{
     if(window.storage){
       const saved=await window.storage.get('voiceprint_profiles');
@@ -2233,6 +2447,7 @@ async function wireHistory(){
       }
     }
   }catch(e){/* no saved profile — fresh start */}
+  if(receivedShares.length){ switchShared(0); return; }
   render();
 })();
 </script>
@@ -2357,6 +2572,46 @@ window.storage = {
     if (error) throw error;
   }
 };
+/* ---- writer sharing, backed by the profile_shares table (see supabase-sharing.sql) ---- */
+const me = async () => { const { data:{ user } } = await supabase.auth.getUser(); return user; };
+const shareCopy = entry => JSON.stringify({ name: entry.name, country: entry.country||'', lang: entry.lang||'', profile: entry.profile });
+window.shares = {
+  async myEmail(){ const u = await me(); return u ? u.email : ''; },
+  async listOwned(){
+    const u = await me(); if (!u) return [];
+    const { data, error } = await supabase.from('profile_shares').select('profile_id,email').eq('owner_id', u.id);
+    if (error) throw error; return data || [];
+  },
+  async listReceived(){
+    const u = await me(); if (!u || !u.email) return [];
+    const { data, error } = await supabase.from('profile_shares')
+      .select('owner_id,owner_email,profile_id,profile').eq('email', u.email.toLowerCase()).neq('owner_id', u.id);
+    if (error) throw error; return data || [];
+  },
+  async add(entry, email){
+    const u = await me();
+    const { error } = await supabase.from('profile_shares').upsert(
+      { owner_id: u.id, owner_email: u.email, profile_id: entry.id, profile: shareCopy(entry), email },
+      { onConflict: 'owner_id,profile_id,email' });
+    if (error) throw error;
+  },
+  async remove(profileId, email){
+    const u = await me();
+    const { error } = await supabase.from('profile_shares').delete().eq('owner_id', u.id).eq('profile_id', profileId).eq('email', email);
+    if (error) throw error;
+  },
+  async removeProfile(profileId){
+    const u = await me();
+    const { error } = await supabase.from('profile_shares').delete().eq('owner_id', u.id).eq('profile_id', profileId);
+    if (error) throw error;
+  },
+  async sync(entry){
+    const u = await me();
+    const { error } = await supabase.from('profile_shares').update({ profile: shareCopy(entry) }).eq('owner_id', u.id).eq('profile_id', entry.id);
+    if (error) throw error;
+  }
+};
+
 window.__getToken = async () => {
   if (!supabase) return '';
   const { data:{ session } } = await supabase.auth.getSession();

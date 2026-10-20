@@ -806,7 +806,6 @@ const answers = {};   /* qid -> value */
 let uploads = {posts:'', about:'', images:[], noLinkedIn:false}; /* images: [{media_type,data}] */
 let profile = null;
 let approved = false;
-let apiKey = '';
 let postInput='', postLink='', postImages=[], currentPost=null, recog=null, lastRefineNote=null;
 let ideasMode='profile', ideasTopic='', ideasCats={news:true,professional:true,personal:true,hobby:true};
 const STEP_COMPOSER = QUESTIONS.length+2, STEP_RESULT = QUESTIONS.length+3, STEP_HISTORY = QUESTIONS.length+4;
@@ -1421,11 +1420,23 @@ function buildUserContent(group){
   return content;
 }
 
+/* "Failed to fetch" is the browser's only word for "the request never got
+   an answer" (offline, blocked, or the login server is down/paused) — swap
+   it for something a person can act on */
+function netErr(){
+  return new Error(lang==='he'
+    ? 'אין חיבור לשרת. בדקו את החיבור לאינטרנט ונסו שוב. אם זה חוזר, ייתכן ששרת ההתחברות (Supabase) מושהה.'
+    : 'Could not reach the server. Check your internet connection and try again. If it keeps happening, the login server (Supabase) may be paused.');
+}
+
 async function callClaude(content, useSearch, maxTokens){
   const headers={'Content-Type':'application/json'};
-  const token = window.__getToken ? await window.__getToken() : '';
+  let token='';
+  try{ token = window.__getToken ? await window.__getToken() : ''; }
+  catch(_){ throw netErr(); }
   if(token) headers['Authorization']='Bearer '+token;
-  const response = await fetch('/api/claude',{
+  let response;
+  try{ response = await fetch('/api/claude',{
     method:'POST',
     headers,
     body:JSON.stringify({
@@ -1440,7 +1451,8 @@ async function callClaude(content, useSearch, maxTokens){
       messages:[{role:'user',content}],
       ...(useSearch?{tools:[{type:'web_search_20250305',name:'web_search'}]}:{})
     })
-  });
+  }); }
+  catch(_){ throw netErr(); }
   /* read as text first: a timed-out or crashed serverless function returns an
      HTML/plain error page, and response.json() would blow up with a cryptic
      "Unexpected token" instead of a usable message */
@@ -1582,15 +1594,9 @@ async function runGeneration(refineNote){
     console.error('Claude API error:',err);
     const card=document.getElementById('main-card');
     card.innerHTML=`<div class="step active">
-      <div class="error-box">${t.err_api}<br><small style="opacity:.7">${(err&&err.message)||''}</small></div>
-      ${String(err&&err.message).includes('fetch')?`
-      <div class="gap-note" style="margin-top:14px">
-        <b>${lang==='he'?'פתרון: מפתח API אישי':'Fix: personal API key'}</b><br>
-        ${lang==='he'?'הקובץ רץ מחוץ ל-Claude, אז צריך מפתח משלכם (אותו אחד מהגנרטור). הוא לא נשמר בשום מקום - רק בזיכרון של העמוד.':'The file runs outside Claude, so it needs your own key. It is not stored anywhere - memory only.'}<br>
-        <input type="text" id="api-key-input" style="min-height:auto;margin-top:8px" placeholder="sk-ant-..." value="${apiKey}">
-      </div>`:''}
+      <div class="error-box">${t.err_api}<br><small style="opacity:.7">${escapeHtml((err&&err.message)||'')}</small></div>
       <div class="nav"><button class="btn btn-ghost" onclick="step=${QUESTIONS.length-1};render()">${t.back}</button>
-      <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
+      <button class="btn btn-primary" onclick="step=${QUESTIONS.length};render()">${t.retry}</button></div></div>`;
   }
 }
 
@@ -2067,10 +2073,9 @@ async function startPostGen(refineNote){
     console.error('post gen error:',err);
     card.innerHTML=`<div class="step active">
       <div class="error-box">${t.err_api}<br><small style="opacity:.7">${escapeHtml((err&&err.message)||'')}</small></div>
-      ${String(err&&err.message).includes('fetch')?`<div class="gap-note" style="margin-top:12px"><input type="text" id="api-key-input" style="min-height:auto" placeholder="sk-ant-..." value="${escapeHtml(apiKey)}"></div>`:''}
       <div class="nav">
         <button class="btn btn-ghost" onclick="step=STEP_COMPOSER;render()">${t.back}</button>
-        <button class="btn btn-primary" onclick="const k=document.getElementById('api-key-input');if(k)apiKey=k.value.trim();startPostGen(lastRefineNote)">${t.retry}</button>
+        <button class="btn btn-primary" onclick="startPostGen(lastRefineNote)">${t.retry}</button>
       </div></div>`;
   }
 }
@@ -2261,11 +2266,13 @@ const AUTH_I18N = {
   he:{ title:'Voiceprint', sub:'הכניסו את המייל שלכם ונשלח לכם קישור כניסה.', ph:'you@example.com',
     btn:'שליחת קישור כניסה', sent:'שלחנו קישור למייל. פתחו אותו כדי להיכנס.',
     err:'משהו השתבש. נסו שוב.', bad:'כתובת מייל לא תקינה.',
-    noconf:'החיבור לשרת עדיין לא הוגדר. ראו את קובץ ההוראות (README).', logout:'יציאה' },
+    noconf:'החיבור לשרת עדיין לא הוגדר. ראו את קובץ ההוראות (README).', logout:'יציאה',
+    net:'אין חיבור לשרת ההתחברות. ייתכן שפרויקט ה-Supabase מושהה — יש להפעיל אותו מחדש בלוח הבקרה של Supabase.' },
   en:{ title:'Voiceprint', sub:'Enter your email and we\'ll send you a login link.', ph:'you@example.com',
     btn:'Send login link', sent:'We\'ve sent a link to your email. Open it to log in.',
     err:'Something went wrong. Please try again.', bad:'Invalid email address.',
-    noconf:'The server connection isn\'t set up yet. See the instructions file (README).', logout:'Log out' }
+    noconf:'The server connection isn\'t set up yet. See the instructions file (README).', logout:'Log out',
+    net:'Can\'t reach the login server. The Supabase project may be paused — restore it from the Supabase dashboard.' }
 };
 let authLang = (typeof lang !== 'undefined' && (lang==='he'||lang==='en')) ? lang : 'he';
 const AT = () => AUTH_I18N[authLang];
@@ -2367,7 +2374,11 @@ sendBtn.addEventListener('click', async () => {
     const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.origin } });
     if (error) throw error;
     showMsg('sent', false);
-  } catch(e){ showMsg('err', true, (e&&e.message)||String(e)); sendBtn.disabled = false; }
+  } catch(e){
+    const m = (e&&e.message)||String(e);
+    showMsg('err', true, /failed to fetch|load failed|networkerror/i.test(m) ? AT().net : m);
+    sendBtn.disabled = false;
+  }
 });
 emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendBtn.click(); });
 

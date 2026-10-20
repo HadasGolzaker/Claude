@@ -567,6 +567,8 @@ const I18N = {
     share_self:'זו הכתובת שלכם - אין צורך לשתף איתה.',
     share_done:'הפרופיל שותף עם {email}. כדי להתחיל, צריך להיכנס לאתר עם כתובת המייל הזו.',
     share_err:'השיתוף נכשל. נסו שוב.',
+    share_mail_sent:'נשלחה הודעה במייל.',
+    share_mail_failed:'לא הצלחתי לשלוח הודעה במייל - כדאי לעדכן בעצמכם.',
     unshare_title:'הסרת שיתוף',
     unshare_desc:'כתובות שיש להן גישה לפרופיל {name}:',
     unshare_btn:'הסרה',
@@ -682,6 +684,8 @@ const I18N = {
     share_self:'That is your own address - no need to share with it.',
     share_done:'The profile is now shared with {email}. To start, they sign in to the site with that email.',
     share_err:'Sharing failed. Please try again.',
+    share_mail_sent:'An email notification was sent.',
+    share_mail_failed:'Couldn\'t send an email notification - let them know yourself.',
     unshare_title:'Remove sharing',
     unshare_desc:'Addresses with access to the profile {name}:',
     unshare_btn:'Remove',
@@ -1080,6 +1084,8 @@ function openShareModal(){
       if(!arr.includes(email)) arr.push(email);
       renderProfilePicker();
       say(t.share_done.replace('{email}',email),false);
+      const sent=await window.shares.notify(entry.id,email,lang).catch(()=>false);
+      say(t.share_done.replace('{email}',email)+' '+(sent?t.share_mail_sent:t.share_mail_failed),false);
       inp.value='';
       cancel.textContent=t.share_close;
     }catch(e){ console.warn('share failed',e); say(t.share_err,true); }
@@ -2604,6 +2610,15 @@ window.shares = {
     const u = await me();
     const { error } = await supabase.from('profile_shares').delete().eq('owner_id', u.id).eq('profile_id', profileId);
     if (error) throw error;
+  },
+  async notify(profileId, email, lang){
+    const { data:{ session } } = await supabase.auth.getSession();
+    const r = await fetch('/api/share-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session ? session.access_token : '') },
+      body: JSON.stringify({ profileId, email, lang })
+    });
+    return r.ok;
   },
   async sync(entry){
     const u = await me();
